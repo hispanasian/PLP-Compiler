@@ -483,6 +483,48 @@ public class ScannerTest
         assertEquals("\"\" should increment cur by 0", 0, scanner.cur);
     }
 
+    /**
+     * Tests the intLiteral method in Scanner.
+     */
+    @Test
+    public void testIntLiteral()
+    {
+        /* The Kind.INT_LIT cases */
+        Scanner scanner = makeScanner("5");
+        assertEquals("\"5\" should return Kind.INT_LIT", TokenStream.Kind.INT_LIT, scanner.separator());
+        assertEquals("\"5\" should increment cur by 1", 1, scanner.cur);
+
+        scanner = makeScanner("65454");
+        assertEquals("\"65454\" should return Kind.INT_LIT", TokenStream.Kind.INT_LIT, scanner.separator());
+        assertEquals("\"65454\" should increment cur by 5", 5, scanner.cur);
+
+        scanner = makeScanner("0654");
+        assertEquals("\"0654\" should return Kind.INT_LIT", TokenStream.Kind.INT_LIT, scanner.separator());
+        assertEquals("\"0654\" should increment cur by 1", 1, scanner.cur);
+
+        scanner = makeScanner("1.789");
+        assertEquals("\"1.789\" should return Kind.INT_LIT", TokenStream.Kind.INT_LIT, scanner.separator());
+        assertEquals("\"1.789\" should increment cur by 5", 5, scanner.cur);
+
+        /* The null cases */
+        scanner = makeScanner("-654");
+        assertEquals("\"-654\" should return null", null, scanner.separator());
+        assertEquals("\"-654\" should not increment cur", 0, scanner.cur);
+
+        scanner = makeScanner(".123");
+        assertEquals("\".123\" should return null", null, scanner.separator());
+        assertEquals("\".123\" should not increment cur", 0, scanner.cur);
+    }
+
+    /**
+     * Tests the stringLiteral method in Scanner
+     */
+    @Test
+    public void testStringLiteral()
+    {
+
+    }
+
     @Test
     public void testTokenize() throws Exception
     {

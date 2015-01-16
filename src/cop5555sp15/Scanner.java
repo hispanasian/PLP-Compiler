@@ -190,6 +190,24 @@ public class Scanner
 	}
 
 	/**
+	 * Checks if cur is at a int literal. If it is, returns Kind.INT_LIT and increments cur accordingly.
+	 * @return	Kind.INT_LIT if cur is at a int literal and null if it is not
+	 */
+	protected Kind intLiteral()
+	{
+		return null;
+	}
+
+	/**
+	 * Checks if cur is at a string literal. If it is, returns Kind.STR_LIT and increments cur accordingly.
+	 * @return	Kind.STR_LIT if cur is at a string literal and null if it is not
+	 */
+	protected Kind stringLiteral()
+	{
+		return null;
+	}
+
+	/**
 	 * Checks if cur is at an identity. If it is, returns the Kind of identity at cur and increments cur accordingly.
 	 * @return	The Kind of identity at cur or null.
 	 */
@@ -273,6 +291,8 @@ public class Scanner
 		if(kind == null) kind = nullLiteral(string);
 		return kind;
 	}
+
+
 
 }
 
