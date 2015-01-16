@@ -48,7 +48,18 @@ public class Scanner
 	 */
 	static protected Kind keyword(String string)
 	{
-		return null;
+		if(string == "int") return Kind.KW_INT;
+		else if(string == "string") return Kind.KW_STRING;
+		else if(string == "boolean") return Kind.KW_BOOLEAN;
+		else if(string == "import") return Kind.KW_IMPORT;
+		else if(string == "class") return Kind.KW_CLASS;
+		else if(string == "def") return Kind.KW_DEF;
+		else if(string == "while") return Kind.KW_WHILE;
+		else if(string == "if") return Kind.KW_IF;
+		else if(string == "else") return Kind.KW_ELSE;
+		else if(string == "return") return Kind.KW_RETURN;
+		else if(string == "print") return Kind.KW_PRINT;
+		else return null;
 	}
 
 	/**
@@ -58,7 +69,9 @@ public class Scanner
 	 */
 	static protected Kind booleanLiteral(String string)
 	{
-		return null;
+		if(string == "true") return Kind.BL_TRUE;
+		if(string == "false") return Kind.BL_FALSE;
+		else return null;
 	}
 
 	/**
@@ -68,7 +81,8 @@ public class Scanner
 	 */
 	static protected Kind nullLiteral(String string)
 	{
-		return null;
+		if(string == "null") return Kind.NL_NULL;
+		else return null;
 	}
 
 	/**
@@ -79,8 +93,9 @@ public class Scanner
 	 */
 	static protected Kind reservedLiteral(String string)
 	{
-		Kind kind = null;
-
+		Kind kind = keyword(string);
+		if(kind == null) kind = booleanLiteral(string);
+		if(kind == null) kind = nullLiteral(string);
 		return kind;
 	}
 
