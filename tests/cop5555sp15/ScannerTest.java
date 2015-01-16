@@ -66,12 +66,12 @@ public class ScannerTest
         assertEquals("\\n\\r should increment cur by one", 1, scanner.cur);
 
         scanner = makeScanner("\t");
-        assertEquals("\\t should return false", true, scanner.newLine());
+        assertEquals("\\t should return false", false, scanner.newLine());
         assertEquals("\\t should not increment the line counter", 0, scanner.line);
         assertEquals("\\t should not increment cur", 0, scanner.cur);
 
         scanner = makeScanner("\t\r");
-        assertEquals("\\t\\r should return false", true, scanner.newLine());
+        assertEquals("\\t\\r should return false", false, scanner.newLine());
         assertEquals("\\t\\r should not increment the line counter", 0, scanner.line);
         assertEquals("\\t\\r should not increment cur", 0, scanner.cur);
     }

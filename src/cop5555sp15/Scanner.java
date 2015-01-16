@@ -47,11 +47,21 @@ public class Scanner
 	 */
 	protected boolean newLine()
 	{
+		boolean newline = false;
 		if(code[cur] == '\r')
 		{
-
+			cur++;
+			line++;
+			newline = true;
+			if(!eof() && code[cur] == '\n') cur++;
 		}
-		return false;
+		else if(code[cur] == '\n')
+		{
+			cur++;
+			line ++;
+			newline = true;
+		}
+		return newline;
 	}
 	/**
 	 * Returns the Kind of keyword string is or null if string is not a keyword
