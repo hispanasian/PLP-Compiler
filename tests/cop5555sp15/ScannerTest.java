@@ -149,7 +149,41 @@ public class ScannerTest
     @Test
     public void testSeparator()
     {
+        Scanner scanner = makeScanner(".");
+        assertEquals("\".\" should return Kind.DOT", TokenStream.Kind.DOT, scanner.operator());
 
+        scanner = makeScanner("..");
+        assertEquals("\"..\" should return Kind.RANGE", TokenStream.Kind.RANGE, scanner.operator());
+
+        scanner = makeScanner(";");
+        assertEquals("\";\" should return Kind.SEMICOLON", TokenStream.Kind.SEMICOLON, scanner.operator());
+
+        scanner = makeScanner(",");
+        assertEquals("\",\" should return Kind.COMMA", TokenStream.Kind.COMMA, scanner.operator());
+
+        scanner = makeScanner("(");
+        assertEquals("\"(\" should return Kind.LPAREN", TokenStream.Kind.LPAREN, scanner.operator());
+
+        scanner = makeScanner(")");
+        assertEquals("\")\" should return Kind.RPAREN", TokenStream.Kind.RPAREN, scanner.operator());
+
+        scanner = makeScanner("[");
+        assertEquals("\"[\" should return Kind.LSQUARE", TokenStream.Kind.LSQUARE, scanner.operator());
+
+        scanner = makeScanner("]");
+        assertEquals("\"]\" should return Kind.RSQUARE", TokenStream.Kind.RSQUARE, scanner.operator());
+
+        scanner = makeScanner("{");
+        assertEquals("\"{\" should return Kind.LCURLY", TokenStream.Kind.LCURLY, scanner.operator());
+
+        scanner = makeScanner("}");
+        assertEquals("\"}\" should return Kind.RCURLY", TokenStream.Kind.RCURLY, scanner.operator());
+
+        scanner = makeScanner(":");
+        assertEquals("\":\" should return Kind.COLON", TokenStream.Kind.COLON, scanner.operator());
+
+        scanner = makeScanner("?");
+        assertEquals("\"?\" should return Kind.QUESTION", TokenStream.Kind.QUESTION, scanner.operator());
     }
 
     /**
