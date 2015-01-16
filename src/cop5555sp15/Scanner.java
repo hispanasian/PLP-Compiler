@@ -44,7 +44,8 @@ public class Scanner
 	protected boolean eof() { return cur >= code.length; }
 
 	/**
-	 * Checks if cur is a new line. If it is, returns true and increments the line counter.
+	 * Checks if cur is a new line. If it is, returns true and increments the line counter and increments cur
+	 * accordingly.
 	 * @return	Whether or scanner is at a new line
 	 */
 	protected boolean newLine()
@@ -67,7 +68,7 @@ public class Scanner
 	}
 
 	/**
-	 * Checks if cur is at an operator. If it is, returns the Kind of the operator.
+	 * Checks if cur is at an operator. If it is, returns the Kind of the operator and increments cur accordingly.
 	 * @return	The Kind of operator at cur.
 	 */
 	protected Kind operator()
@@ -131,7 +132,7 @@ public class Scanner
 	}
 
 	/**
-	 * Checks if cur is a separator. If it is, returns the Kind of the separator.
+	 * Checks if cur is a separator. If it is, returns the Kind of the separator and increments cur accordingly.
 	 * @return	The Kind of the separator at cur.
 	 */
 	protected Kind separator()
@@ -169,6 +170,15 @@ public class Scanner
 		/* Always increment cur when a separator is found */
 		if(kind != null) cur++;
 		return kind;
+	}
+
+	/**
+	 * Checks if cur is at an identity. If it is, returns the Kind of identity at cur and increments cur accordingly.
+	 * @return	The Kind of identity at cur or null.
+	 */
+	protected Kind identity()
+	{
+		return null;
 	}
 
 	/**
@@ -228,5 +238,6 @@ public class Scanner
 		if(kind == null) kind = nullLiteral(string);
 		return kind;
 	}
+
 }
 

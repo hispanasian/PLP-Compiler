@@ -298,10 +298,77 @@ public class ScannerTest
     @Test
     public void testNullLiteral()
     {
-        assertEquals("the string \"null\" should return Kind.NL_NULL", TokenStream.Kind.NL_NULL, Scanner.nullLiteral("null"));
 
+        assertEquals("the string \"null\" should return Kind.NL_NULL", TokenStream.Kind.NL_NULL, Scanner.nullLiteral("null"));
         /* Test the nulls */
         assertEquals("the string \"nullify\" should return Kind.NL_NULL", null, Scanner.nullLiteral("nullify"));
+    }
+
+    /**
+     * Tests the identity method in Scanner.
+     */
+    @Test
+    public void testIdentity()
+    {
+        Scanner scanner = makeScanner("int");
+        assertEquals("the string \"int\" should return Kind.KW_INT", TokenStream.Kind.KW_INT, scanner.identity());
+        assertEquals("\"int\" should increment cur by 3", 3, scanner.cur);
+
+        scanner = makeScanner("string");
+        assertEquals("the string \"string\" should return Kind.KW_STRING", TokenStream.Kind.KW_STRING, scanner.identity());
+        assertEquals("\"string\" should increment cur by 6", 6, scanner.cur);
+
+        scanner = makeScanner("boolean");
+        assertEquals("the string \"boolean\" should return Kind.KW_BOOLEAN", TokenStream.Kind.KW_BOOLEAN, scanner.identity());
+        assertEquals("\"boolean\" should increment cur by 7", 7, scanner.cur);
+
+        scanner = makeScanner("import");
+        assertEquals("the string \"import\" should return Kind.KW_IMPORT", TokenStream.Kind.KW_IMPORT, scanner.identity());
+        assertEquals("\"import\" should increment cur by 6", 6, scanner.cur);
+
+        scanner = makeScanner("class");
+        assertEquals("the string \"class\" should return Kind.KW_CLASS", TokenStream.Kind.KW_CLASS, scanner.identity());
+        assertEquals("\"class\" should increment cur by 5", 5, scanner.cur);
+
+        scanner = makeScanner("def");
+        assertEquals("the string \"def\" should return Kind.KW_DEF", TokenStream.Kind.KW_DEF, scanner.identity());
+        assertEquals("\"def\" should increment cur by 3", 3, scanner.cur);
+
+        scanner = makeScanner("while");
+        assertEquals("the string \"while\" should return Kind.KW_WHILE", TokenStream.Kind.KW_WHILE, scanner.identity());
+        assertEquals("\"wihle\" should increment cur by 5", 5, scanner.cur);
+
+        scanner = makeScanner("if");
+        assertEquals("the string \"if\" should return Kind.KW_IF", TokenStream.Kind.KW_IF, scanner.identity());
+        assertEquals("\"if\" should increment cur by 2", 2, scanner.cur);
+
+        scanner = makeScanner("else");
+        assertEquals("the string \"else\" should return Kind.KW_ELSE", TokenStream.Kind.KW_ELSE, scanner.identity());
+        assertEquals("\"else\" should increment cur by 4", 4, scanner.cur);
+
+        scanner = makeScanner("return");
+        assertEquals("the string \"return\" should return Kind.KW_RETURN", TokenStream.Kind.KW_RETURN, scanner.identity());
+        assertEquals("\"return\" should increment cur by 6", 6, scanner.cur);
+
+        scanner = makeScanner("print");
+        assertEquals("the string \"print\" should return Kind.KW_PRINT", TokenStream.Kind.KW_PRINT, scanner.identity());
+        assertEquals("\"print\" should increment cur by 5", 5, scanner.cur);
+
+        /* Test for boolean literals */
+        scanner = makeScanner("true");
+        assertEquals("the string \"true\" should return Kind.BL_TRUE", TokenStream.Kind.BL_TRUE, scanner.identity());
+        assertEquals("\"true\" should increment cur by 4", 4, scanner.cur);
+
+        scanner = makeScanner("false");
+        assertEquals("the string \"false\" should return Kind.BL_FALSE", TokenStream.Kind.BL_FALSE, scanner.identity());
+        assertEquals("\"false\" should increment cur by 5", 5, scanner.cur);
+
+        /* Test for the null literal */
+        scanner = makeScanner("null");
+        assertEquals("the string \"null\" should return Kind.NL_NULL", TokenStream.Kind.NL_NULL, scanner.identity());
+        assertEquals("\"null\" should increment cur by 4", 4, scanner.cur);
+
+        /* Tests that should return null */
     }
 
     @Test
