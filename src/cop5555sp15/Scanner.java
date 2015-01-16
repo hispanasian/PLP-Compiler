@@ -1,5 +1,6 @@
 package cop5555sp15;
 
+import com.sun.xml.internal.fastinfoset.util.CharArray;
 import cop5555sp15.TokenStream.Kind;
 import cop5555sp15.TokenStream.Token;
 
@@ -39,6 +40,49 @@ public class Scanner
 	 * @return	Whether or not scanner has reached the end of file.
 	 */
 	protected boolean eof() { return cur >= code.length; }
+
+	/**
+	 * Returns the Kind of keyword string is or null if string is not a keyword
+	 * @param string	The string being checked
+	 * @return			The Kind of keyword or null
+	 */
+	static protected Kind keyword(String string)
+	{
+		return null;
+	}
+
+	/**
+	 * Returns the Kind of booleanLiteral that string is or null if string is not a boolean literal
+	 * @param string	The string being checked
+	 * @return			The Kind of boolean literal or null
+	 */
+	static protected Kind booleanLiteral(String string)
+	{
+		return null;
+	}
+
+	/**
+	 * Returns Kind.NL_NULL if string is a null literal or null if string is not a null literal
+	 * @param string	The string being checked
+	 * @return			Kind.NL_NULL if string is a null literal or null
+	 */
+	static protected Kind nullLiteral(String string)
+	{
+		return null;
+	}
+
+	/**
+	 * Returns the Kind of string if string is a reserved keyword or literal. If string is not a reserved keyword or
+	 * literal, this method returns null.
+	 * @param string	The string being checked
+	 * @return			The Kind of string
+	 */
+	static protected Kind reservedLiteral(String string)
+	{
+		Kind kind = null;
+
+		return kind;
+	}
 
 	/**
 	 * Takes in the code character array and tokenizes code.
