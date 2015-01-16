@@ -534,7 +534,53 @@ public class ScannerTest
     @Test
     public void testStringLiteral()
     {
+        /* The Kind.STRING_LIT cases */
+        Scanner scanner = makeScanner("\"string\"");
+        assertEquals("\"string\" should return Kind.STRINT_LIT", TokenStream.Kind.STRING_LIT, scanner.stringLiteral());
+        assertEquals("\"string\" should increment cur by 8", 8, scanner.cur);
+        assertEquals("\"string\" should increment line by 0", 0, scanner.line);
 
+        scanner = makeScanner("\"\"");
+        assertEquals("\"\" should return Kind.STRINT_LIT", TokenStream.Kind.STRING_LIT, scanner.stringLiteral());
+        assertEquals("\"\" should increment cur by 0", 0, scanner.cur);
+        assertEquals("\"\" should increment line by 0", 0, scanner.line);
+
+        scanner = makeScanner("\"new\rline\"");
+        assertEquals("\"new\rline\" should return Kind.STRINT_LIT", TokenStream.Kind.STRING_LIT, scanner.stringLiteral());
+        assertEquals("\"new\rline\" should increment cur by 10", 10, scanner.cur);
+        assertEquals("\"new\rline\" should increment line by 1", 1, scanner.line);
+
+        scanner = makeScanner("\"operators+-5485\"");
+        assertEquals("\"operators+-5485\" should return Kind.STRINT_LIT", TokenStream.Kind.STRING_LIT, scanner.stringLiteral());
+        assertEquals("\"operators+-5485\" should increment cur by 17", 17, scanner.cur);
+        assertEquals("\"operators+-5485\" should increment line by 0", 0, scanner.line);
+
+        scanner = makeScanner("\"i have a escape seq \\n\"");
+        assertEquals("\"i have a escape seq \\n\" should return Kind.STRINT_LIT", TokenStream.Kind.STRING_LIT, scanner.stringLiteral());
+        assertEquals("\"i have a escape seq \\n\" should increment cur by 24", 24, scanner.cur);
+        assertEquals("\"i have a escape seq \\n\" should increment line by 0", 0, scanner.line);
+
+        scanner = makeScanner("\"another \r\nnew line\"");
+        assertEquals("\"another new \r\nline\" should return Kind.STRINT_LIT", TokenStream.Kind.STRING_LIT, scanner.stringLiteral());
+        assertEquals("\"another new \r\nline\" should increment cur by 20", 20, scanner.cur);
+        assertEquals("\"another new \r\nline\" should increment line by 1", 1, scanner.line);
+
+        scanner = makeScanner("\"Some asterisks**\"");
+        assertEquals("\"Some asterisks**\" should return Kind.STRINT_LIT", TokenStream.Kind.STRING_LIT, scanner.stringLiteral());
+        assertEquals("\"Some asterisks**\" should increment cur by 18", 18, scanner.cur);
+        assertEquals("\"Some asterisks**\" should increment line by 0", 0, scanner.line);
+
+        /* The UNTERMINATED_STRING cases */
+        scanner = makeScanner("\"not terminated string");
+        assertEquals("\"not terminated string should return Kind.UNTERMINATED_STRING", TokenStream.Kind.UNTERMINATED_STRING, scanner.stringLiteral());
+        assertEquals("\"not terminated string should increment cur by 23", 22, scanner.cur);
+        assertEquals("\"not terminated string should increment line by 0", 0, scanner.line);
+
+        scanner = makeScanner("\"not terminated\rnewline");
+        assertEquals("\"not terminated\rnewline should return Kind.UNTERMINATED_STRING", TokenStream.Kind.UNTERMINATED_STRING, scanner.stringLiteral());
+        assertEquals("\"not terminated\rnewline should increment cur by 23", 23, scanner.cur);
+        assertEquals("\"not terminated\rnewline should increment line by 1", 1, scanner.line);
+        
     }
 
     @Test
