@@ -236,6 +236,17 @@ public class Scanner
 	}
 
 	/**
+	 * Checks if cur is at a comment. If it is, returns null (unless it is an UNTERMINATED_COMMENT) and increments cur
+	 * and line accordingly.
+	 * @return	null unless the comment is unterminated.
+	 */
+	protected Kind comment()
+	{
+		Kind kind = Kind.UNTERMINATED_COMMENT;
+		return kind;
+	}
+
+	/**
 	 * Checks if cur is at an identity. If it is, returns the Kind of identity at cur and increments cur accordingly.
 	 * @return	The Kind of identity at cur or null.
 	 */

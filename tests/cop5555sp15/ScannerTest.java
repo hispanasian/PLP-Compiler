@@ -103,7 +103,7 @@ public class ScannerTest
         assertEquals("\\n\\r should increment the line counter by one", 1, scanner.line);
         assertEquals("\\n\\r should increment cur by one", 1, scanner.cur);
 
-        /* Other whitespac tests */
+        /* Other whitespace tests */
         scanner = makeScanner("\t");
         assertEquals("\\t should return true", true, scanner.whitespace());
         assertEquals("\\t should not increment the line counter", 0, scanner.line);
@@ -580,7 +580,51 @@ public class ScannerTest
         assertEquals("\"not terminated\rnewline should return Kind.UNTERMINATED_STRING", TokenStream.Kind.UNTERMINATED_STRING, scanner.stringLiteral());
         assertEquals("\"not terminated\rnewline should increment cur by 23", 23, scanner.cur);
         assertEquals("\"not terminated\rnewline should increment line by 1", 1, scanner.line);
+    }
 
+    @Test
+    public void testComment()
+    {
+        Scanner scanner = makeScanner("/*  */");
+        assertEquals("\"/*  */\" should return true", null, scanner.comment());
+        assertEquals("\"/*  */\" should increment the line counter by 6", 6, scanner.line);
+        assertEquals("\"/*  */\" should increment cur by 0", 0, scanner.cur);
+
+        scanner = makeScanner("/* Some stuff */");
+        assertEquals("\"/* Some stuff */\" should return true", null, scanner.comment());
+        assertEquals("\"/* Some stuff */\" should increment the line counter by 16", 16, scanner.line);
+        assertEquals("\"/* Some stuff */\" should increment cur by 0", 0, scanner.cur);
+
+        scanner = makeScanner("/*******/");
+        assertEquals("\"/*******/\" should return true", null, scanner.comment());
+        assertEquals("\"/*******/\" should increment the line counter by 9", 9, scanner.line);
+        assertEquals("\"/*******/\" should increment cur by 0", 0, scanner.cur);
+
+        scanner = makeScanner("/*\r\n*/");
+        assertEquals("\"/*\r\n*/\" should return true", null, scanner.comment());
+        assertEquals("\"/*\r\n*/\" should increment the line counter by 6", 6, scanner.line);
+        assertEquals("\"/*\r\n*/\" should increment cur by 1", 1, scanner.cur);
+
+        scanner = makeScanner("/* operators +*-/*= */");
+        assertEquals("\"/* operators +*-/*= */\" should return true", null, scanner.comment());
+        assertEquals("\"/* operators +*-/*= */\" should increment the line counter by 22", 22, scanner.line);
+        assertEquals("\"/* operators +*-/*= */\" should increment cur by 0", 0, scanner.cur);
+
+        /* Test for Kind.UNTERMINATED_COMMENT */
+        scanner = makeScanner("/* operators +-=");
+        assertEquals("\"/* operators +-=\" should return true", TokenStream.Kind.UNTERMINATED_COMMENT, scanner.comment());
+        assertEquals("\"/* operators +-=\" should increment the line counter by 16", 16, scanner.line);
+        assertEquals("\"/* operators +-=\" should increment cur by 0", 0, scanner.cur);
+
+        scanner = makeScanner("/* \r");
+        assertEquals("\"/* \r\" should return true", TokenStream.Kind.UNTERMINATED_COMMENT, scanner.comment());
+        assertEquals("\"/* \r\" should increment the line counter by 4", 4, scanner.line);
+        assertEquals("\"/* \r\" should increment cur by 1", 1, scanner.cur);
+
+        scanner = makeScanner("/* ***");
+        assertEquals("\"/* ***\" should return true", TokenStream.Kind.UNTERMINATED_COMMENT, scanner.comment());
+        assertEquals("\"/* ***\" should increment the line counter by 6", 6, scanner.line);
+        assertEquals("\"/* ***\" should increment cur by 0", 0, scanner.cur);
     }
 
     @Test
