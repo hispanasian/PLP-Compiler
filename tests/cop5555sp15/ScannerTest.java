@@ -403,7 +403,7 @@ public class ScannerTest
 
         scanner = makeScanner("null operator");
         assertEquals("the string \"null operator\" should return Kind.NL_NULL", TokenStream.Kind.NL_NULL, scanner.identity());
-        assertEquals("\"null operator\" should increment cur by 3", 3, scanner.cur);
+        assertEquals("\"null operator\" should increment cur by 4", 4, scanner.cur);
 
         /* Tests that should return null */
         scanner = makeScanner("123a4");
@@ -419,8 +419,8 @@ public class ScannerTest
         assertEquals("\" space\" should increment cur by 0", 0, scanner.cur);
 
         scanner = makeScanner("");
-        assertEquals("the string \"123a4\" should return null", null, scanner.identity());
-        assertEquals("\"123a4\" should increment cur by 0", 0, scanner.cur);
+        assertEquals("the string \"\" should return null", null, scanner.identity());
+        assertEquals("\"\" should increment cur by 0", 0, scanner.cur);
     }
 
     @Test

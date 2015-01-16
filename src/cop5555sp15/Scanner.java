@@ -178,7 +178,25 @@ public class Scanner
 	 */
 	protected Kind identity()
 	{
-		return null;
+		Kind kind = null;
+		if(!eof() && Character.isJavaIdentifierStart(code[cur]))
+		{
+			int start = cur;
+			kind = Kind.IDENT;
+			cur++;
+
+			/* Now to see if the following characters are also part of the Identity */
+			while(!eof() && Character.isJavaIdentifierPart(code[cur]))
+			{
+				cur++;
+			}
+
+			/* Now check to see if the identity is a keyword or reserved literal */
+			String ident = String.copyValueOf(code, start, (cur - start));
+			Kind temp = Scanner.reservedLiteral(ident);
+			if(temp != null) kind = temp;
+		}
+		return kind;
 	}
 
 	/**
@@ -188,17 +206,17 @@ public class Scanner
 	 */
 	static protected Kind keyword(String string)
 	{
-		if(string == "int") return Kind.KW_INT;
-		else if(string == "string") return Kind.KW_STRING;
-		else if(string == "boolean") return Kind.KW_BOOLEAN;
-		else if(string == "import") return Kind.KW_IMPORT;
-		else if(string == "class") return Kind.KW_CLASS;
-		else if(string == "def") return Kind.KW_DEF;
-		else if(string == "while") return Kind.KW_WHILE;
-		else if(string == "if") return Kind.KW_IF;
-		else if(string == "else") return Kind.KW_ELSE;
-		else if(string == "return") return Kind.KW_RETURN;
-		else if(string == "print") return Kind.KW_PRINT;
+		if(string.equals("int")) return Kind.KW_INT;
+		else if(string.equals("string")) return Kind.KW_STRING;
+		else if(string.equals("boolean")) return Kind.KW_BOOLEAN;
+		else if(string.equals("import")) return Kind.KW_IMPORT;
+		else if(string.equals("class")) return Kind.KW_CLASS;
+		else if(string.equals("def")) return Kind.KW_DEF;
+		else if(string.equals("while")) return Kind.KW_WHILE;
+		else if(string.equals("if")) return Kind.KW_IF;
+		else if(string.equals("else")) return Kind.KW_ELSE;
+		else if(string.equals("return")) return Kind.KW_RETURN;
+		else if(string.equals("print")) return Kind.KW_PRINT;
 		else return null;
 	}
 
@@ -209,8 +227,8 @@ public class Scanner
 	 */
 	static protected Kind booleanLiteral(String string)
 	{
-		if(string == "true") return Kind.BL_TRUE;
-		if(string == "false") return Kind.BL_FALSE;
+		if(string.equals("true")) return Kind.BL_TRUE;
+		if(string.equals("false")) return Kind.BL_FALSE;
 		else return null;
 	}
 
@@ -221,7 +239,7 @@ public class Scanner
 	 */
 	static protected Kind nullLiteral(String string)
 	{
-		if(string == "null") return Kind.NL_NULL;
+		if(string.equals("null")) return Kind.NL_NULL;
 		else return null;
 	}
 
