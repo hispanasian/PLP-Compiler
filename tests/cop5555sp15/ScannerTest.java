@@ -368,11 +368,64 @@ public class ScannerTest
         assertEquals("the string \"null\" should return Kind.NL_NULL", TokenStream.Kind.NL_NULL, scanner.identity());
         assertEquals("\"null\" should increment cur by 4", 4, scanner.cur);
 
+        /* Test for general identity */
+        scanner = makeScanner("someIdent");
+        assertEquals("the string \"someIdent\" should return Kind.IDENT", TokenStream.Kind.IDENT, scanner.identity());
+        assertEquals("\"someIdent\" should increment cur by 9", 9, scanner.cur);
+
+        scanner = makeScanner("this2works");
+        assertEquals("the string \"this2works\" should return Kind.IDENT", TokenStream.Kind.IDENT, scanner.identity());
+        assertEquals("\"this2works\" should increment cur by 10", 10, scanner.cur);
+
+        scanner = makeScanner("this\risweird");
+        assertEquals("the string \"this\risweird\" should return Kind.IDENT", TokenStream.Kind.IDENT, scanner.identity());
+        assertEquals("\"this\risweird\" should increment cur by 4", 4, scanner.cur);
+
+        scanner = makeScanner("this2works");
+        assertEquals("the string \"this2works\" should return Kind.IDENT", TokenStream.Kind.IDENT, scanner.identity());
+        assertEquals("\"this2works\" should increment cur by 10", 10, scanner.cur);
+
+        scanner = makeScanner("def_startwithkeywrod");
+        assertEquals("the string \"def_startwithkeyword\" should return Kind.IDENT", TokenStream.Kind.IDENT, scanner.identity());
+        assertEquals("\"def_startwithkeyword\" should increment cur by 20", 20, scanner.cur);
+
+        scanner = makeScanner("endkw_print");
+        assertEquals("the string \"endkw_print\" should return Kind.IDENT", TokenStream.Kind.IDENT, scanner.identity());
+        assertEquals("\"endkw_print\" should increment cur by 11", 11, scanner.cur);
+
+        scanner = makeScanner("has.separator");
+        assertEquals("the string \"has.separator\" should return Kind.IDENT", TokenStream.Kind.IDENT, scanner.identity());
+        assertEquals("\"has.separator\" should increment cur by 3", 3, scanner.cur);
+
+        scanner = makeScanner("has=operator");
+        assertEquals("the string \"has=operator\" should return Kind.IDENT", TokenStream.Kind.IDENT, scanner.identity());
+        assertEquals("\"has=operator\" should increment cur by 3", 3, scanner.cur);
+
+        scanner = makeScanner("null operator");
+        assertEquals("the string \"null operator\" should return Kind.NL_NULL", TokenStream.Kind.NL_NULL, scanner.identity());
+        assertEquals("\"null operator\" should increment cur by 3", 3, scanner.cur);
+
         /* Tests that should return null */
+        scanner = makeScanner("123a4");
+        assertEquals("the string \"123a4\" should return null", null, scanner.identity());
+        assertEquals("\"123a4\" should increment cur by 0", 0, scanner.cur);
+
+        scanner = makeScanner("+operator");
+        assertEquals("the string \"+operator\" should return null", null, scanner.identity());
+        assertEquals("\"+operator\" should increment cur by 0", 0, scanner.cur);
+
+        scanner = makeScanner(" space");
+        assertEquals("the string \" space\" should return Kind.IDENT", null, scanner.identity());
+        assertEquals("\" space\" should increment cur by 0", 0, scanner.cur);
+
+        scanner = makeScanner("");
+        assertEquals("the string \"123a4\" should return null", null, scanner.identity());
+        assertEquals("\"123a4\" should increment cur by 0", 0, scanner.cur);
     }
 
     @Test
-    public void testTokenize() throws Exception {
+    public void testTokenize() throws Exception
+    {
 
     }
 }
