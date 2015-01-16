@@ -72,7 +72,62 @@ public class Scanner
 	 */
 	protected Kind operator()
 	{
-		return null;
+		Kind kind = null;
+		switch(code[cur])
+		{
+			/* This is a tricky case. We must check for the following operators: = and == */
+			case '=': kind = Kind.ASSIGN;
+				cur++;
+				if(!eof() && code[cur] == '=') kind = Kind.EQUAL;
+				else cur--;
+				break;
+			case '|': kind = Kind.BAR;
+				break;
+			case '&': kind = Kind.AND;
+				break;
+			/* This is a tricky case. We must check for the following operators: ! and != */
+			case '!': kind = Kind.NOT;
+				cur++;
+				if(!eof() && code[cur] == '=') kind = Kind.NOTEQUAL;
+				else cur--;
+				break;
+			/* This is a tricky case. We must check for the following operators: < and <= and << */
+			case '<': kind = Kind.LT;
+				cur++;
+				if(!eof() && code[cur] == '=') kind = Kind.LE;
+				else if(!eof() && code[cur] == '<') kind = Kind.LSHIFT;
+				else cur--;
+				break;
+			/* This is a tricky case. We must check for the following operators: > and >= and >> */
+			case '>': kind = Kind.GT;
+				cur++;
+				if(!eof() && code[cur] == '=') kind = Kind.GE;
+				else if(!eof() && code[cur] == '>') kind = Kind.RSHIFT;
+				else cur--;
+				break;
+			case '+': kind = Kind.PLUS;
+				break;
+			/* This is a tricky case. We must check for the following operators: - and -> */
+			case '-': kind = Kind.MINUS;
+				cur++;
+				if(!eof() && code[cur] == '>') kind = Kind.ARROW;
+				else cur--;
+				break;
+			case '*': kind = Kind.TIMES;
+				break;
+			/* This is a tricky case. We must check for / and ensure there is not a leading * */
+			case '/': cur++;
+				if(eof() || !(!eof() && code[cur] == '*')) kind = Kind.DIV;
+				cur--;
+				break;
+			case '%': kind = Kind.MOD;
+				break;
+			case '@': kind = Kind.AT;
+				break;
+		}
+		/* Always increment cur when an operator is found */
+		if(kind != null) cur++;
+		return kind;
 	}
 
 	/**
@@ -81,7 +136,39 @@ public class Scanner
 	 */
 	protected Kind separator()
 	{
-		return null;
+		Kind kind = null;
+		switch(code[cur])
+		{
+			/* This is a tricky case. We must check for the following separators: . and .. */
+			case '.': kind = Kind.DOT;
+				cur++;
+				if(!eof() && code[cur] == '.') kind = Kind.RANGE;
+				else cur--;
+				break;
+			case ';': kind = Kind.SEMICOLON;
+				break;
+			case ',': kind = Kind.COMMA;
+				break;
+			case '(': kind = Kind.LPAREN;
+				break;
+			case ')': kind = Kind.RPAREN;
+				break;
+			case '[': kind = Kind.LSQUARE;
+				break;
+			case ']': kind = Kind.RSQUARE;
+				break;
+			case '{': kind = Kind.LCURLY;
+				break;
+			case '}': kind = Kind.RCURLY;
+				break;
+			case ':': kind = Kind.COLON;
+				break;
+			case '?': kind = Kind.QUESTION;
+				break;
+		}
+		/* Always increment cur when a separator is found */
+		if(kind != null) cur++;
+		return kind;
 	}
 
 	/**

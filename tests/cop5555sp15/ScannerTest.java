@@ -84,63 +84,83 @@ public class ScannerTest
     {
         Scanner scanner = makeScanner("=");
         assertEquals("\"=\" should return Kind.ASSIGN", TokenStream.Kind.ASSIGN, scanner.operator());
+        assertEquals("\"=\" should increment cur by 1", 1, scanner.cur);
 
         scanner = makeScanner("|");
         assertEquals("\"|\" should return Kind.BAR", TokenStream.Kind.BAR, scanner.operator());
+        assertEquals("\"|\" should increment cur by 1", 1, scanner.cur);
 
         scanner = makeScanner("&");
         assertEquals("\"&\" should return Kind.AND", TokenStream.Kind.AND, scanner.operator());
+        assertEquals("\"&\" should increment cur by 1", 1, scanner.cur);
 
         scanner = makeScanner("==");
         assertEquals("\"==\" should return Kind.EQUAL", TokenStream.Kind.EQUAL, scanner.operator());
+        assertEquals("\"==\" should increment cur by 2", 2, scanner.cur);
 
         scanner = makeScanner("!=");
         assertEquals("\"!=\" should return Kind.NOTEQUAL", TokenStream.Kind.NOTEQUAL, scanner.operator());
+        assertEquals("\"!=\" should increment cur by 2", 2, scanner.cur);
 
         scanner = makeScanner("<");
         assertEquals("\"<\" should return Kind.LT", TokenStream.Kind.LT, scanner.operator());
+        assertEquals("\"<\" should increment cur by 1", 1, scanner.cur);
 
         scanner = makeScanner(">");
         assertEquals("\">\" should return Kind.GT", TokenStream.Kind.GT, scanner.operator());
+        assertEquals("\">\" should increment cur by 1", 1, scanner.cur);
 
         scanner = makeScanner("<=");
         assertEquals("\"<=\" should return Kind.LE", TokenStream.Kind.LE, scanner.operator());
+        assertEquals("\"<=\" should increment cur by 2", 2, scanner.cur);
 
         scanner = makeScanner(">=");
         assertEquals("\">=\" should return Kind.GE", TokenStream.Kind.GE, scanner.operator());
+        assertEquals("\">=\" should increment cur by 2", 2, scanner.cur);
 
         scanner = makeScanner("+");
         assertEquals("\"+\" should return Kind.PLUS", TokenStream.Kind.PLUS, scanner.operator());
+        assertEquals("\"+\" should increment cur by 1", 1, scanner.cur);
 
         scanner = makeScanner("-");
         assertEquals("\"-\" should return Kind.MINUS", TokenStream.Kind.MINUS, scanner.operator());
+        assertEquals("\"-\" should increment cur by 1", 1, scanner.cur);
 
         scanner = makeScanner("*");
         assertEquals("\"*\" should return Kind.TIMES", TokenStream.Kind.TIMES, scanner.operator());
+        assertEquals("\"*\" should increment cur by 1", 1, scanner.cur);
 
         scanner = makeScanner("/");
         assertEquals("\"/\" should return Kind.BAR", TokenStream.Kind.DIV, scanner.operator());
+        assertEquals("\"/\" should increment cur by 1", 1, scanner.cur);
 
         scanner = makeScanner("/*");
         assertEquals("\"/*\" should return null", null, scanner.operator());
+        assertEquals("\"/*\" should not increment cur", 0, scanner.cur);
 
         scanner = makeScanner("%");
         assertEquals("\"%\" should return Kind.MOD", TokenStream.Kind.MOD, scanner.operator());
+        assertEquals("\"%\" should increment cur by 1", 1, scanner.cur);
 
         scanner = makeScanner("!");
         assertEquals("\"!\" should return Kind.NOT", TokenStream.Kind.NOT, scanner.operator());
+        assertEquals("\"!\" should increment cur by 1", 1, scanner.cur);
 
         scanner = makeScanner("<<");
         assertEquals("\"<<\" should return Kind.LSHIFT", TokenStream.Kind.LSHIFT, scanner.operator());
+        assertEquals("\"<<\" should increment cur by 2", 2, scanner.cur);
 
         scanner = makeScanner(">>");
         assertEquals("\">>\" should return Kind.RSHIFT", TokenStream.Kind.RSHIFT, scanner.operator());
+        assertEquals("\">>\" should increment cur by 2", 2, scanner.cur);
 
         scanner = makeScanner("->");
         assertEquals("\"->\" should return Kind.ARROW", TokenStream.Kind.ARROW, scanner.operator());
+        assertEquals("\"->\" should increment cur by 2", 2, scanner.cur);
 
         scanner = makeScanner("@");
         assertEquals("\"@\" should return Kind.AT", TokenStream.Kind.AT, scanner.operator());
+        assertEquals("\"@\" should increment cur by 1", 1, scanner.cur);
     }
 
     /**
@@ -150,40 +170,52 @@ public class ScannerTest
     public void testSeparator()
     {
         Scanner scanner = makeScanner(".");
-        assertEquals("\".\" should return Kind.DOT", TokenStream.Kind.DOT, scanner.operator());
+        assertEquals("\".\" should return Kind.DOT", TokenStream.Kind.DOT, scanner.separator());
+        assertEquals("\".\" should increment cur by 1", 1, scanner.cur);
 
         scanner = makeScanner("..");
-        assertEquals("\"..\" should return Kind.RANGE", TokenStream.Kind.RANGE, scanner.operator());
+        assertEquals("\"..\" should return Kind.RANGE", TokenStream.Kind.RANGE, scanner.separator());
+        assertEquals("\"..\" should increment cur by 2", 2, scanner.cur);
 
         scanner = makeScanner(";");
-        assertEquals("\";\" should return Kind.SEMICOLON", TokenStream.Kind.SEMICOLON, scanner.operator());
+        assertEquals("\";\" should return Kind.SEMICOLON", TokenStream.Kind.SEMICOLON, scanner.separator());
+        assertEquals("\";\" should increment cur by 1", 1, scanner.cur);
 
         scanner = makeScanner(",");
-        assertEquals("\",\" should return Kind.COMMA", TokenStream.Kind.COMMA, scanner.operator());
+        assertEquals("\",\" should return Kind.COMMA", TokenStream.Kind.COMMA, scanner.separator());
+        assertEquals("\",\" should increment cur by 1", 1, scanner.cur);
 
         scanner = makeScanner("(");
-        assertEquals("\"(\" should return Kind.LPAREN", TokenStream.Kind.LPAREN, scanner.operator());
+        assertEquals("\"(\" should return Kind.LPAREN", TokenStream.Kind.LPAREN, scanner.separator());
+        assertEquals("\"(\" should increment cur by 1", 1, scanner.cur);
 
         scanner = makeScanner(")");
-        assertEquals("\")\" should return Kind.RPAREN", TokenStream.Kind.RPAREN, scanner.operator());
+        assertEquals("\")\" should return Kind.RPAREN", TokenStream.Kind.RPAREN, scanner.separator());
+        assertEquals("\")\" should increment cur by 1", 1, scanner.cur);
 
         scanner = makeScanner("[");
-        assertEquals("\"[\" should return Kind.LSQUARE", TokenStream.Kind.LSQUARE, scanner.operator());
+        assertEquals("\"[\" should return Kind.LSQUARE", TokenStream.Kind.LSQUARE, scanner.separator());
+        assertEquals("\"[\" should increment cur by 1", 1, scanner.cur);
 
         scanner = makeScanner("]");
-        assertEquals("\"]\" should return Kind.RSQUARE", TokenStream.Kind.RSQUARE, scanner.operator());
+        assertEquals("\"]\" should return Kind.RSQUARE", TokenStream.Kind.RSQUARE, scanner.separator());
+        assertEquals("\"]\" should increment cur by 1", 1, scanner.cur);
 
         scanner = makeScanner("{");
-        assertEquals("\"{\" should return Kind.LCURLY", TokenStream.Kind.LCURLY, scanner.operator());
+        assertEquals("\"{\" should return Kind.LCURLY", TokenStream.Kind.LCURLY, scanner.separator());
+        assertEquals("\"{\" should increment cur by 1", 1, scanner.cur);
 
         scanner = makeScanner("}");
-        assertEquals("\"}\" should return Kind.RCURLY", TokenStream.Kind.RCURLY, scanner.operator());
+        assertEquals("\"}\" should return Kind.RCURLY", TokenStream.Kind.RCURLY, scanner.separator());
+        assertEquals("\"}\" should increment cur by 1", 1, scanner.cur);
 
         scanner = makeScanner(":");
-        assertEquals("\":\" should return Kind.COLON", TokenStream.Kind.COLON, scanner.operator());
+        assertEquals("\":\" should return Kind.COLON", TokenStream.Kind.COLON, scanner.separator());
+        assertEquals("\":\" should increment cur by 1", 1, scanner.cur);
 
         scanner = makeScanner("?");
-        assertEquals("\"?\" should return Kind.QUESTION", TokenStream.Kind.QUESTION, scanner.operator());
+        assertEquals("\"?\" should return Kind.QUESTION", TokenStream.Kind.QUESTION, scanner.separator());
+        assertEquals("\"?\" should increment cur by 1", 1, scanner.cur);
     }
 
     /**
