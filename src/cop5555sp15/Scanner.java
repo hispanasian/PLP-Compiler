@@ -12,6 +12,7 @@ public class Scanner
 	protected char[] code;
 	protected int cur;
 	protected int line;
+	protected ArrayList<Token> tokens;
 
 	/**
 	 * The constructor for Scanner.
@@ -23,6 +24,7 @@ public class Scanner
 		this.code = stream.inputChars;
 		this.cur = 0;
 		this.line = 0;
+		this.tokens = new ArrayList<Token>();
 	}
 
 	/**
@@ -63,6 +65,25 @@ public class Scanner
 		}
 		return newline;
 	}
+
+	/**
+	 * Checks if cur is at an operator. If it is, returns the Kind of the operator.
+	 * @return	The Kind of operator at cur.
+	 */
+	protected Kind operator()
+	{
+		return null;
+	}
+
+	/**
+	 * Checks if cur is a separator. If it is, returns the Kind of the separator.
+	 * @return	The Kind of the separator at cur.
+	 */
+	protected Kind separator()
+	{
+		return null;
+	}
+
 	/**
 	 * Returns the Kind of keyword string is or null if string is not a keyword
 	 * @param string	The string being checked
@@ -119,17 +140,6 @@ public class Scanner
 		if(kind == null) kind = booleanLiteral(string);
 		if(kind == null) kind = nullLiteral(string);
 		return kind;
-	}
-
-	/**
-	 * Takes in the code character array and tokenizes code.
-	 * @param code	The character array being tokenized
-	 * @return		A ArrayList<Token> representation of code.
-	 */
-	protected ArrayList<Token> tokenize(char[] code)
-	{
-		ArrayList<Token> tokens = new ArrayList<Token>();
-		return tokens;
 	}
 }
 

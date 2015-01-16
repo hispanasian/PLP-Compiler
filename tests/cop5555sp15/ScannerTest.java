@@ -77,6 +77,82 @@ public class ScannerTest
     }
 
     /**
+     * Tests the operator method in Scanner.
+     */
+    @Test
+    public void testOperator()
+    {
+        Scanner scanner = makeScanner("=");
+        assertEquals("\"=\" should return Kind.ASSIGN", TokenStream.Kind.ASSIGN, scanner.operator());
+
+        scanner = makeScanner("|");
+        assertEquals("\"|\" should return Kind.BAR", TokenStream.Kind.BAR, scanner.operator());
+
+        scanner = makeScanner("&");
+        assertEquals("\"&\" should return Kind.AND", TokenStream.Kind.AND, scanner.operator());
+
+        scanner = makeScanner("==");
+        assertEquals("\"==\" should return Kind.EQUAL", TokenStream.Kind.EQUAL, scanner.operator());
+
+        scanner = makeScanner("!=");
+        assertEquals("\"!=\" should return Kind.NOTEQUAL", TokenStream.Kind.NOTEQUAL, scanner.operator());
+
+        scanner = makeScanner("<");
+        assertEquals("\"<\" should return Kind.LT", TokenStream.Kind.LT, scanner.operator());
+
+        scanner = makeScanner(">");
+        assertEquals("\">\" should return Kind.GT", TokenStream.Kind.GT, scanner.operator());
+
+        scanner = makeScanner("<=");
+        assertEquals("\"<=\" should return Kind.LE", TokenStream.Kind.LE, scanner.operator());
+
+        scanner = makeScanner(">=");
+        assertEquals("\">=\" should return Kind.GE", TokenStream.Kind.GE, scanner.operator());
+
+        scanner = makeScanner("+");
+        assertEquals("\"+\" should return Kind.PLUS", TokenStream.Kind.PLUS, scanner.operator());
+
+        scanner = makeScanner("-");
+        assertEquals("\"-\" should return Kind.MINUS", TokenStream.Kind.MINUS, scanner.operator());
+
+        scanner = makeScanner("*");
+        assertEquals("\"*\" should return Kind.TIMES", TokenStream.Kind.TIMES, scanner.operator());
+
+        scanner = makeScanner("/");
+        assertEquals("\"/\" should return Kind.BAR", TokenStream.Kind.DIV, scanner.operator());
+
+        scanner = makeScanner("/*");
+        assertEquals("\"/*\" should return null", null, scanner.operator());
+
+        scanner = makeScanner("%");
+        assertEquals("\"%\" should return Kind.MOD", TokenStream.Kind.MOD, scanner.operator());
+
+        scanner = makeScanner("!");
+        assertEquals("\"!\" should return Kind.NOT", TokenStream.Kind.NOT, scanner.operator());
+
+        scanner = makeScanner("<<");
+        assertEquals("\"<<\" should return Kind.LSHIFT", TokenStream.Kind.LSHIFT, scanner.operator());
+
+        scanner = makeScanner(">>");
+        assertEquals("\">>\" should return Kind.RSHIFT", TokenStream.Kind.RSHIFT, scanner.operator());
+
+        scanner = makeScanner("->");
+        assertEquals("\"->\" should return Kind.ARROW", TokenStream.Kind.ARROW, scanner.operator());
+
+        scanner = makeScanner("@");
+        assertEquals("\"@\" should return Kind.AT", TokenStream.Kind.AT, scanner.operator());
+    }
+
+    /**
+     * Tests the separator method in Scanner.
+     */
+    @Test
+    public void testSeparator()
+    {
+
+    }
+
+    /**
      * Tests the reservedLiteral method in Scanner. reservedLiteral should take a string and return the Kind of literal
      * that is represented by the String (if any).
      */
