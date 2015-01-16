@@ -195,7 +195,21 @@ public class Scanner
 	 */
 	protected Kind intLiteral()
 	{
-		return null;
+		Kind kind = null;
+		if(code[cur] == '0')
+		{
+			kind = Kind.INT_LIT;
+			cur++;
+		}
+		else if(Character.isDigit(code[cur]))
+		{
+			kind = Kind.INT_LIT;
+			while(!eof() && Character.isDigit(code[cur]))
+			{
+				cur++;
+			}
+		}
+		return kind;
 	}
 
 	/**

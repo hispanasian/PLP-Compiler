@@ -491,29 +491,41 @@ public class ScannerTest
     {
         /* The Kind.INT_LIT cases */
         Scanner scanner = makeScanner("5");
-        assertEquals("\"5\" should return Kind.INT_LIT", TokenStream.Kind.INT_LIT, scanner.separator());
+        assertEquals("\"5\" should return Kind.INT_LIT", TokenStream.Kind.INT_LIT, scanner.intLiteral());
         assertEquals("\"5\" should increment cur by 1", 1, scanner.cur);
 
         scanner = makeScanner("65454");
-        assertEquals("\"65454\" should return Kind.INT_LIT", TokenStream.Kind.INT_LIT, scanner.separator());
+        assertEquals("\"65454\" should return Kind.INT_LIT", TokenStream.Kind.INT_LIT, scanner.intLiteral());
         assertEquals("\"65454\" should increment cur by 5", 5, scanner.cur);
 
         scanner = makeScanner("0654");
-        assertEquals("\"0654\" should return Kind.INT_LIT", TokenStream.Kind.INT_LIT, scanner.separator());
+        assertEquals("\"0654\" should return Kind.INT_LIT", TokenStream.Kind.INT_LIT, scanner.intLiteral());
         assertEquals("\"0654\" should increment cur by 1", 1, scanner.cur);
 
         scanner = makeScanner("1.789");
-        assertEquals("\"1.789\" should return Kind.INT_LIT", TokenStream.Kind.INT_LIT, scanner.separator());
+        assertEquals("\"1.789\" should return Kind.INT_LIT", TokenStream.Kind.INT_LIT, scanner.intLiteral());
         assertEquals("\"1.789\" should increment cur by 5", 5, scanner.cur);
+
+        scanner = makeScanner("100,000");
+        assertEquals("\"100,000\" should return Kind.INT_LIT", TokenStream.Kind.INT_LIT, scanner.intLiteral());
+        assertEquals("\"100,000\" should increment cur by 3", 3, scanner.cur);
+
+        scanner = makeScanner("00");
+        assertEquals("\"00\" should return Kind.INT_LIT", TokenStream.Kind.INT_LIT, scanner.intLiteral());
+        assertEquals("\"00\" should increment cur by 1", 1, scanner.cur);
 
         /* The null cases */
         scanner = makeScanner("-654");
-        assertEquals("\"-654\" should return null", null, scanner.separator());
+        assertEquals("\"-654\" should return null", null, scanner.intLiteral());
         assertEquals("\"-654\" should not increment cur", 0, scanner.cur);
 
         scanner = makeScanner(".123");
-        assertEquals("\".123\" should return null", null, scanner.separator());
+        assertEquals("\".123\" should return null", null, scanner.intLiteral());
         assertEquals("\".123\" should not increment cur", 0, scanner.cur);
+
+        scanner = makeScanner("s54");
+        assertEquals("\"s54\" should return null", null, scanner.intLiteral());
+        assertEquals("\"s54\" should not increment cur", 0, scanner.cur);
     }
 
     /**
