@@ -218,7 +218,21 @@ public class Scanner
 	 */
 	protected Kind stringLiteral()
 	{
-		return null;
+		Kind kind = null;
+		if(code[cur] == '\"')
+		{
+			kind = Kind.UNTERMINATED_STRING;
+			cur++;
+			boolean terminated = false;
+			while(!eof() && !terminated)
+			{
+				if(code[cur] == '\"') terminated = true;
+				else if(newLine()) { /* new line found */ }
+				cur++;
+			}
+			if(terminated) kind = Kind.STRING_LIT;
+		}
+		return kind;
 	}
 
 	/**

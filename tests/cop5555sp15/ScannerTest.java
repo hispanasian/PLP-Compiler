@@ -542,7 +542,7 @@ public class ScannerTest
 
         scanner = makeScanner("\"\"");
         assertEquals("\"\" should return Kind.STRINT_LIT", TokenStream.Kind.STRING_LIT, scanner.stringLiteral());
-        assertEquals("\"\" should increment cur by 0", 0, scanner.cur);
+        assertEquals("\"\" should increment cur by 2", 2, scanner.cur);
         assertEquals("\"\" should increment line by 0", 0, scanner.line);
 
         scanner = makeScanner("\"new\rline\"");
@@ -580,7 +580,7 @@ public class ScannerTest
         assertEquals("\"not terminated\rnewline should return Kind.UNTERMINATED_STRING", TokenStream.Kind.UNTERMINATED_STRING, scanner.stringLiteral());
         assertEquals("\"not terminated\rnewline should increment cur by 23", 23, scanner.cur);
         assertEquals("\"not terminated\rnewline should increment line by 1", 1, scanner.line);
-        
+
     }
 
     @Test
