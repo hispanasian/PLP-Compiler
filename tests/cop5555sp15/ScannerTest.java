@@ -17,26 +17,26 @@ public class ScannerTest
     }
 
     /**
-     * Tests the isEOF method in Scanner
+     * Tests the eof method in Scanner
      * @throws Exception
      */
     @Test
-    public void testIsEOF() throws Exception
+    public void testEof() throws Exception
     {
         Scanner scanner = makeScanner("");
-        assertEquals("isEOF should return true when code is an empty array", true, scanner.isEOF());
+        assertEquals("eof should return true when code is an empty array", true, scanner.eof());
 
         scanner = makeScanner("123");
-        assertEquals("isEOF should return false when cur is at the beginning of a non-empty code", false, scanner.isEOF());
+        assertEquals("eof should return false when cur is at the beginning of a non-empty code", false, scanner.eof());
 
         scanner.cur = 2;
-        assertEquals("isEOF should return false when cur is at the last character of code", false, scanner.isEOF());
+        assertEquals("eof should return false when cur is at the last character of code", false, scanner.eof());
 
         scanner.cur = 3;
-        assertEquals("isEOF should return true when cur has passed the last character of code", true, scanner.isEOF());
+        assertEquals("eof should return true when cur has passed the last character of code", true, scanner.eof());
 
         scanner.cur = 50;
-        assertEquals("isEOF should return true when cur has surpassed the last character", true, scanner.isEOF());
+        assertEquals("eof should return true when cur has surpassed the last character", true, scanner.eof());
     }
 
     @Test

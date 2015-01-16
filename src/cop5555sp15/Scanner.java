@@ -36,9 +36,9 @@ public class Scanner
 	/**
 	 * Returns if scanner has reached the end of the file. The end of file is reached when the current index surpasses
 	 * the last element in code.
-	 * @return	Wehther or not scanner has reached the end of file.
+	 * @return	Whether or not scanner has reached the end of file.
 	 */
-	protected boolean isEOF() { return cur >= code.length; }
+	protected boolean eof() { return cur >= code.length; }
 
 	/**
 	 * Takes in the code character array and tokenizes code.
