@@ -38,11 +38,7 @@ public class Scanner
 	 * the last element in code.
 	 * @return	Wehther or not scanner has reached the end of file.
 	 */
-	protected boolean isEOF()
-	{
-
-		return true;
-	}
+	protected boolean isEOF() { return cur >= code.length; }
 
 	/**
 	 * Takes in the code character array and tokenizes code.
