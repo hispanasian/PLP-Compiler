@@ -504,7 +504,7 @@ public class ScannerTest
 
         scanner = makeScanner("1.789");
         assertEquals("\"1.789\" should return Kind.INT_LIT", TokenStream.Kind.INT_LIT, scanner.intLiteral());
-        assertEquals("\"1.789\" should increment cur by 5", 5, scanner.cur);
+        assertEquals("\"1.789\" should increment cur by 1", 1, scanner.cur);
 
         scanner = makeScanner("100,000");
         assertEquals("\"100,000\" should return Kind.INT_LIT", TokenStream.Kind.INT_LIT, scanner.intLiteral());
