@@ -6,13 +6,12 @@ import cop5555sp15.TokenStream.Token;
 
 import java.util.ArrayList;
 
-import static cop5555sp15.TokenStream.Kind.*;
-
 public class Scanner
 {
 	protected TokenStream stream;
 	protected char[] code;
 	protected int cur;
+	protected int line;
 
 	/**
 	 * The constructor for Scanner.
@@ -23,6 +22,7 @@ public class Scanner
 		this.stream = stream;
 		this.code = stream.inputChars;
 		this.cur = 0;
+		this.line = 0;
 	}
 
 	/**
@@ -41,6 +41,18 @@ public class Scanner
 	 */
 	protected boolean eof() { return cur >= code.length; }
 
+	/**
+	 * Checks if cur is a new line. If it is, returns true and increments the line counter.
+	 * @return	Whether or scanner is at a new line
+	 */
+	protected boolean newLine()
+	{
+		if(code[cur] == '\r')
+		{
+
+		}
+		return false;
+	}
 	/**
 	 * Returns the Kind of keyword string is or null if string is not a keyword
 	 * @param string	The string being checked
