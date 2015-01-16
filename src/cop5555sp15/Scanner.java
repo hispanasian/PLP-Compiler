@@ -44,6 +44,23 @@ public class Scanner
 	protected boolean eof() { return cur >= code.length; }
 
 	/**
+	 * Returns if cur is currently pointing at whitespace. If the whitespace is also a new line, it will increment the
+	 * line counter.
+	 * @return	True if cur is pointing at whitespace.
+	 */
+	protected boolean whitespace()
+	{
+		boolean whitespace = false;
+		if(newLine()) whitespace = true;
+		else if(Character.isWhitespace(code[cur]))
+		{
+			whitespace = true;
+			cur++;
+		}
+		return whitespace;
+	}
+
+	/**
 	 * Checks if cur is a new line. If it is, returns true and increments the line counter and increments cur
 	 * accordingly.
 	 * @return	Whether or scanner is at a new line

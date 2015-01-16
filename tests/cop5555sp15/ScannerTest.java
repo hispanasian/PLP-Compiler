@@ -77,6 +77,66 @@ public class ScannerTest
     }
 
     /**
+     * Tests the whitespace method in Scanner
+     */
+    @Test
+    public void testWhitespace()
+    {
+        /* New line tests */
+        Scanner scanner = makeScanner("\r");
+        assertEquals("\\r should return true", true, scanner.whitespace());
+        assertEquals("\\r should increment the line counter by 1", 1, scanner.line);
+        assertEquals("\\r should increment cur by 1", 1, scanner.cur);
+
+        scanner = makeScanner("\n");
+        assertEquals("\\n should return true", true, scanner.whitespace());
+        assertEquals("\\n should increment the line counter by 1", 1, scanner.line);
+        assertEquals("\\n should increment cur by 1", 1, scanner.cur);
+
+        scanner = makeScanner("\r\n");
+        assertEquals("\\r\\n should return true", true, scanner.whitespace());
+        assertEquals("\\r\\n should increment the line counter by 1", 1, scanner.line);
+        assertEquals("\\r\\n should increment cur by 2", 2, scanner.cur);
+
+        scanner = makeScanner("\n\r");
+        assertEquals("\\n\\r should return true", true, scanner.whitespace());
+        assertEquals("\\n\\r should increment the line counter by one", 1, scanner.line);
+        assertEquals("\\n\\r should increment cur by one", 1, scanner.cur);
+
+        /* Other whitespac tests */
+        scanner = makeScanner("\t");
+        assertEquals("\\t should return true", true, scanner.whitespace());
+        assertEquals("\\t should not increment the line counter", 0, scanner.line);
+        assertEquals("\\t should increment cur by 1", 1, scanner.cur);
+
+        scanner = makeScanner("\t\r");
+        assertEquals("\\t\\r should return true", true, scanner.whitespace());
+        assertEquals("\\t\\r should not increment the line counter", 0, scanner.line);
+        assertEquals("\\t\\r should increment cur by 1", 1, scanner.cur);
+
+
+        scanner = makeScanner("\t\r");
+        assertEquals("\\t\\r should return true", true, scanner.whitespace());
+        assertEquals("\\t\\r should not increment the line counter", 0, scanner.line);
+        assertEquals("\\t\\r should increment cur by 1", 1, scanner.cur);
+
+        scanner = makeScanner(" ");
+        assertEquals("\" \" should return true", true, scanner.whitespace());
+        assertEquals("\" \" should not increment the line counter", 0, scanner.line);
+        assertEquals("\" \" should increment cur by 1", 1, scanner.cur);
+
+        scanner = makeScanner("a");
+        assertEquals("\"a\" should return true", false, scanner.whitespace());
+        assertEquals("\"a\" should not increment the line counter", 0, scanner.line);
+        assertEquals("\"a\" should not increment cur", 0, scanner.cur);
+
+        scanner = makeScanner("a space");
+        assertEquals("\"a space\" should return true", false, scanner.whitespace());
+        assertEquals("\"a space\" should not increment the line counter", 0, scanner.line);
+        assertEquals("\"a space\" should not increment cur", 0, scanner.cur);
+    }
+
+    /**
      * Tests the operator method in Scanner.
      */
     @Test
