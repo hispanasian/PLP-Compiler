@@ -2,6 +2,8 @@ package cop5555sp15;
 
 import org.junit.Test;
 
+import java.util.ArrayList;
+
 import static org.junit.Assert.*;
 
 /**
@@ -10,11 +12,6 @@ import static org.junit.Assert.*;
 public class ScannerTest
 {
     Scanner makeScanner(String string) { return new Scanner(new TokenStream(string.toCharArray())); }
-    @Test
-    public void testScan() throws Exception
-    {
-
-    }
 
     /**
      * Tests the eof method in Scanner
@@ -638,9 +635,158 @@ public class ScannerTest
         assertEquals("\"I am not a comment\" should increment the line counter by 0", 0, scanner.line);
     }
 
+    /**
+     * Test the scan method in Scanner
+     */
     @Test
-    public void testTokenize() throws Exception
+    public void testScan()
     {
+        /* Some basic tests */
+        Scanner scanner = makeScanner("");
+        ArrayList<TokenStream.Token> tokens;
+        scanner.scan();
+        tokens = scanner.stream.tokens;
+        assertEquals("\"\" should provide an empty ArrayList", true, tokens.isEmpty());
 
+        scanner = makeScanner("acd456asd");
+        scanner.scan();
+        tokens = scanner.stream.tokens;
+        assertEquals("\"45asd45\" should provide 1 token", 1, tokens.size());
+        assertEquals("\"acd456asd\" should provide a single token of type Kind.IDENT", TokenStream.Kind.IDENT, tokens.get(0).kind);
+        assertEquals("\"acd456asd\" should begin at 0", 0, tokens.get(0).beg);
+        assertEquals("\"acd456asd\" should end at 8", 8, tokens.get(0).end);
+        assertEquals("\"acd456asd\" should be on line 1", 1, tokens.get(0).lineNumber);
+
+        scanner = makeScanner("45asd45");
+        scanner.scan();
+        tokens = scanner.stream.tokens;
+        assertEquals("\"45asd45\" should provide two tokens", 2, tokens.size());
+        assertEquals("Token 0 should provide a single token of type Kind.INT_LIT", TokenStream.Kind.INT_LIT, tokens.get(0).kind);
+        assertEquals("Token 0 should begin at 0", 0, tokens.get(0).beg);
+        assertEquals("Token 0 should end at 1", 1, tokens.get(0).end);
+        assertEquals("Token 0 should be on line 1", 8, tokens.get(0).lineNumber);
+        assertEquals("Token 1 should provide a single token of type Kind.IDENT", TokenStream.Kind.IDENT, tokens.get(1).kind);
+        assertEquals("Token 1 should begin at 2", 2, tokens.get(1).beg);
+        assertEquals("Token 1 should end at 6", 6, tokens.get(1).end);
+        assertEquals("Token 1 should be on line 1", 1, tokens.get(1).lineNumber);
+
+        scanner = makeScanner("01654");
+        scanner.scan();
+        tokens = scanner.stream.tokens;
+        assertEquals("\"01654\" should provide two tokens", 2, tokens.size());
+        assertEquals("Token 0 should provide a single token of type Kind.INT_LIT", TokenStream.Kind.INT_LIT, tokens.get(0).kind);
+        assertEquals("Token 0 should begin at 0", 0, tokens.get(0).beg);
+        assertEquals("Token 0 should end at 0", 0, tokens.get(0).end);
+        assertEquals("Token 0 should be on line 1", 8, tokens.get(0).lineNumber);
+        assertEquals("Token 1 should provide a single token of type Kind.INT_LIT", TokenStream.Kind.INT_LIT, tokens.get(1).kind);
+        assertEquals("Token 1 should begin at 1", 1, tokens.get(1).beg);
+        assertEquals("Token 1 should end at 4", 4, tokens.get(1).end);
+        assertEquals("Token 1 should be on line 1", 1, tokens.get(1).lineNumber);
+
+        scanner = makeScanner("45asd45");
+        scanner.scan();
+        tokens = scanner.stream.tokens;
+        assertEquals("\"45asd45\" should provide two tokens", 2, tokens.size());
+        assertEquals("Token 0 should provide a single token of type Kind.INT_LIT", TokenStream.Kind.INT_LIT, tokens.get(0).kind);
+        assertEquals("Token 0 should begin at 0", 0, tokens.get(0).beg);
+        assertEquals("Token 0 should end at 1", 1, tokens.get(0).end);
+        assertEquals("Token 0 should be on line 1", 8, tokens.get(0).lineNumber);
+        assertEquals("Token 1 should provide a single token of type Kind.IDENT", TokenStream.Kind.IDENT, tokens.get(1).kind);
+        assertEquals("Token 1 should begin at 2", 2, tokens.get(1).beg);
+        assertEquals("Token 1 should end at 6", 6, tokens.get(1).end);
+        assertEquals("Token 1 should be on line 1", 1, tokens.get(1).lineNumber);
+
+        scanner = makeScanner("test /**");
+        scanner.scan();
+        tokens = scanner.stream.tokens;
+        assertEquals("\"test /**\" should provide two tokens", 2, tokens.size());
+        assertEquals("Token 0 should provide a single token of type Kind.IDENT", TokenStream.Kind.IDENT, tokens.get(0).kind);
+        assertEquals("Token 0 should begin at 0", 0, tokens.get(0).beg);
+        assertEquals("Token 0 should end at 3", 3, tokens.get(0).end);
+        assertEquals("Token 0 should be on line 1", 8, tokens.get(0).lineNumber);
+        assertEquals("Token 1 should provide a single token of type Kind.UNTERMINATED_COMMENT", TokenStream.Kind.UNTERMINATED_COMMENT, tokens.get(1).kind);
+        assertEquals("Token 1 should begin at 5", 5, tokens.get(1).beg);
+        assertEquals("Token 1 should end at 7", 7, tokens.get(1).end);
+        assertEquals("Token 1 should be on line 1", 1, tokens.get(1).lineNumber);
+
+        scanner = makeScanner("something \"something something /*");
+        scanner.scan();
+        tokens = scanner.stream.tokens;
+        assertEquals("\"something \"something something /*\" should provide two tokens", 2, tokens.size());
+        assertEquals("Token 0 should provide a single token of type Kind.IDENT", TokenStream.Kind.IDENT, tokens.get(0).kind);
+        assertEquals("Token 0 should begin at 0", 0, tokens.get(0).beg);
+        assertEquals("Token 0 should end at 9", 9, tokens.get(0).end);
+        assertEquals("Token 0 should be on line 1", 8, tokens.get(0).lineNumber);
+        assertEquals("Token 1 should provide a single token of type Kind.UNTERMINATED_STRING", TokenStream.Kind.UNTERMINATED_STRING, tokens.get(1).kind);
+        assertEquals("Token 1 should begin at 10", 10, tokens.get(1).beg);
+        assertEquals("Token 1 should end at 32", 32, tokens.get(1).end);
+        assertEquals("Token 1 should be on line 1", 1, tokens.get(1).lineNumber);
+
+        /* Intermediate test cases */
+        scanner = makeScanner("here is a \"string\" /* this is a comment */ */");
+        scanner.scan();
+        tokens = scanner.stream.tokens;
+        assertEquals("\"45asd45\" should provide 6 tokens", 6, tokens.size());
+        assertEquals("Token 0 should provide a single token of type Kind.IDENT", TokenStream.Kind.IDENT, tokens.get(0).kind);
+        assertEquals("Token 0 should begin at 0", 0, tokens.get(0).beg);
+        assertEquals("Token 0 should end at 4", 4, tokens.get(0).end);
+        assertEquals("Token 0 should be on line 1", 1, tokens.get(0).lineNumber);
+        assertEquals("Token 1 should provide a single token of type Kind.IDENT", TokenStream.Kind.IDENT, tokens.get(1).kind);
+        assertEquals("Token 1 should begin at 5", 5, tokens.get(1).beg);
+        assertEquals("Token 1 should end at 7", 7, tokens.get(1).end);
+        assertEquals("Token 1 should be on line 1", 1, tokens.get(1).lineNumber);
+        assertEquals("Token 2 should provide a single token of type Kind.IDENT", TokenStream.Kind.IDENT, tokens.get(2).kind);
+        assertEquals("Token 2 should begin at 9", 9, tokens.get(2).beg);
+        assertEquals("Token 2 should end at 9", 9, tokens.get(2).end);
+        assertEquals("Token 2 should be on line 1", 1, tokens.get(2).lineNumber);
+        assertEquals("Token 3 should provide a single token of type Kind.STRING_LIT", TokenStream.Kind.STRING_LIT, tokens.get(3).kind);
+        assertEquals("Token 3 should begin at 10", 10, tokens.get(3).beg);
+        assertEquals("Token 3 should end at 42", 41, tokens.get(3).end);
+        assertEquals("Token 3 should be on line 1", 1, tokens.get(3).lineNumber);
+        assertEquals("Token 4 should provide a single token of type Kind.TIMES", TokenStream.Kind.TIMES, tokens.get(4).kind);
+        assertEquals("Token 4 should begin at 43", 43, tokens.get(4).beg);
+        assertEquals("Token 4 should end at 43", 43, tokens.get(4).end);
+        assertEquals("Token 4 should be on line 1", 1, tokens.get(4).lineNumber);
+        assertEquals("Token 5 should provide a single token of type Kind.DIV", TokenStream.Kind.DIV, tokens.get(5).kind);
+        assertEquals("Token 5 should begin at 44", 44, tokens.get(5).beg);
+        assertEquals("Token 5 should end at 44", 44, tokens.get(5).end);
+        assertEquals("Token 5 should be on line 1", 1, tokens.get(5).lineNumber);
+
+        scanner = makeScanner("int x = 5;\r\nprint x;");
+        scanner.scan();
+        tokens = scanner.stream.tokens;
+        assertEquals("\"45asd45\" should provide 8 tokens", 8, tokens.size());
+        assertEquals("Token 0 should provide a single token of type Kind.KW_INT", TokenStream.Kind.KW_INT, tokens.get(0).kind);
+        assertEquals("Token 0 should begin at 0", 0, tokens.get(0).beg);
+        assertEquals("Token 0 should end at 2", 2, tokens.get(0).end);
+        assertEquals("Token 0 should be on line 1", 1, tokens.get(0).lineNumber);
+        assertEquals("Token 1 should provide a single token of type Kind.IDENT", TokenStream.Kind.IDENT, tokens.get(1).kind);
+        assertEquals("Token 1 should begin at 4", 4, tokens.get(1).beg);
+        assertEquals("Token 1 should end at 4", 4, tokens.get(1).end);
+        assertEquals("Token 1 should be on line 1", 1, tokens.get(1).lineNumber);
+        assertEquals("Token 2 should provide a single token of type Kind.ASSIGN", TokenStream.Kind.ASSIGN, tokens.get(2).kind);
+        assertEquals("Token 2 should begin at 6", 6, tokens.get(2).beg);
+        assertEquals("Token 2 should end at 6", 6, tokens.get(2).end);
+        assertEquals("Token 2 should be on line 1", 1, tokens.get(2).lineNumber);
+        assertEquals("Token 3 should provide a single token of type Kind.INT_LIT", TokenStream.Kind.INT_LIT, tokens.get(3).kind);
+        assertEquals("Token 3 should begin at 8", 8, tokens.get(3).beg);
+        assertEquals("Token 3 should end at 8", 8, tokens.get(3).end);
+        assertEquals("Token 3 should be on line 1", 1, tokens.get(3).lineNumber);
+        assertEquals("Token 4 should provide a single token of type Kind.SEMICOLON", TokenStream.Kind.SEMICOLON, tokens.get(4).kind);
+        assertEquals("Token 4 should begin at 10", 10, tokens.get(4).beg);
+        assertEquals("Token 4 should end at 10", 10, tokens.get(4).end);
+        assertEquals("Token 4 should be on line 2", 1, tokens.get(4).lineNumber);
+        assertEquals("Token 5 should provide a single token of type Kind.KW_PRINT", TokenStream.Kind.KW_PRINT, tokens.get(5).kind);
+        assertEquals("Token 5 should begin at 14", 14, tokens.get(5).beg);
+        assertEquals("Token 5 should end at 19", 19, tokens.get(5).end);
+        assertEquals("Token 5 should be on line 2", 2, tokens.get(5).lineNumber);
+        assertEquals("Token 5 should provide a single token of type Kind.IDENT", TokenStream.Kind.IDENT, tokens.get(6).kind);
+        assertEquals("Token 5 should begin at 21", 21, tokens.get(6).beg);
+        assertEquals("Token 5 should end at 21", 21, tokens.get(6).end);
+        assertEquals("Token 5 should be on line 2", 2, tokens.get(6).lineNumber);
+        assertEquals("Token 5 should provide a single token of type Kind.SEMICOLON", TokenStream.Kind.SEMICOLON, tokens.get(7).kind);
+        assertEquals("Token 5 should begin at 22", 22, tokens.get(7).beg);
+        assertEquals("Token 5 should end at 22", 22, tokens.get(7).end);
+        assertEquals("Token 5 should be on line 2", 2, tokens.get(7).lineNumber);
     }
 }

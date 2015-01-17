@@ -358,8 +358,5 @@ public class Scanner
 		if(kind == null) kind = nullLiteral(string);
 		return kind;
 	}
-
-
-
 }
 
