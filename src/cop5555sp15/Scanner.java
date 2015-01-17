@@ -12,7 +12,6 @@ public class Scanner
 	protected char[] code;
 	protected int cur;
 	protected int line;
-	protected ArrayList<Token> tokens;
 
 	/**
 	 * The constructor for Scanner.
@@ -24,7 +23,6 @@ public class Scanner
 		this.code = stream.inputChars;
 		this.cur = 0;
 		this.line = 0;
-		this.tokens = new ArrayList<Token>();
 	}
 
 	/**
@@ -33,7 +31,24 @@ public class Scanner
 	 */
 	public void scan()
 	{
-          //TODO: IMPLEMENT THIS
+		Kind kind = null;
+		int start = cur;
+
+		while(!eof())
+		{
+			if(newLine()) {/* do nothing on new line, newLine() increments line and cur automatically */}
+			else if(whitespace()) {/* do nothing, whitespace() increments cur automatically */}
+			else
+			{
+				start = cur;
+				kind = this.identity();
+				if(kind == null) kind = this.stringLiteral();
+				if(kind == null) kind = this.intLiteral();
+				if(kind == null) kind = this.comment();
+
+				if(kind != null) stream.tokens.add(stream.new Token(kind, start, cur-1, line+1)); // increment line by 1 so it does not start at 0
+			}
+		}
 	}
 
 	/**
