@@ -47,13 +47,15 @@ public class Scanner
 				if(kind == null) kind = this.operator();
 				if(kind == null) kind = this.separator();
 				if(kind == null) kind = this.comment();
-				if(kind == null)
+				/* Check if cur == start because comment can still return null but not be an illegal char */
+				if(kind == null && cur == start)
 				{
 					kind = Kind.ILLEGAL_CHAR;
 					cur++;
 				}
 
-				stream.tokens.add(stream.new Token(kind, start, cur-1, line+1)); // increment line by 1 so it does not start at 0
+				/* Again, a terminated comment does not create a token */
+				if(kind != null) stream.tokens.add(stream.new Token(kind, start, cur-1, line+1)); // increment line by 1 so it does not start at 0
 			}
 		}
 		/* Add EOF token */
