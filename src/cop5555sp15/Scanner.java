@@ -243,6 +243,7 @@ public class Scanner
 	protected Kind comment()
 	{
 		Kind kind = Kind.UNTERMINATED_COMMENT;
+		int start = cur;
 		boolean terminated = false;
 		if(code[cur] == '/')
 		{
@@ -261,7 +262,7 @@ public class Scanner
 							terminated = true;
 							cur++;
 						}
-						else if(newLine()) { /* take care of any new lines */ }
+						else if(!eof() && newLine()) { /* take care of any new lines */ }
 					}
 					else if(newLine()) { /* take care of any new lines */ }
 					else cur++;
@@ -269,7 +270,7 @@ public class Scanner
 			}
 			else cur--; // Fix the increment to cur
 		}
-		if(terminated) kind = null;
+		if(terminated || (cur - start == 0)) kind = null;
 		return kind;
 	}
 
