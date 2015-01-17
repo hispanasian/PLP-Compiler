@@ -44,6 +44,8 @@ public class Scanner
 				kind = this.identity();
 				if(kind == null) kind = this.stringLiteral();
 				if(kind == null) kind = this.intLiteral();
+				if(kind == null) kind = this.operator();
+				if(kind == null) kind = this.separator();
 				if(kind == null) kind = this.comment();
 
 				if(kind != null) stream.tokens.add(stream.new Token(kind, start, cur-1, line+1)); // increment line by 1 so it does not start at 0
