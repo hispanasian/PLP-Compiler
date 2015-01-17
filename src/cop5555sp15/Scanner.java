@@ -243,6 +243,33 @@ public class Scanner
 	protected Kind comment()
 	{
 		Kind kind = Kind.UNTERMINATED_COMMENT;
+		boolean terminated = false;
+		if(code[cur] == '/')
+		{
+			cur++;
+			if(code[cur] == '*')
+			{/* We are inside a comment */
+				cur++;
+				while(!eof() && !terminated)
+				{
+					/* check for termination */
+					if(code[cur] == '*')
+					{
+						cur++;
+						if(!eof() && code[cur] == '/')
+						{
+							terminated = true;
+							cur++;
+						}
+						else if(newLine()) { /* take care of any new lines */ }
+					}
+					else if(newLine()) { /* take care of any new lines */ }
+					else cur++;
+				}
+			}
+			else cur--; // Fix the increment to cur
+		}
+		if(terminated) kind = null;
 		return kind;
 	}
 
