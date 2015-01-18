@@ -9,7 +9,7 @@ import static org.junit.Assert.*;
 /**
  * Test cases for ScannerTest
  */
-public class ScannerTest
+public class TestScanner
 {
     Scanner makeScanner(String string) { return new Scanner(new TokenStream(string.toCharArray())); }
 
