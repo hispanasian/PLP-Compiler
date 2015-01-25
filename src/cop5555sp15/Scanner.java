@@ -55,7 +55,7 @@ public class Scanner
 				}
 
 				/* Again, a terminated comment does not create a token */
-				if(kind != null) stream.tokens.add(stream.new Token(kind, start, cur-1, line+1)); // increment line by 1 so it does not start at 0
+				if(kind != null) stream.tokens.add(stream.new Token(kind, start, cur, line+1)); // increment line by 1 so it does not start at 0
 			}
 		}
 		/* Add EOF token */
