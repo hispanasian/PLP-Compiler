@@ -1,6 +1,5 @@
 package cop5555sp15;
 
-import com.sun.xml.internal.fastinfoset.util.CharArray;
 import cop5555sp15.TokenStream.Kind;
 import cop5555sp15.TokenStream.Token;
 
@@ -250,10 +249,13 @@ public class Scanner
 			kind = Kind.UNTERMINATED_STRING;
 			cur++;
 			boolean terminated = false;
+            boolean escapePrev = false;
 			while(!eof() && !terminated)
 			{
-				if(code[cur] == '\"') terminated = true;
+                if(code[cur] == '\\') escapePrev = true;
+				else if(code[cur] == '\"' && !escapePrev) terminated = true;
 				else if(newLine()) { /* new line found */ }
+                else escapePrev = false;
 				cur++;
 			}
 			if(terminated) kind = Kind.STRING_LIT;
