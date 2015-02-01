@@ -578,6 +578,4 @@ public class TestScannerFull {
         assertArrayEquals(expectedTexts, makeTokenTextArray(stream));
         assertArrayEquals(expectedKinds, makeKindArray(stream));
     }
-
-
 }

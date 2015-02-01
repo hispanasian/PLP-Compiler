@@ -252,7 +252,7 @@ public class Scanner
             boolean escapePrev = false;
 			while(!eof() && !terminated)
 			{
-                if(code[cur] == '\\') escapePrev = true;
+                if(code[cur] == '\\' && !escapePrev) escapePrev = true;
 				else if(code[cur] == '\"' && !escapePrev) terminated = true;
 				else if(newLine()) { /* new line found */ }
                 else escapePrev = false;
