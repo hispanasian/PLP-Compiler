@@ -165,6 +165,103 @@ public class SimpleParser {
 		match(RCURLY);
 	}
 
+    private void Declaration() throws SyntaxException {
 
+    }
 
+    private void VarDec() throws SyntaxException {
+
+    }
+
+    private void Type() throws SyntaxException {
+
+    }
+
+    private void SimpleType() throws SyntaxException {
+
+    }
+
+    private void KeyValueType() throws SyntaxException {
+
+    }
+
+    private void ListType() throws SyntaxException {
+
+    }
+
+    private void ClosureDec() throws SyntaxException {
+
+    }
+
+    private void Closure() throws SyntaxException {
+
+    }
+
+    private void FormalArgList() throws SyntaxException {
+
+    }
+
+    private void Statement() throws SyntaxException {
+
+    }
+
+    private void ClosureEvalExpression() throws SyntaxException {
+
+    }
+
+    private void LValue() throws SyntaxException {
+
+    }
+
+    private void List() throws SyntaxException {
+
+    }
+
+    private void ExpressionList() throws SyntaxException {
+
+    }
+
+    private void KeyValueList() throws SyntaxException {
+
+    }
+
+    private void MapList() throws SyntaxException {
+
+    }
+
+    private void RangeExpr() throws SyntaxException {
+
+    }
+
+    private void Expression() throws SyntaxException {
+
+    }
+
+    private void Term() throws SyntaxException {
+
+    }
+
+    private void Elem() throws SyntaxException {
+
+    }
+
+    private void Thing() throws SyntaxException {
+
+    }
+
+    private void Factor() throws SyntaxException {
+
+    }
+
+    private void RelOp() throws SyntaxException {
+
+    }
+
+    private void WeakOp() throws SyntaxException {
+
+    }
+
+    private void VeryStrongOp() throws SyntaxException {
+
+    }
 }
