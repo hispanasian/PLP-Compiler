@@ -822,18 +822,95 @@ public class TestSimpleParser
     public void formalArgList1() throws SyntaxException
     {
         System.out.println("formalArgList1");
-        String input = "x:x";
+        String input = "x:int";
         System.out.format("FormalArgList should accept '%s'", input);
         parseCorrectInput(input, FORMAL_ARG_LIST);
     }
 
     @Test
-    public void formalArgListxxxxxx() throws SyntaxException
+    public void formalArgList2() throws SyntaxException
     {
         System.out.println("formalArgList1");
-        String input = "x:x";
+        String input = "";
+        System.out.format("FormalArgList should accept '%s'", input);
+        parseCorrectInput(input, FORMAL_ARG_LIST);
+    }
+
+    @Test
+    public void formalArgList3() throws SyntaxException
+    {
+        System.out.println("formalArgList1");
+        String input = "x:int, y:string, x:boolean";
+        System.out.format("FormalArgList should accept '%s'", input);
+        parseCorrectInput(input, FORMAL_ARG_LIST);
+    }
+
+    @Test
+    public void formalArgList4() throws SyntaxException
+    {
+        System.out.println("formalArgList1");
+        String input = "x:int, lkajsd123, lkj";
+        System.out.format("FormalArgList should accept '%s'", input);
+        parseCorrectInput(input, FORMAL_ARG_LIST);
+    }
+
+    @Test
+    public void formalArgList5() throws SyntaxException
+    {
+        System.out.println("formalArgList5");
+        String input = "x:int, int";
+        System.out.format("FormalArgList should not accept '%s'", input);
+        Kind ExpectedIncorrectTokenKind = KW_INT;
+        parseIncorrectInput(input, ExpectedIncorrectTokenKind, FORMAL_ARG_LIST);
+    }
+
+    @Test
+    public void formalArgList6() throws SyntaxException
+    {
+        System.out.println("formalArgList6");
+        String input = "x::";
+        System.out.format("FormalArgList should not accept '%s'", input);
+        Kind ExpectedIncorrectTokenKind = COLON;
+        parseIncorrectInput(input, ExpectedIncorrectTokenKind, FORMAL_ARG_LIST);
+    }
+
+    @Test
+    public void formalArgList7() throws SyntaxException
+    {
+        System.out.println("formalArgList7");
+        String input = "x:int, ";
+        System.out.format("FormalArgList should not accept '%s'", input);
+        Kind ExpectedIncorrectTokenKind = EOF;
+        parseIncorrectInput(input, ExpectedIncorrectTokenKind, FORMAL_ARG_LIST);
+    }
+
+    @Test
+    public void formalArgList8() throws SyntaxException
+    {
+        System.out.println("formalArgList8");
+        String input = "x:,";
+        System.out.format("FormalArgList should not accept '%s'", input);
+        Kind ExpectedIncorrectTokenKind = COMMA;
+        parseIncorrectInput(input, ExpectedIncorrectTokenKind, FORMAL_ARG_LIST);
+    }
+
+    @Test
+    public void formalArgList9() throws SyntaxException
+    {
+        System.out.println("formalArgList9");
+        String input = "x:INT";
         System.out.format("FormalArgList should not accept '%s'", input);
         Kind ExpectedIncorrectTokenKind = IDENT;
+        parseIncorrectInput(input, ExpectedIncorrectTokenKind, FORMAL_ARG_LIST);
+    }
+
+    @Test
+    public void formalArgList10() throws SyntaxException
+    {
+        System.out.println("formalArgList10");
+        String input = "x:10";
+        System.out.format("FormalArgList should not accept '%s'", input);
+        Kind ExpectedIncorrectTokenKind = INT_LIT;
         parseIncorrectInput(input, ExpectedIncorrectTokenKind, FORMAL_ARG_LIST);
     }
 

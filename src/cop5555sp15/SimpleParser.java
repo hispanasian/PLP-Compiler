@@ -250,7 +250,15 @@ public class SimpleParser
 
     protected void FormalArgList() throws SyntaxException
     {
-
+        if(isKind(IDENT))
+        {
+            VarDec();
+            while(isKind(COMMA))
+            {
+                match(COMMA);
+                VarDec();
+            }
+        }
     }
 
     protected void Statement() throws SyntaxException
