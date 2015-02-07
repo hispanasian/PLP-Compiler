@@ -304,23 +304,11 @@ public class SimpleParser
 
     }
 
-    protected void RelOp() throws SyntaxException
-    {
+    protected void RelOp() throws SyntaxException { match(REL_OPS); }
 
-    }
+    protected void WeakOp() throws SyntaxException { match(WEAK_OPS); }
 
-    protected void WeakOp() throws SyntaxException
-    {
+    protected void StrongOp() throws SyntaxException { match(STRONG_OPS); }
 
-    }
-
-    protected void StrongOp() throws SyntaxException
-    {
-
-    }
-
-    protected void VeryStrongOp() throws SyntaxException
-    {
-
-    }
+    protected void VeryStrongOp() throws SyntaxException { match(VERY_STRONG_OPS); }
 }

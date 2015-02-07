@@ -257,7 +257,6 @@ public class TestSimpleParser
         System.out.println("import10");
         String input = "class A { } "; // empty imports are allowed
         System.out.println(input);
-        Kind ExpectedIncorrectTokenKind = KW_IMPORT;
         parseCorrectInput(input);
     }
 
@@ -428,25 +427,218 @@ public class TestSimpleParser
     @Test
     public void relOp1() throws SyntaxException
     {
+        System.out.println("relOp1");
+        System.out.println("RelOp should accept a '|'");
+        String input = "|";
+        System.out.println(input);
+        parseCorrectInput(input, REL_OP);
+    }
 
+    @Test
+    public void relOp2() throws SyntaxException
+    {
+        System.out.println("relOp2");
+        System.out.println("RelOp should accept a '&'");
+        String input = "&";
+        System.out.println(input);
+        parseCorrectInput(input, REL_OP);
+    }
+
+    @Test
+    public void relOp3() throws SyntaxException
+    {
+        System.out.println("relOp3");
+        System.out.println("RelOp should accept a '=='");
+        String input = "==";
+        System.out.println(input);
+        parseCorrectInput(input, REL_OP);
+    }
+
+    @Test
+    public void relOp4() throws SyntaxException
+    {
+        System.out.println("relOp4");
+        System.out.println("RelOp should accept a '!='");
+        String input = "!=";
+        System.out.println(input);
+        parseCorrectInput(input, REL_OP);
+    }
+
+    @Test
+    public void relOp5() throws SyntaxException
+    {
+        System.out.println("relOp5");
+        System.out.println("RelOp should accept a '<'");
+        String input = "<";
+        System.out.println(input);
+        parseCorrectInput(input, REL_OP);
+    }
+
+    @Test
+    public void relOp6() throws SyntaxException
+    {
+        System.out.println("relOp6");
+        System.out.println("RelOp should accept a '>'");
+        String input = ">";
+        System.out.println(input);
+        parseCorrectInput(input, REL_OP);
+    }
+
+    @Test
+    public void relOp7() throws SyntaxException
+    {
+        System.out.println("relOp7");
+        System.out.println("RelOp should accept a '<='");
+        String input = "<=";
+        System.out.println(input);
+        parseCorrectInput(input, REL_OP);
+    }
+
+    @Test
+    public void relOp8() throws SyntaxException
+    {
+        System.out.println("relOp8");
+        System.out.println("RelOp should accept a '>='");
+        String input = ">=";
+        System.out.println(input);
+        parseCorrectInput(input, REL_OP);
+    }
+
+    @Test
+    public void relOp9() throws SyntaxException
+    {
+        System.out.println("relOp9");
+        System.out.println("RelOp should not accept a '");
+        String input = "'";
+        System.out.println(input);
+        Kind ExpectedIncorrectTokenKind = ILLEGAL_CHAR;
+        parseIncorrectInput(input, ExpectedIncorrectTokenKind, REL_OP);
+    }
+
+    @Test
+    public void relOp10() throws SyntaxException
+    {
+        System.out.println("relOp10");
+        System.out.println("RelOp should not accept a '\\'");
+        String input = "\\";
+        System.out.println(input);
+        Kind ExpectedIncorrectTokenKind = ILLEGAL_CHAR;
+        parseIncorrectInput(input, ExpectedIncorrectTokenKind, REL_OP);
+    }
+
+    @Test
+    public void relOp11() throws SyntaxException
+    {
+        System.out.println("relOp11");
+        System.out.println("RelOp should not accept a '*'");
+        String input = "*";
+        System.out.println(input);
+        Kind ExpectedIncorrectTokenKind = TIMES;
+        parseIncorrectInput(input, ExpectedIncorrectTokenKind, REL_OP);
     }
 
     @Test
     public void weakOp1() throws SyntaxException
     {
+        System.out.println("weakOp1");
+        System.out.println("strongOp should accept a '+'");
+        String input = "+";
+        System.out.println(input);
+        parseCorrectInput(input, WEAK_OP);
+    }
 
+    @Test
+    public void weakOp2() throws SyntaxException
+    {
+        System.out.println("weakOp2");
+         System.out.println("strongOp should accept a '-'");
+        String input = "-";
+        System.out.println(input);
+        parseCorrectInput(input, WEAK_OP);
+    }
+
+    @Test
+    public void weakOp3() throws SyntaxException
+    {
+        System.out.println("weakOp3");
+        System.out.println("WeakOp should not accept a '\\'");
+        String input = "\\";
+        System.out.println(input);
+        Kind ExpectedIncorrectTokenKind = ILLEGAL_CHAR;
+        parseIncorrectInput(input, ExpectedIncorrectTokenKind, WEAK_OP);
+    }
+
+    @Test
+    public void weakOp4() throws SyntaxException
+    {
+        System.out.println("weakOp4");
+        System.out.println("WeakOp should not accept a '/'");
+        String input = "/";
+        System.out.println(input);
+        Kind ExpectedIncorrectTokenKind = DIV;
+        parseIncorrectInput(input, ExpectedIncorrectTokenKind, WEAK_OP);
     }
 
     @Test
     public void strongOp1() throws SyntaxException
     {
+        System.out.println("strongOp1");
+        System.out.println("StrongOp should accept a '*'");
+        String input = "*";
+        System.out.println(input);
+        parseCorrectInput(input, STRONG_OP);
+    }
 
+    @Test
+    public void strongOp2() throws SyntaxException
+    {
+        System.out.println("strongOp2");
+        System.out.println("StrongOp should accept a '/'");
+        String input = "/";
+        System.out.println(input);
+        parseCorrectInput(input, STRONG_OP);
+    }
+
+    @Test
+    public void strongOp3() throws SyntaxException
+    {
+        System.out.println("strongOp3");
+        System.out.println("StrongOp should not accept a '\\'");
+        String input = "\\";
+        System.out.println(input);
+        Kind ExpectedIncorrectTokenKind = ILLEGAL_CHAR;
+        parseIncorrectInput(input, ExpectedIncorrectTokenKind, STRONG_OP);
     }
 
     @Test
     public void veryStrongOp1() throws SyntaxException
     {
+        System.out.println("veryStrongOp1");
+        System.out.println("VeryStrongOp should accept a '<<'");
+        String input = "<<";
+        System.out.println(input);
+        parseCorrectInput(input, VERY_STRONG_OP);
+    }
 
+    @Test
+    public void veryStrongOp2() throws SyntaxException
+    {
+        System.out.println("veryStrongOp2");
+        System.out.println("VeryStrongOp should accept a '<<'");
+        String input = ">>";
+        System.out.println(input);
+        parseCorrectInput(input, VERY_STRONG_OP);
+    }
+
+    @Test
+    public void veryStrongOp3() throws SyntaxException
+    {
+        System.out.println("veryStrongOp3");
+        System.out.println("VeryStrongOp should accept a '+'");
+        String input = "+";
+        System.out.println(input);
+        Kind ExpectedIncorrectTokenKind = PLUS;
+        parseIncorrectInput(input, ExpectedIncorrectTokenKind, STRONG_OP);
     }
 
 	@Test
