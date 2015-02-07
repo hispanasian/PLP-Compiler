@@ -313,7 +313,142 @@ public class TestSimpleParser
     @Test
     public void type1() throws SyntaxException
     {
+        System.out.println("type1");
+        String input = "@@[boolean:@[int]]";
+        System.out.format("Type should not accept '%s'", input);
+        parseCorrectInput(input, TYPE);
+    }
 
+    @Test
+    public void type2() throws SyntaxException
+    {
+        System.out.println("type2");
+        String input = "int";
+        System.out.format("Type should not accept '%s'", input);
+        parseCorrectInput(input, TYPE);
+    }
+
+    @Test
+    public void type3() throws SyntaxException
+    {
+        System.out.println("type3");
+        String input = "boolean";
+        System.out.format("Type should not accept '%s'", input);
+        parseCorrectInput(input, TYPE);
+    }
+
+    @Test
+    public void type4() throws SyntaxException
+    {
+        System.out.println("type4");
+        String input = "string";
+        System.out.format("Type should not accept '%s'", input);
+        parseCorrectInput(input, TYPE);
+    }
+
+    @Test
+    public void type5() throws SyntaxException
+    {
+        System.out.println("type5");
+        String input = "@@[boolean:int]";
+        System.out.format("Type should not accept '%s'", input);
+        parseCorrectInput(input, TYPE);
+    }
+
+    @Test
+    public void type6() throws SyntaxException
+    {
+        System.out.println("type6");
+        String input = "@[int]";
+        System.out.format("Type should not accept '%s'", input);
+        parseCorrectInput(input, TYPE);
+    }
+
+    @Test
+    public void type7() throws SyntaxException
+    {
+        System.out.println("type7");
+        String input = "@@[boolean:@@[int:string]]";
+        System.out.format("Type should not accept '%s'", input);
+        parseCorrectInput(input, TYPE);
+    }
+
+    @Test
+    public void type8() throws SyntaxException
+    {
+        System.out.println("type8");
+        String input = "@[boolean:@[int:string]]";
+        System.out.format("Type should not accept '%s'", input);
+        Kind ExpectedIncorrectTokenKind = COLON;
+        parseIncorrectInput(input, ExpectedIncorrectTokenKind, TYPE);
+    }
+
+    @Test
+    public void type9() throws SyntaxException
+    {
+        System.out.println("type9");
+        String input = "";
+        System.out.format("Type should not accept '%s'", input);
+        Kind ExpectedIncorrectTokenKind = EOF;
+        parseIncorrectInput(input, ExpectedIncorrectTokenKind, TYPE);
+    }
+
+    @Test
+    public void type10() throws SyntaxException
+    {
+        System.out.println("type10");
+        String input = "@[string";
+        System.out.format("Type should not accept '%s'", input);
+        Kind ExpectedIncorrectTokenKind = EOF;
+        parseIncorrectInput(input, ExpectedIncorrectTokenKind, TYPE);
+    }
+
+    @Test
+    public void type11() throws SyntaxException
+    {
+        System.out.println("type11");
+        String input = "@[string]]";
+        System.out.format("Type should not accept '%s'", input);
+        parseCorrectInput(input, TYPE);
+    }
+
+    @Test
+    public void type12() throws SyntaxException
+    {
+        System.out.println("type10");
+        String input = "@@[int:@@[boolean:@@[string:@[int]]]]";
+        System.out.format("Type should accept '%s'", input);
+        parseCorrectInput(input, TYPE);
+    }
+
+    @Test
+    public void type13() throws SyntaxException
+    {
+        System.out.println("type13");
+        String input = "@string";
+        System.out.format("Type should not accept '%s'", input);
+        Kind ExpectedIncorrectTokenKind = KW_STRING;
+        parseIncorrectInput(input, ExpectedIncorrectTokenKind, TYPE);
+    }
+
+    @Test
+    public void type14() throws SyntaxException
+    {
+        System.out.println("type14");
+        String input = "@@[@[string]:int]";
+        System.out.format("Type should not accept '%s'", input);
+        Kind ExpectedIncorrectTokenKind = AT;
+        parseIncorrectInput(input, ExpectedIncorrectTokenKind, TYPE);
+    }
+
+    @Test
+    public void type15() throws SyntaxException
+    {
+        System.out.println("type15");
+        String input = "@@[boolean:@[int:string]]";
+        System.out.format("Type should not accept '%s'", input);
+        Kind ExpectedIncorrectTokenKind = COLON;
+        parseIncorrectInput(input, ExpectedIncorrectTokenKind, TYPE);
     }
 
     @Test
@@ -322,7 +457,6 @@ public class TestSimpleParser
         System.out.println("simpleType1");
         System.out.println("SimpleType should accept 'int'");
         String input = "int";
-        System.out.println(input);
         parseCorrectInput(input, SIMPLE_TYPE);
     }
 
@@ -332,7 +466,6 @@ public class TestSimpleParser
         System.out.println("simpleType2");
         System.out.println("SimpleType should accept 'boolean'");
         String input = "boolean";
-        System.out.println(input);
         parseCorrectInput(input, SIMPLE_TYPE);
     }
 
@@ -342,7 +475,6 @@ public class TestSimpleParser
         System.out.println("simpleType3");
         System.out.println("SimpleType should accept 'string'");
         String input = "string";
-        System.out.println(input);
         parseCorrectInput(input, SIMPLE_TYPE);
     }
 
@@ -352,7 +484,6 @@ public class TestSimpleParser
         System.out.println("simpleType5");
         System.out.println("SimpleType should not accept 'Boolean'");
         String input = "Boolean";
-        System.out.println(input);
         Kind ExpectedIncorrectTokenKind = IDENT;
         parseIncorrectInput(input, ExpectedIncorrectTokenKind, SIMPLE_TYPE);
     }
@@ -363,7 +494,6 @@ public class TestSimpleParser
         System.out.println("simpleType5");
         System.out.println("SimpleType should not accept 'STRING'");
         String input = "STRING";
-        System.out.println(input);
         Kind ExpectedIncorrectTokenKind = IDENT;
         parseIncorrectInput(input, ExpectedIncorrectTokenKind, SIMPLE_TYPE);
     }
@@ -371,13 +501,229 @@ public class TestSimpleParser
     @Test
     public void keyValueType1() throws SyntaxException
     {
+        System.out.println("keyValueType1");
+        String input = "[int:string]";
+        System.out.format("KeyValueType should accept '%s'", input);
+        parseCorrectInput(input, KEY_VALUE_TYPE);
+    }
 
+    @Test
+    public void keyValueType2() throws SyntaxException
+    {
+        System.out.println("keyValueType2");
+        String input = "[boolean]";
+        System.out.format("KeyValueType should not accept '%s'", input);
+        Kind ExpectedIncorrectTokenKind = RSQUARE;
+        parseIncorrectInput(input, ExpectedIncorrectTokenKind, KEY_VALUE_TYPE);
+    }
+
+    @Test
+    public void keyValueType3() throws SyntaxException
+    {
+        System.out.println("keyValueType3");
+        String input = "[boolean:@[boolean]]";
+        System.out.format("KeyValueType should accept '%s'", input);
+        System.out.println(input);
+        parseCorrectInput(input, KEY_VALUE_TYPE);
+    }
+
+    @Test
+    public void keyValueType4() throws SyntaxException
+    {
+        System.out.println("keyValueType4");
+        String input = "[boolean:@@[boolean:int]]";
+        System.out.format("KeyValueType should accept '%s'", input);
+        System.out.println(input);
+        parseCorrectInput(input, KEY_VALUE_TYPE);
+    }
+
+    @Test
+    public void keyValueType5() throws SyntaxException
+    {
+        System.out.println("keyValueType5");
+        String input = "[boolean:int:string]";
+        System.out.format("KeyValueType should not accept '%s'", input);
+        Kind ExpectedIncorrectTokenKind = COLON;
+        parseIncorrectInput(input, ExpectedIncorrectTokenKind, KEY_VALUE_TYPE);
+    }
+
+    @Test
+    public void keyValueType6() throws SyntaxException
+    {
+        System.out.println("keyValueType6");
+        String input = "[boolean:@@[[int:string]]";
+        System.out.format("KeyValueType should not accept '%s'", input);
+        Kind ExpectedIncorrectTokenKind = LSQUARE;
+        parseIncorrectInput(input, ExpectedIncorrectTokenKind, KEY_VALUE_TYPE);
+    }
+
+    @Test
+    public void keyValueType7() throws SyntaxException
+    {
+        System.out.println("keyValueType7");
+        String input = "[boolean:@@[boolean:@[string]]]";
+        System.out.format("KeyValueType should accept '%s'", input);
+        System.out.println(input);
+        parseCorrectInput(input, KEY_VALUE_TYPE);
+    }
+
+    @Test
+    public void keyValueType8() throws SyntaxException
+    {
+        System.out.println("keyValueType8");
+        String input = "[boolean:@@[boolean:@@[string:int]]]";
+        System.out.format("KeyValueType should accept '%s'", input);
+        System.out.println(input);
+        parseCorrectInput(input, KEY_VALUE_TYPE);
+    }
+
+    @Test
+    public void keyValueType9() throws SyntaxException
+    {
+        System.out.println("keyValueType9");
+        String input = "[boolean:@@[int]]";
+        System.out.format("KeyValueType should not accept '%s'", input);
+        Kind ExpectedIncorrectTokenKind = RSQUARE;
+        parseIncorrectInput(input, ExpectedIncorrectTokenKind, KEY_VALUE_TYPE);
+    }
+
+    @Test
+    public void keyValueType10() throws SyntaxException
+    {
+        System.out.println("keyValueType10");
+        String input = "[boolean:@@[int:string]";
+        System.out.format("KeyValueType should not accept '%s'", input);
+        Kind ExpectedIncorrectTokenKind = EOF;
+        parseIncorrectInput(input, ExpectedIncorrectTokenKind, KEY_VALUE_TYPE);
+    }
+
+    @Test
+    public void keyValueType11() throws SyntaxException
+    {
+        System.out.println("keyValueType11");
+        String input = "boolean";
+        System.out.format("KeyValueType should not accept '%s'", input);
+        Kind ExpectedIncorrectTokenKind = KW_BOOLEAN;
+        parseIncorrectInput(input, ExpectedIncorrectTokenKind, KEY_VALUE_TYPE);
+    }
+
+    @Test
+    public void keyValueType12() throws SyntaxException
+    {
+        System.out.println("keyValueType12");
+        String input = "[]";
+        System.out.format("KeyValueType should not accept '%s'", input);
+        Kind ExpectedIncorrectTokenKind = RSQUARE;
+        parseIncorrectInput(input, ExpectedIncorrectTokenKind, KEY_VALUE_TYPE);
     }
 
     @Test
     public void listType1() throws SyntaxException
     {
+        System.out.println("listType1");
+        String input = "[@[string]]";
+        System.out.format("ListType should accept '%s'", input);
+        System.out.println(input);
+        parseCorrectInput(input, LIST_TYPE);
+    }
 
+    @Test
+    public void listType2() throws SyntaxException
+    {
+        System.out.println("listType2");
+        String input = "[]";
+        System.out.format("ListType should not accept '%s'", input);
+        Kind ExpectedIncorrectTokenKind = RSQUARE;
+        parseIncorrectInput(input, ExpectedIncorrectTokenKind, LIST_TYPE);
+    }
+
+    @Test
+    public void listType3() throws SyntaxException
+    {
+        System.out.println("listType3");
+        String input = "[boolean]";
+        System.out.format("ListType should accept '%s'", input);
+        System.out.println(input);
+        parseCorrectInput(input, LIST_TYPE);
+    }
+
+    @Test
+    public void listType4() throws SyntaxException
+    {
+        System.out.println("listType4");
+        String input = "[@[boolean]]";
+        System.out.format("ListType should accept '%s'", input);
+        System.out.println(input);
+        parseCorrectInput(input, LIST_TYPE);
+    }
+
+    @Test
+    public void listType5() throws SyntaxException
+    {
+        System.out.println("listType5");
+        String input = "[boolean:string]";
+        System.out.format("ListType should not accept '%s'", input);
+        Kind ExpectedIncorrectTokenKind = COLON;
+        parseIncorrectInput(input, ExpectedIncorrectTokenKind, LIST_TYPE);
+    }
+
+    @Test
+    public void listType6() throws SyntaxException
+    {
+        System.out.println("listType6");
+        String input = "[@[@@[string:int]]]";
+        System.out.format("ListType should accept '%s'", input);
+        System.out.println(input);
+        parseCorrectInput(input, LIST_TYPE);
+    }
+
+    @Test
+    public void listType7() throws SyntaxException
+    {
+        System.out.println("listType7");
+        String input = "[@@[boolean]]";
+        System.out.format("ListType should not accept '%s'", input);
+        Kind ExpectedIncorrectTokenKind = RSQUARE;
+        parseIncorrectInput(input, ExpectedIncorrectTokenKind, LIST_TYPE);
+    }
+
+    @Test
+    public void listType8() throws SyntaxException
+    {
+        System.out.println("listType8");
+        String input = "";
+        System.out.format("ListType should not accept '%s'", input);
+        Kind ExpectedIncorrectTokenKind = EOF;
+        parseIncorrectInput(input, ExpectedIncorrectTokenKind, LIST_TYPE);
+    }
+
+    @Test
+    public void listType9() throws SyntaxException
+    {
+        System.out.println("listType9");
+        String input = "[@@[boolean::string";
+        System.out.format("ListType should not accept '%s'", input);
+        Kind ExpectedIncorrectTokenKind = COLON;
+        parseIncorrectInput(input, ExpectedIncorrectTokenKind, LIST_TYPE);
+    }
+
+    @Test
+    public void listType10() throws SyntaxException
+    {
+        System.out.println("listType10");
+        String input = "[@@[boolean:string]]";
+        System.out.format("ListType should not accept '%s'", input);
+        parseCorrectInput(input, LIST_TYPE);
+    }
+
+    @Test
+    public void listType11() throws SyntaxException
+    {
+        System.out.println("listType11");
+        String input = "[@@[boolean:string";
+        System.out.format("ListType should not accept '%s'", input);
+        Kind ExpectedIncorrectTokenKind = EOF;
+        parseIncorrectInput(input, ExpectedIncorrectTokenKind, LIST_TYPE);
     }
 
     @Test

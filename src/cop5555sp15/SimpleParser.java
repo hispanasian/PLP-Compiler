@@ -49,6 +49,7 @@ import static cop5555sp15.TokenStream.Kind.STRING_LIT;
 import static cop5555sp15.TokenStream.Kind.TIMES;
 import cop5555sp15.TokenStream.Kind;
 import cop5555sp15.TokenStream.Token;
+import sun.java2d.pipe.SpanShapeRenderer;
 
 public class SimpleParser
 {
@@ -201,19 +202,35 @@ public class SimpleParser
 
     protected void Type() throws SyntaxException
     {
-
+        if(isKind(AT))
+        {
+            match(AT);
+            if(isKind(AT))
+            {
+                match(AT);
+                KeyValueType();
+            }
+            else ListType();
+        }
+        else SimpleType();
     }
 
     protected void SimpleType() throws SyntaxException { match(SIMPLE_TYPE); }
 
     protected void KeyValueType() throws SyntaxException
     {
-
+        match(LSQUARE);
+        SimpleType();
+        match(COLON);
+        Type();
+        match(RSQUARE);
     }
 
     protected void ListType() throws SyntaxException
     {
-
+        match(LSQUARE);
+        Type();
+        match(RSQUARE);
     }
 
     protected void ClosureDec() throws SyntaxException
