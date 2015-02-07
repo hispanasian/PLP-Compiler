@@ -309,7 +309,7 @@ public class TestSimpleParser
     {
         System.out.println("varDec1");
         String input = "x";
-        System.out.format("VarDec should not accept '%s'", input);
+        System.out.format("VarDec should accept '%s'", input);
         parseCorrectInput(input, VAR_DEC);
     }
 
@@ -348,7 +348,7 @@ public class TestSimpleParser
     {
         System.out.println("varDec5");
         String input = "x:string";
-        System.out.format("VarDec should not accept '%s'", input);
+        System.out.format("VarDec should accept '%s'", input);
         parseCorrectInput(input, VAR_DEC);
     }
 
@@ -357,7 +357,7 @@ public class TestSimpleParser
     {
         System.out.println("varDec6");
         String input = "x:int";
-        System.out.format("VarDec should not accept '%s'", input);
+        System.out.format("VarDec should accept '%s'", input);
         parseCorrectInput(input, VAR_DEC);
     }
 
@@ -366,7 +366,7 @@ public class TestSimpleParser
     {
         System.out.println("varDec5");
         String input = "x:boolean";
-        System.out.format("VarDec should not accept '%s'", input);
+        System.out.format("VarDec should accept '%s'", input);
         parseCorrectInput(input, VAR_DEC);
     }
 
@@ -395,7 +395,7 @@ public class TestSimpleParser
     {
         System.out.println("type1");
         String input = "@@[boolean:@[int]]";
-        System.out.format("Type should not accept '%s'", input);
+        System.out.format("Type should accept '%s'", input);
         parseCorrectInput(input, TYPE);
     }
 
@@ -404,7 +404,7 @@ public class TestSimpleParser
     {
         System.out.println("type2");
         String input = "int";
-        System.out.format("Type should not accept '%s'", input);
+        System.out.format("Type should accept '%s'", input);
         parseCorrectInput(input, TYPE);
     }
 
@@ -413,7 +413,7 @@ public class TestSimpleParser
     {
         System.out.println("type3");
         String input = "boolean";
-        System.out.format("Type should not accept '%s'", input);
+        System.out.format("Type should accept '%s'", input);
         parseCorrectInput(input, TYPE);
     }
 
@@ -422,7 +422,7 @@ public class TestSimpleParser
     {
         System.out.println("type4");
         String input = "string";
-        System.out.format("Type should not accept '%s'", input);
+        System.out.format("Type should accept '%s'", input);
         parseCorrectInput(input, TYPE);
     }
 
@@ -431,7 +431,7 @@ public class TestSimpleParser
     {
         System.out.println("type5");
         String input = "@@[boolean:int]";
-        System.out.format("Type should not accept '%s'", input);
+        System.out.format("Type should accept '%s'", input);
         parseCorrectInput(input, TYPE);
     }
 
@@ -440,7 +440,7 @@ public class TestSimpleParser
     {
         System.out.println("type6");
         String input = "@[int]";
-        System.out.format("Type should not accept '%s'", input);
+        System.out.format("Type should accept '%s'", input);
         parseCorrectInput(input, TYPE);
     }
 
@@ -449,7 +449,7 @@ public class TestSimpleParser
     {
         System.out.println("type7");
         String input = "@@[boolean:@@[int:string]]";
-        System.out.format("Type should not accept '%s'", input);
+        System.out.format("Type should accept '%s'", input);
         parseCorrectInput(input, TYPE);
     }
 
@@ -488,7 +488,7 @@ public class TestSimpleParser
     {
         System.out.println("type11");
         String input = "@[string]]";
-        System.out.format("Type should not accept '%s'", input);
+        System.out.format("Type should accept '%s'", input);
         parseCorrectInput(input, TYPE);
     }
 
@@ -792,7 +792,7 @@ public class TestSimpleParser
     {
         System.out.println("listType10");
         String input = "[@@[boolean:string]]";
-        System.out.format("ListType should not accept '%s'", input);
+        System.out.format("ListType should accept '%s'", input);
         parseCorrectInput(input, LIST_TYPE);
     }
 
@@ -821,7 +821,20 @@ public class TestSimpleParser
     @Test
     public void formalArgList1() throws SyntaxException
     {
+        System.out.println("formalArgList1");
+        String input = "x:x";
+        System.out.format("FormalArgList should accept '%s'", input);
+        parseCorrectInput(input, FORMAL_ARG_LIST);
+    }
 
+    @Test
+    public void formalArgListxxxxxx() throws SyntaxException
+    {
+        System.out.println("formalArgList1");
+        String input = "x:x";
+        System.out.format("FormalArgList should not accept '%s'", input);
+        Kind ExpectedIncorrectTokenKind = IDENT;
+        parseIncorrectInput(input, ExpectedIncorrectTokenKind, FORMAL_ARG_LIST);
     }
 
     @Test
