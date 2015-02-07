@@ -307,7 +307,87 @@ public class TestSimpleParser
     @Test
     public void varDec1() throws SyntaxException
     {
+        System.out.println("varDec1");
+        String input = "x";
+        System.out.format("VarDec should not accept '%s'", input);
+        parseCorrectInput(input, VAR_DEC);
+    }
 
+    @Test
+    public void varDec2() throws SyntaxException
+    {
+        System.out.println("varDec2");
+        String input = "";
+        System.out.format("VarDec should not accept '%s'", input);
+        Kind ExpectedIncorrectTokenKind = EOF;
+        parseIncorrectInput(input, ExpectedIncorrectTokenKind, VAR_DEC);
+    }
+
+    @Test
+    public void varDec3() throws SyntaxException
+    {
+        System.out.println("varDec3");
+        String input = "x:";
+        System.out.format("VarDec should not accept '%s'", input);
+        Kind ExpectedIncorrectTokenKind = EOF;
+        parseIncorrectInput(input, ExpectedIncorrectTokenKind, VAR_DEC);
+    }
+
+    @Test
+    public void varDec4() throws SyntaxException
+    {
+        System.out.println("varDec4");
+        String input = "3";
+        System.out.format("VarDec should not accept '%s'", input);
+        Kind ExpectedIncorrectTokenKind = INT_LIT;
+        parseIncorrectInput(input, ExpectedIncorrectTokenKind, VAR_DEC);
+    }
+
+    @Test
+    public void varDec5() throws SyntaxException
+    {
+        System.out.println("varDec5");
+        String input = "x:string";
+        System.out.format("VarDec should not accept '%s'", input);
+        parseCorrectInput(input, VAR_DEC);
+    }
+
+    @Test
+    public void varDec6() throws SyntaxException
+    {
+        System.out.println("varDec6");
+        String input = "x:int";
+        System.out.format("VarDec should not accept '%s'", input);
+        parseCorrectInput(input, VAR_DEC);
+    }
+
+    @Test
+    public void varDec7() throws SyntaxException
+    {
+        System.out.println("varDec5");
+        String input = "x:boolean";
+        System.out.format("VarDec should not accept '%s'", input);
+        parseCorrectInput(input, VAR_DEC);
+    }
+
+    @Test
+    public void varDec8() throws SyntaxException
+    {
+        System.out.println("varDec8");
+        String input = "x:x";
+        System.out.format("VarDec should not accept '%s'", input);
+        Kind ExpectedIncorrectTokenKind = IDENT;
+        parseIncorrectInput(input, ExpectedIncorrectTokenKind, VAR_DEC);
+    }
+
+    @Test
+    public void varDec9() throws SyntaxException
+    {
+        System.out.println("varDec9");
+        String input = "x:9";
+        System.out.format("VarDec should not accept '%s'", input);
+        Kind ExpectedIncorrectTokenKind = INT_LIT;
+        parseIncorrectInput(input, ExpectedIncorrectTokenKind, VAR_DEC);
     }
 
     @Test

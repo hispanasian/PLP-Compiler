@@ -197,7 +197,12 @@ public class SimpleParser
 
     protected void VarDec() throws SyntaxException
     {
-
+        match(IDENT);
+        if(isKind(COLON))
+        {
+            match(COLON);
+            Type();
+        }
     }
 
     protected void Type() throws SyntaxException
