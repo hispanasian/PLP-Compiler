@@ -149,7 +149,7 @@ public class SimpleParser
 	static final Kind[] WEAK_OPS = { PLUS, MINUS };
 	static final Kind[] STRONG_OPS = { TIMES, DIV };
 	static final Kind[] VERY_STRONG_OPS = { LSHIFT, RSHIFT };
-
+    static final Kind[] SIMPLE_TYPE = { KW_INT, KW_BOOLEAN, KW_STRING };
 
 	public void parse() throws SyntaxException
     {
@@ -204,10 +204,7 @@ public class SimpleParser
 
     }
 
-    protected void SimpleType() throws SyntaxException
-    {
-
-    }
+    protected void SimpleType() throws SyntaxException { match(SIMPLE_TYPE); }
 
     protected void KeyValueType() throws SyntaxException
     {

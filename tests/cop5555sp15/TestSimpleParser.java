@@ -319,7 +319,53 @@ public class TestSimpleParser
     @Test
     public void simpleType1() throws SyntaxException
     {
+        System.out.println("simpleType1");
+        System.out.println("SimpleType should accept 'int'");
+        String input = "int";
+        System.out.println(input);
+        parseCorrectInput(input, SIMPLE_TYPE);
+    }
 
+    @Test
+    public void simpleType2() throws SyntaxException
+    {
+        System.out.println("simpleType2");
+        System.out.println("SimpleType should accept 'boolean'");
+        String input = "boolean";
+        System.out.println(input);
+        parseCorrectInput(input, SIMPLE_TYPE);
+    }
+
+    @Test
+    public void simpleType3() throws SyntaxException
+    {
+        System.out.println("simpleType3");
+        System.out.println("SimpleType should accept 'string'");
+        String input = "string";
+        System.out.println(input);
+        parseCorrectInput(input, SIMPLE_TYPE);
+    }
+
+    @Test
+    public void simpleType4() throws SyntaxException
+    {
+        System.out.println("simpleType5");
+        System.out.println("SimpleType should not accept 'Boolean'");
+        String input = "Boolean";
+        System.out.println(input);
+        Kind ExpectedIncorrectTokenKind = IDENT;
+        parseIncorrectInput(input, ExpectedIncorrectTokenKind, SIMPLE_TYPE);
+    }
+
+    @Test
+    public void simpleType5() throws SyntaxException
+    {
+        System.out.println("simpleType5");
+        System.out.println("SimpleType should not accept 'STRING'");
+        String input = "STRING";
+        System.out.println(input);
+        Kind ExpectedIncorrectTokenKind = IDENT;
+        parseIncorrectInput(input, ExpectedIncorrectTokenKind, SIMPLE_TYPE);
     }
 
     @Test
