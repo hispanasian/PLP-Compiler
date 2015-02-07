@@ -50,7 +50,8 @@ import static cop5555sp15.TokenStream.Kind.TIMES;
 import cop5555sp15.TokenStream.Kind;
 import cop5555sp15.TokenStream.Token;
 
-public class SimpleParser {
+public class SimpleParser
+{
 
 	@SuppressWarnings("serial")
 	public class SyntaxException extends Exception {
@@ -92,43 +93,50 @@ public class SimpleParser {
 	TokenStream tokens;
 	Token t;
 
-	SimpleParser(TokenStream tokens) {
+	SimpleParser(TokenStream tokens)
+    {
 		this.tokens = tokens;
 		t = tokens.nextToken();
 	}
 
-	private Kind match(Kind kind) throws SyntaxException {
-		if (isKind(kind)) {
+	private Kind match(Kind kind) throws SyntaxException
+    {
+		if (isKind(kind))
+        {
 			consume();
 			return kind;
 		}
 		throw new SyntaxException(t, kind);
 	}
 
-	private Kind match(Kind... kinds) throws SyntaxException {
+	private Kind match(Kind... kinds) throws SyntaxException
+    {
 		Kind kind = t.kind;
-		if (isKind(kinds)) {
+		if (isKind(kinds))
+        {
 			consume();
 			return kind;
 		}
 		StringBuilder sb = new StringBuilder();
-		for (Kind kind1 : kinds) {
-			sb.append(kind1).append(kind1).append(" ");
-		}
+		for (Kind kind1 : kinds) { sb.append(kind1).append(kind1).append(" "); }
 		throw new SyntaxException(t, "expected one of " + sb.toString());
 	}
 
-	private boolean isKind(Kind kind) {
+	private boolean isKind(Kind kind)
+    {
 		return (t.kind == kind);
 	}
 
-	private void consume() {
+	private void consume()
+    {
 		if (t.kind != EOF)
 			t = tokens.nextToken();
 	}
 
-	private boolean isKind(Kind... kinds) {
-		for (Kind kind : kinds) {
+	private boolean isKind(Kind... kinds)
+    {
+		for (Kind kind : kinds)
+        {
 			if (t.kind == kind)
 				return true;
 		}
@@ -143,125 +151,165 @@ public class SimpleParser {
 	static final Kind[] VERY_STRONG_OPS = { LSHIFT, RSHIFT };
 
 
-	public void parse() throws SyntaxException {
+	public void parse() throws SyntaxException
+    {
 		Program();
 		match(EOF);
 	}
 
-	private void Program() throws SyntaxException {
+	private void Program() throws SyntaxException
+    {
 		ImportList();
 		match(KW_CLASS);
 		match(IDENT);
 		Block();
 	}
 
-	private void ImportList() throws SyntaxException {
-		//TODO  Fill this in
+	private void ImportList() throws SyntaxException
+    {
+        // Note: ImportList is not optional. There must be at least one import (according to the
+        // Phrase Structure documentation.
+        do {
+            match(KW_IMPORT);
+            match(IDENT);
+            while(isKind(DOT))
+            {
+                match(DOT);
+                match(IDENT);
+            }
+            match(SEMICOLON);
+        } while(isKind(KW_IMPORT));
 	}
 
-	private void Block() throws SyntaxException {
+	private void Block() throws SyntaxException
+    {
 		match(LCURLY);
 		//TODO  Fill this in
 		match(RCURLY);
 	}
 
-    private void Declaration() throws SyntaxException {
+    private void Declaration() throws SyntaxException
+    {
 
     }
 
-    private void VarDec() throws SyntaxException {
+    private void VarDec() throws SyntaxException
+    {
 
     }
 
-    private void Type() throws SyntaxException {
+    private void Type() throws SyntaxException
+    {
 
     }
 
-    private void SimpleType() throws SyntaxException {
+    private void SimpleType() throws SyntaxException
+    {
 
     }
 
-    private void KeyValueType() throws SyntaxException {
+    private void KeyValueType() throws SyntaxException
+    {
 
     }
 
-    private void ListType() throws SyntaxException {
+    private void ListType() throws SyntaxException
+    {
 
     }
 
-    private void ClosureDec() throws SyntaxException {
+    private void ClosureDec() throws SyntaxException
+    {
 
     }
 
-    private void Closure() throws SyntaxException {
+    private void Closure() throws SyntaxException
+    {
 
     }
 
-    private void FormalArgList() throws SyntaxException {
+    private void FormalArgList() throws SyntaxException
+    {
 
     }
 
-    private void Statement() throws SyntaxException {
+    private void Statement() throws SyntaxException
+    {
 
     }
 
-    private void ClosureEvalExpression() throws SyntaxException {
+    private void ClosureEvalExpression() throws SyntaxException
+    {
 
     }
 
-    private void LValue() throws SyntaxException {
+    private void LValue() throws SyntaxException
+    {
 
     }
 
-    private void List() throws SyntaxException {
+    private void List() throws SyntaxException
+    {
 
     }
 
-    private void ExpressionList() throws SyntaxException {
+    private void ExpressionList() throws SyntaxException
+    {
 
     }
 
-    private void KeyValueList() throws SyntaxException {
+    private void KeyValueList() throws SyntaxException
+    {
 
     }
 
-    private void MapList() throws SyntaxException {
+    private void MapList() throws SyntaxException
+    {
 
     }
 
-    private void RangeExpr() throws SyntaxException {
+    private void RangeExpr() throws SyntaxException
+    {
 
     }
 
-    private void Expression() throws SyntaxException {
+    private void Expression() throws SyntaxException
+    {
 
     }
 
-    private void Term() throws SyntaxException {
+    private void Term() throws SyntaxException
+    {
 
     }
 
-    private void Elem() throws SyntaxException {
+    private void Elem() throws SyntaxException
+    {
 
     }
 
-    private void Thing() throws SyntaxException {
+    private void Thing() throws SyntaxException
+    {
 
     }
 
-    private void Factor() throws SyntaxException {
+    private void Factor() throws SyntaxException
+    {
 
     }
 
-    private void RelOp() throws SyntaxException {
+    private void RelOp() throws SyntaxException
+    {
 
     }
 
-    private void WeakOp() throws SyntaxException {
+    private void WeakOp() throws SyntaxException
+    {
 
     }
 
-    private void VeryStrongOp() throws SyntaxException {
+    private void VeryStrongOp() throws SyntaxException
+    {
 
     }
 }
