@@ -14,7 +14,7 @@ public class TestSimpleParser
     {
         DECLARATION, VAR_DEC, TYPE, SIMPLE_TYPE, KEY_VALUE_TYPE, LIST_TYPE, CLOSURE_DEC, CLOSURE,
         FORMAL_ARG_LIST, STATEMENT, CLOSURE_EVAL_EXPRESSION, LVALUE, LIST, EXPRESSION_LIST,
-        KEY_VALUE_EXPRESSION, KEY_VALYE_LIST, MAP_LIST, RANGE_EXPR, EXPRESSION, TERM, ELEM, THING,
+        KEY_VALUE_EXPRESSION, KEY_VALUE_LIST, MAP_LIST, RANGE_EXPR, EXPRESSION, TERM, ELEM, THING,
         FACTOR, REL_OP, WEAK_OP, STRONG_OP, VERY_STRONG_OP, BLOCK
     }
 
@@ -52,7 +52,7 @@ public class TestSimpleParser
                 break;
             case KEY_VALUE_EXPRESSION: parser.KeyValueExpression();
                 break;
-            case KEY_VALYE_LIST: parser.KeyValueList();
+            case KEY_VALUE_LIST: parser.KeyValueList();
                 break;
             case MAP_LIST: parser.MapList();
                 break;
@@ -933,6 +933,33 @@ public class TestSimpleParser
     }
 
     @Test
+    public void list1()throws SyntaxException
+    {
+        System.out.println("list1");
+        String input = "class A  { \n x = @[a,b,c]; \n y = @[d,e,f]+x; \n } ";
+        System.out.println(input);
+        parseCorrectInput(input);
+    }
+
+    @Test
+    public void list2()throws SyntaxException
+    {
+        System.out.println("list2");
+        String input = "[true, false]";
+        System.out.format("List should not accept '%s'", input);
+        parseCorrectInput(input, LIST);
+    }
+
+    @Test
+    public void list3()throws SyntaxException
+    {
+        System.out.println("list3");
+        String input = "[!5, -false, 5+a[stuff]]";
+        System.out.format("List should not accept '%s'", input);
+        parseCorrectInput(input, LIST);
+    }
+
+    @Test
     public void expressionList1() throws SyntaxException
     {
 
@@ -951,9 +978,50 @@ public class TestSimpleParser
     }
 
     @Test
-    public void mapList1() throws SyntaxException
+    public void maplist1()throws SyntaxException
     {
+        System.out.println("maplist1");
+        String input = "class A  { x = @@[x:y]; y = @@[x:y,4:5]; } ";
+        System.out.println(input);
+        parseCorrectInput(input);
+    }
 
+    @Test
+    public void maplist2() throws SyntaxException
+    {
+        System.out.println("maplist2");
+        String input = "[]";
+        System.out.format("MapList should accept '%s'", input);
+        parseCorrectInput(input, MAP_LIST);
+    }
+
+    @Test
+    public void maplist3() throws SyntaxException
+    {
+        System.out.println("maplist3");
+        String input = "";
+        System.out.format("MapList should not accept '%s'", input);
+        Kind ExpectedIncorrectTokenKind = EOF;
+        parseIncorrectInput(input, ExpectedIncorrectTokenKind, MAP_LIST);
+    }
+
+    @Test
+    public void maplist4() throws SyntaxException
+    {
+        System.out.println("maplist4");
+        String input = "]";
+        System.out.format("MapList should not accept '%s'", input);
+        Kind ExpectedIncorrectTokenKind = RSQUARE;
+        parseIncorrectInput(input, ExpectedIncorrectTokenKind, MAP_LIST);
+    }
+
+    @Test
+    public void maplist5() throws SyntaxException
+    {
+        System.out.println("maplist5");
+        String input = "[x:5]";
+        System.out.format("MapList should accept '%s'", input);
+        parseCorrectInput(input, MAP_LIST);
     }
 
     @Test
@@ -965,25 +1033,300 @@ public class TestSimpleParser
     @Test
     public void expression1() throws SyntaxException
     {
+        System.out.println("expression1");
+        String input = "x";
+        System.out.format("Expression should accept '%s'", input);
+        parseCorrectInput(input, EXPRESSION);
+    }
 
+    @Test
+    public void expression2() throws SyntaxException
+    {
+        System.out.println("expression2");
+        String input = "x|a";
+        System.out.format("Expression should accept '%s'", input);
+        parseCorrectInput(input, EXPRESSION);
+    }
+
+    @Test
+    public void expression3() throws SyntaxException
+    {
+        System.out.println("expression3");
+        String input = "x&a";
+        System.out.format("Expression should accept '%s'", input);
+        parseCorrectInput(input, EXPRESSION);
+    }
+
+    @Test
+    public void expression4() throws SyntaxException
+    {
+        System.out.println("expression4");
+        String input = "x==a";
+        System.out.format("Expression should accept '%s'", input);
+        parseCorrectInput(input, EXPRESSION);
+    }
+
+    @Test
+    public void expression5() throws SyntaxException
+    {
+        System.out.println("expression5");
+        String input = "x!=a";
+        System.out.format("Expression should accept '%s'", input);
+        parseCorrectInput(input, EXPRESSION);
+    }
+
+    @Test
+    public void expression6() throws SyntaxException
+    {
+        System.out.println("expression6");
+        String input = "x<a";
+        System.out.format("Expression should accept '%s'", input);
+        parseCorrectInput(input, EXPRESSION);
+    }
+
+    @Test
+    public void expression7() throws SyntaxException
+    {
+        System.out.println("expression7");
+        String input = "x>a";
+        System.out.format("Expression should accept '%s'", input);
+        parseCorrectInput(input, EXPRESSION);
+    }
+
+    @Test
+    public void expression8() throws SyntaxException
+    {
+        System.out.println("expression8");
+        String input = "x<=a";
+        System.out.format("Expression should accept '%s'", input);
+        parseCorrectInput(input, EXPRESSION);
+    }
+
+    @Test
+    public void expression9() throws SyntaxException
+    {
+        System.out.println("expression9");
+        String input = "x>=a";
+        System.out.format("Expression should accept '%s'", input);
+        parseCorrectInput(input, EXPRESSION);
+    }
+
+    @Test
+    public void expression10() throws SyntaxException
+    {
+        System.out.println("expression10");
+        String input = "";
+        System.out.format("Expression should not accept '%s'", input);
+        Kind ExpectedIncorrectTokenKind = EOF;
+        parseIncorrectInput(input, ExpectedIncorrectTokenKind, ELEM);
+    }
+
+    @Test
+    public void expression11() throws SyntaxException
+    {
+        System.out.println("expression11");
+        String input = "x+";
+        System.out.format("Expression should not accept '%s'", input);
+        Kind ExpectedIncorrectTokenKind = PLUS;
+        parseIncorrectInput(input, ExpectedIncorrectTokenKind, ELEM);
+    }
+
+    @Test
+    public void expression12() throws SyntaxException
+    {
+        System.out.println("expression2");
+        String input = "x&";
+        System.out.format("Expression should not accept '%s'", input);
+        Kind ExpectedIncorrectTokenKind = EOF;
+        parseIncorrectInput(input, ExpectedIncorrectTokenKind, ELEM);
+    }
+
+    @Test
+    public void expression13() throws SyntaxException
+    {
+        System.out.println("expression13");
+        String input = "c&5+";
+        System.out.format("Expression should not accept '%s'", input);
+        Kind ExpectedIncorrectTokenKind = EOF;
+        parseIncorrectInput(input, ExpectedIncorrectTokenKind, ELEM);
     }
 
     @Test
     public void term1() throws SyntaxException
     {
+        System.out.println("term1");
+        String input = "x";
+        System.out.format("Term should accept '%s'", input);
+        parseCorrectInput(input, TERM);
+    }
 
+    @Test
+    public void term2() throws SyntaxException
+    {
+        System.out.println("term2");
+        String input = "x+1";
+        System.out.format("Term should accept '%s'", input);
+        parseCorrectInput(input, TERM);
+    }
+
+    @Test
+    public void term3() throws SyntaxException
+    {
+        System.out.println("term3");
+        String input = "1-2";
+        System.out.format("Term should accept '%s'", input);
+        parseCorrectInput(input, TERM);
+    }
+
+    @Test
+    public void term4() throws SyntaxException
+    {
+        System.out.println("term4");
+        String input = "x+1-3*5/6";
+        System.out.format("Term should accept '%s'", input);
+        parseCorrectInput(input, TERM);
+    }
+
+    @Test
+    public void term5() throws SyntaxException
+    {
+        System.out.println("term5");
+        String input = "";
+        System.out.format("Term should not accept '%s'", input);
+        Kind ExpectedIncorrectTokenKind = EOF;
+        parseIncorrectInput(input, ExpectedIncorrectTokenKind, ELEM);
+    }
+
+    @Test
+    public void term6() throws SyntaxException
+    {
+        System.out.println("term6");
+        String input = "x+";
+        System.out.format("Term should not accept '%s'", input);
+        Kind ExpectedIncorrectTokenKind = EOF;
+        parseIncorrectInput(input, ExpectedIncorrectTokenKind, ELEM);
     }
 
     @Test
     public void elem1() throws SyntaxException
     {
+        System.out.println("elem1");
+        String input = "x";
+        System.out.format("Thing should accept '%s'", input);
+        parseCorrectInput(input, ELEM);
+    }
 
+    @Test
+    public void elem2() throws SyntaxException
+    {
+        System.out.println("elem2");
+        String input = "x*a";
+        System.out.format("Thing should accept '%s'", input);
+        parseCorrectInput(input, ELEM);
+    }
+
+    @Test
+    public void elem3() throws SyntaxException
+    {
+        System.out.println("elem3");
+        String input = "x/b";
+        System.out.format("Thing should accept '%s'", input);
+        parseCorrectInput(input, ELEM);
+    }
+
+    @Test
+    public void elem4() throws SyntaxException
+    {
+        System.out.println("elem4");
+        String input = "x*a+c/d";
+        System.out.format("Thing should accept '%s'", input);
+        parseCorrectInput(input, ELEM);
+    }
+
+    @Test
+    public void elem5() throws SyntaxException
+    {
+        System.out.println("elem5");
+        String input = "";
+        System.out.format("Thing should not accept '%s'", input);
+        Kind ExpectedIncorrectTokenKind = EOF;
+        parseIncorrectInput(input, ExpectedIncorrectTokenKind, ELEM);
+    }
+
+    @Test
+    public void elem6() throws SyntaxException
+    {
+        System.out.println("elem6");
+        String input = "x*";
+        System.out.format("Thing should not accept '%s'", input);
+        Kind ExpectedIncorrectTokenKind = EOF;
+        parseIncorrectInput(input, ExpectedIncorrectTokenKind, ELEM);
     }
 
     @Test
     public void thing1() throws SyntaxException
     {
+        System.out.println("thing1");
+        String input = "x";
+        System.out.format("Thing should accept '%s'", input);
+        parseCorrectInput(input, THING);
+    }
 
+    @Test
+    public void thing2() throws SyntaxException
+    {
+        System.out.println("thing3");
+        String input = "x<<false";
+        System.out.format("Thing should accept '%s'", input);
+        parseCorrectInput(input, THING);
+    }
+
+    @Test
+    public void thing3() throws SyntaxException
+    {
+        System.out.println("thing3");
+        String input = "x >> 2";
+        System.out.format("Thing should accept '%s'", input);
+        parseCorrectInput(input, THING);
+    }
+
+    @Test
+    public void thing4() throws SyntaxException
+    {
+        System.out.println("thing4");
+        String input = "x <<";
+        System.out.format("Thing should not accept '%s'", input);
+        Kind ExpectedIncorrectTokenKind = EOF;
+        parseIncorrectInput(input, ExpectedIncorrectTokenKind, THING);
+    }
+
+    @Test
+    public void thing5() throws SyntaxException
+    {
+        System.out.println("thing5");
+        String input = "";
+        System.out.format("Thing should not accept '%s'", input);
+        Kind ExpectedIncorrectTokenKind = EOF;
+        parseIncorrectInput(input, ExpectedIncorrectTokenKind, THING);
+    }
+
+    @Test
+    public void thing6() throws SyntaxException
+    {
+        System.out.println("thing6");
+        String input = "x >> 2 >> a << b";
+        System.out.format("Thing should accept '%s'", input);
+        parseCorrectInput(input, THING);
+    }
+
+    @Test
+    public void thing7() throws SyntaxException
+    {
+        System.out.println("thing7");
+        String input = "x << b >>";
+        System.out.format("Thing should not accept '%s'", input);
+        Kind ExpectedIncorrectTokenKind = EOF;
+        parseIncorrectInput(input, ExpectedIncorrectTokenKind, THING);
     }
 
     @Test
@@ -1321,7 +1664,152 @@ public class TestSimpleParser
 		System.out.println(input);
 		parseIncorrectInput(input,AND);
 	}
-	
+
+    @Test
+    public void factor8() throws SyntaxException
+    {
+        System.out.println("factor8");
+        String input = "x";
+        System.out.format("Factor should accept '%s'", input);
+        parseCorrectInput(input, FACTOR);
+    }
+
+    @Test
+    public void factor9() throws SyntaxException
+    {
+        System.out.println("factor8");
+        String input = "x[a]";
+        System.out.format("Factor should accept '%s'", input);
+        parseCorrectInput(input, FACTOR);
+    }
+
+    @Test
+    public void factor10() throws SyntaxException
+    {
+        System.out.println("factor10");
+        String input = "5";
+        System.out.format("Factor should accept '%s'", input);
+        parseCorrectInput(input, FACTOR);
+    }
+
+    @Test
+    public void factor11() throws SyntaxException
+    {
+        System.out.println("factor11");
+        String input = "true";
+        System.out.format("Factor should accept '%s'", input);
+        parseCorrectInput(input, FACTOR);
+    }
+
+    @Test
+    public void factor12() throws SyntaxException
+    {
+        System.out.println("factor12");
+        String input = "false";
+        System.out.format("Factor should accept '%s'", input);
+        parseCorrectInput(input, FACTOR);
+    }
+
+    @Test
+    public void factor13() throws SyntaxException
+    {
+        System.out.println("factor13");
+        String input = "string";
+        System.out.format("Factor should accept '%s'", input);
+        parseCorrectInput(input, FACTOR);
+    }
+
+    @Test
+    public void factor14() throws SyntaxException
+    {
+        System.out.println("factor14");
+        String input = "(x+5)";
+        System.out.format("Factor should accept '%s'", input);
+        parseCorrectInput(input, FACTOR);
+    }
+
+
+    @Test
+    public void factor15() throws SyntaxException
+    {
+        System.out.println("factor15");
+        String input = "!true";
+        System.out.format("Factor should accept '%s'", input);
+        parseCorrectInput(input, FACTOR);
+    }
+
+    @Test
+    public void factor16() throws SyntaxException
+    {
+        System.out.println("factor16");
+        String input = "-false";
+        System.out.format("Factor should accept '%s'", input);
+        parseCorrectInput(input, FACTOR);
+    }
+
+    @Test
+    public void factor17() throws SyntaxException
+    {
+        System.out.println("factor17");
+        String input = "size(x)";
+        System.out.format("Factor should accept '%s'", input);
+        parseCorrectInput(input, FACTOR);
+    }
+
+    @Test
+    public void factor18() throws SyntaxException
+    {
+        System.out.println("factor18");
+        String input = "key(5)";
+        System.out.format("Factor should accept '%s'", input);
+        parseCorrectInput(input, FACTOR);
+    }
+
+    @Test
+    public void factor19() throws SyntaxException
+    {
+        System.out.println("factor19");
+        String input = "value(\"stuff\")";
+        System.out.format("Factor should accept '%s'", input);
+        parseCorrectInput(input, FACTOR);
+    }
+
+    @Test
+    public void factor20() throws SyntaxException
+    {
+        System.out.println("factor20");
+        String input = "x()";
+        System.out.format("Factor should accept '%s'", input);
+        parseCorrectInput(input, FACTOR);
+    }
+
+    @Test
+    public void factor21() throws SyntaxException
+    {
+        System.out.println("factor21");
+        String input = "{->}";
+        System.out.format("Factor should accept '%s'", input);
+        parseCorrectInput(input, FACTOR);
+    }
+
+    @Test
+    public void factor22() throws SyntaxException
+    {
+        System.out.println("factor22");
+        String input = "@[]";
+        System.out.format("Factor should accept '%s'", input);
+        parseCorrectInput(input, FACTOR);
+    }
+
+    @Test
+    public void factor23() throws SyntaxException
+    {
+        System.out.println("factor23");
+        String input = "@@[]";
+        System.out.format("Factor should accept '%s'", input);
+        parseCorrectInput(input, FACTOR);
+    }
+
 	@Test
 	public void expressions1() throws SyntaxException
     {
@@ -1415,27 +1903,9 @@ public class TestSimpleParser
 	@Test
 	public void closureEval()throws SyntaxException
     {
-		System.out.println("closureEva");
+		System.out.println("closureEval");
 		String input = "class A  { x[z] = a(1,2,3); } ";
 		System.out.println(input);
 		parseCorrectInput(input);
-	} 	
-	
-	@Test
-	public void list1()throws SyntaxException
-    {
-		System.out.println("list1");
-		String input = "class A  { \n x = @[a,b,c]; \n y = @[d,e,f]+x; \n } ";
-		System.out.println(input);
-		parseCorrectInput(input);
-	} 	
-	
-	@Test
-	public void maplist1()throws SyntaxException
-    {
-		System.out.println("maplist1");
-		String input = "class A  { x = @@[x:y]; y = @@[x:y,4:5]; } ";
-		System.out.println(input);
-		parseCorrectInput(input);
-	} 	
+	}
 }

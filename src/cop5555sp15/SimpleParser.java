@@ -152,6 +152,11 @@ public class SimpleParser
 	static final Kind[] VERY_STRONG_OPS = { LSHIFT, RSHIFT };
     static final Kind[] SIMPLE_TYPE = { KW_INT, KW_BOOLEAN, KW_STRING };
 
+    // Kinds used by Factor
+    static final Kind[] FACTOR_FIRST = { IDENT, INT_LIT, BL_TRUE, BL_FALSE, STRING_LIT };
+    static final Kind[] FACTOR_FACTOR = { NOT, MINUS };
+    static final Kind[] FACTOR_EXPRESSION = {}; //TODO: Implement
+
 	public void parse() throws SyntaxException
     {
 		Program();
@@ -278,7 +283,9 @@ public class SimpleParser
 
     protected void List() throws SyntaxException
     {
-
+        match(LSQUARE);
+        ExpressionList();
+        match(RSQUARE);
     }
 
     protected void ExpressionList() throws SyntaxException
@@ -298,7 +305,9 @@ public class SimpleParser
 
     protected void MapList() throws SyntaxException
     {
-
+        match(LSQUARE);
+        KeyValueList();
+        match(RSQUARE);
     }
 
     protected void RangeExpr() throws SyntaxException
@@ -308,27 +317,81 @@ public class SimpleParser
 
     protected void Expression() throws SyntaxException
     {
-
+        Term();
+        while(isKind(REL_OPS))
+        {
+            RelOp();
+            Term();
+        }
     }
 
     protected void Term() throws SyntaxException
     {
-
+        Elem();
+        while(isKind(WEAK_OPS))
+        {
+            WeakOp();
+            Elem();
+        }
     }
 
     protected void Elem() throws SyntaxException
     {
-
+        Thing();
+        while(isKind(STRONG_OPS))
+        {
+            StrongOp();
+            Thing();
+        }
     }
 
     protected void Thing() throws SyntaxException
     {
-
+        Factor();
+        while(isKind(VERY_STRONG_OPS))
+        {
+            VeryStrongOp();
+            Factor();
+        }
     }
 
     protected void Factor() throws SyntaxException
     {
-
+        if(isKind(IDENT))
+        {
+            match(IDENT);
+            if(isKind(LPAREN)) ClosureEvalExpression();
+            else if (isKind(LSQUARE))
+            {
+                match(LSQUARE);
+                Expression();
+                match(RSQUARE);
+            }
+        }
+        else if(isKind(FACTOR_FACTOR))
+        {
+            match(FACTOR_FACTOR);
+            Factor();
+        }
+        else if(isKind(LCURLY)) Closure();
+        else if(isKind(AT))
+        {
+            match(AT);
+            if(isKind(AT))
+            {
+                match(AT);
+                MapList();
+            }
+            else List();
+        }
+        else if(isKind(FACTOR_EXPRESSION) || isKind(LPAREN))
+        {
+            if(isKind(FACTOR_EXPRESSION)) match(FACTOR_EXPRESSION);
+            match(LPAREN);
+            Expression();
+            match(RPAREN);
+        }
+        else match(FACTOR_FIRST);
     }
 
     protected void RelOp() throws SyntaxException { match(REL_OPS); }
