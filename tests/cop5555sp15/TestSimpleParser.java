@@ -6,15 +6,16 @@ import org.junit.Test;
 import cop5555sp15.SimpleParser.SyntaxException;
 import cop5555sp15.TokenStream.Kind;
 import static cop5555sp15.TokenStream.Kind.*;
+import static cop5555sp15.TestSimpleParser.Phrase.*;
 
 public class TestSimpleParser
 {
-    private static enum Phrase
+    protected static enum Phrase
     {
         DECLARATION, VAR_DEC, TYPE, SIMPLE_TYPE, KEY_VALUE_TYPE, LIST_TYPE, CLOSURE_DEC, CLOSURE,
         FORMAL_ARG_LIST, STATEMENT, CLOSURE_EVAL_EXPRESSION, LVALUE, LIST, EXPRESSION_LIST,
         KEY_VALUE_EXPRESSION, KEY_VALYE_LIST, MAP_LIST, RANGE_EXPR, EXPRESSION, TERM, ELEM, THING,
-        FACTOR, REL_OP, WEAK_OP, STRONG_OP, VERY_STRONG_OP;
+        FACTOR, REL_OP, WEAK_OP, STRONG_OP, VERY_STRONG_OP, BLOCK
     }
 
     private void processPhrase(SimpleParser parser, Phrase phrase) throws SyntaxException
@@ -74,6 +75,8 @@ public class TestSimpleParser
             case STRONG_OP: parser.StrongOp();
                 break;
             case VERY_STRONG_OP: parser.VeryStrongOp();
+                break;
+            case BLOCK: parser.TestBlock();
                 break;
         }
     }
@@ -249,27 +252,33 @@ public class TestSimpleParser
     }
 
     @Test
-    /**
-     * SimpleParser.Block should allow an empty block
-     */
-    public void block1() throws SyntaxException
+    public void import10() throws SyntaxException
     {
-        System.out.println("block1");
-        String input = "import x; class A { } ";
+        System.out.println("import10");
+        String input = "class A { } "; // empty imports are allowed
         System.out.println(input);
+        Kind ExpectedIncorrectTokenKind = KW_IMPORT;
         parseCorrectInput(input);
     }
 
     @Test
-    /**
-     * SimpleParser.Block should allow an empty block
-     */
+    public void block1() throws SyntaxException
+    {
+        System.out.println("block1");
+        System.out.println("SimpleParser.Block should allow an empty block");
+        String input = "{ } ";
+        System.out.println(input);
+        parseCorrectInput(input, BLOCK);
+    }
+
+    @Test
     public void block2() throws SyntaxException
     {
-        System.out.println("block");
+        System.out.println("block2");
+        System.out.println();
         String input = "import Import; import not; class A { } ";
         System.out.println(input);
-        parseCorrectInput(input);
+        parseCorrectInput(input, BLOCK);
     }
 
     @Test
@@ -286,6 +295,156 @@ public class TestSimpleParser
 
     @Test
     public void block5() throws SyntaxException
+    {
+
+    }
+
+    @Test
+    public void declaration1() throws SyntaxException
+    {
+
+    }
+
+    @Test
+    public void varDec1() throws SyntaxException
+    {
+
+    }
+
+    @Test
+    public void type1() throws SyntaxException
+    {
+
+    }
+
+    @Test
+    public void simpleType1() throws SyntaxException
+    {
+
+    }
+
+    @Test
+    public void keyValueType1() throws SyntaxException
+    {
+
+    }
+
+    @Test
+    public void listType1() throws SyntaxException
+    {
+
+    }
+
+    @Test
+    public void closureDec1() throws SyntaxException
+    {
+
+    }
+
+    @Test
+    public void closure1() throws SyntaxException
+    {
+
+    }
+
+    @Test
+    public void formalArgList1() throws SyntaxException
+    {
+
+    }
+
+    @Test
+    public void statement1() throws SyntaxException
+    {
+
+    }
+
+    @Test
+    public void closureEvalExpression1() throws SyntaxException
+    {
+
+    }
+
+    @Test
+    public void lValue1() throws SyntaxException
+    {
+
+    }
+
+    @Test
+    public void expressionList1() throws SyntaxException
+    {
+
+    }
+
+    @Test
+    public void keyValueExpression1() throws SyntaxException
+    {
+
+    }
+
+    @Test
+    public void keyValueList1() throws SyntaxException
+    {
+
+    }
+
+    @Test
+    public void mapList1() throws SyntaxException
+    {
+
+    }
+
+    @Test
+    public void rangeExpr1() throws SyntaxException
+    {
+
+    }
+
+    @Test
+    public void expression1() throws SyntaxException
+    {
+
+    }
+
+    @Test
+    public void term1() throws SyntaxException
+    {
+
+    }
+
+    @Test
+    public void elem1() throws SyntaxException
+    {
+
+    }
+
+    @Test
+    public void thing1() throws SyntaxException
+    {
+
+    }
+
+    @Test
+    public void relOp1() throws SyntaxException
+    {
+
+    }
+
+    @Test
+    public void weakOp1() throws SyntaxException
+    {
+
+    }
+
+    @Test
+    public void strongOp1() throws SyntaxException
+    {
+
+    }
+
+    @Test
+    public void veryStrongOp1() throws SyntaxException
     {
 
     }

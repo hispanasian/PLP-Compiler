@@ -167,9 +167,8 @@ public class SimpleParser
 
 	private void ImportList() throws SyntaxException
     {
-        // Note: ImportList is not optional. There must be at least one import (according to the
-        // Phrase Structure documentation.
-        do {
+        while(isKind(KW_IMPORT))
+        {
             match(KW_IMPORT);
             match(IDENT);
             while(isKind(DOT))
@@ -178,7 +177,7 @@ public class SimpleParser
                 match(IDENT);
             }
             match(SEMICOLON);
-        } while(isKind(KW_IMPORT));
+        }
 	}
 
 	private void Block() throws SyntaxException
@@ -187,6 +186,8 @@ public class SimpleParser
 		//TODO  Fill this in
 		match(RCURLY);
 	}
+
+    protected void TestBlock() throws SyntaxException { Block(); }
 
     protected void Declaration() throws SyntaxException
     {
