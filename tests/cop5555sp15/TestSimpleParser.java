@@ -7,8 +7,76 @@ import cop5555sp15.SimpleParser.SyntaxException;
 import cop5555sp15.TokenStream.Kind;
 import static cop5555sp15.TokenStream.Kind.*;
 
-public class TestSimpleParser {
+public class TestSimpleParser
+{
+    private static enum Phrase
+    {
+        DECLARATION, VAR_DEC, TYPE, SIMPLE_TYPE, KEY_VALUE_TYPE, LIST_TYPE, CLOSURE_DEC, CLOSURE,
+        FORMAL_ARG_LIST, STATEMENT, CLOSURE_EVAL_EXPRESSION, LVALUE, LIST, EXPRESSION_LIST,
+        KEY_VALUE_EXPRESSION, KEY_VALYE_LIST, MAP_LIST, RANGE_EXPR, EXPRESSION, TERM, ELEM, THING,
+        FACTOR, REL_OP, WEAK_OP, STRONG_OP, VERY_STRONG_OP;
+    }
 
+    private void processPhrase(SimpleParser parser, Phrase phrase) throws SyntaxException
+    {
+        switch (phrase)
+        {
+            case DECLARATION: parser.Declaration();
+                break;
+            case VAR_DEC: parser.VarDec();
+                break;
+            case TYPE: parser.Type();
+                break;
+            case SIMPLE_TYPE: parser.SimpleType();
+                break;
+            case KEY_VALUE_TYPE: parser.KeyValueType();
+                break;
+            case LIST_TYPE: parser.ListType();
+                break;
+            case CLOSURE_DEC: parser.ClosureDec();
+                break;
+            case CLOSURE: parser.Closure();
+                break;
+            case FORMAL_ARG_LIST: parser.FormalArgList();
+                break;
+            case STATEMENT: parser.Statement();
+                break;
+            case CLOSURE_EVAL_EXPRESSION: parser.ClosureEvalExpression();
+                break;
+            case LVALUE: parser.LValue();
+                break;
+            case LIST: parser.List();
+                break;
+            case EXPRESSION_LIST: parser.ExpressionList();
+                break;
+            case KEY_VALUE_EXPRESSION: parser.KeyValueExpression();
+                break;
+            case KEY_VALYE_LIST: parser.KeyValueList();
+                break;
+            case MAP_LIST: parser.MapList();
+                break;
+            case RANGE_EXPR: parser.RangeExpr();
+                break;
+            case EXPRESSION: parser.Expression();
+                break;
+            case TERM: parser.Term();
+                break;
+            case ELEM: parser.Elem();
+                break;
+            case THING: parser.Thing();
+                break;
+            case FACTOR: parser.Factor();
+                break;
+            case REL_OP: parser.RelOp();
+                break;
+            case WEAK_OP: parser.WeakOp();
+                break;
+            case STRONG_OP: parser.StrongOp();
+                break;
+            case VERY_STRONG_OP: parser.VeryStrongOp();
+                break;
+        }
+    }
 	
 	private void parseIncorrectInput(String input,
 			Kind ExpectedIncorrectTokenKind)
@@ -25,6 +93,23 @@ public class TestSimpleParser {
 			assertEquals(ExpectedIncorrectTokenKind, e.t.kind); // class is the incorrect token
 		}
 	}
+
+    private void parseIncorrectInput(String input,
+                                    Kind ExpectedIncorrectTokenKind,
+                                    Phrase phrase)
+    {
+        TokenStream stream = new TokenStream(input);
+        Scanner scanner = new Scanner(stream);
+        scanner.scan();
+        SimpleParser parser = new SimpleParser(stream);
+        System.out.println(stream);
+        try {
+            processPhrase(parser, phrase);
+            fail("expected syntax error");
+        } catch (SyntaxException e) {
+            assertEquals(ExpectedIncorrectTokenKind, e.t.kind); // class is the incorrect token
+        }
+    }
 	
 	private void parseCorrectInput(String input) throws SyntaxException
     {
@@ -34,8 +119,17 @@ public class TestSimpleParser {
 		System.out.println(stream);
 		SimpleParser parser = new SimpleParser(stream);
 		parser.parse();
-	}	
+	}
 
+    private void parseCorrectInput(String input, Phrase phrase) throws SyntaxException
+    {
+        TokenStream stream = new TokenStream(input);
+        Scanner scanner = new Scanner(stream);
+        scanner.scan();
+        System.out.println(stream);
+        SimpleParser parser = new SimpleParser(stream);
+        processPhrase(parser, phrase);
+    }
 
 	/**This is an example of testing correct input
 	 * Just call parseCorrectInput
@@ -152,6 +246,48 @@ public class TestSimpleParser {
         System.out.println(input);
         Kind ExpectedIncorrectTokenKind = KW_IMPORT;
         parseIncorrectInput(input, ExpectedIncorrectTokenKind);
+    }
+
+    @Test
+    /**
+     * SimpleParser.Block should allow an empty block
+     */
+    public void block1() throws SyntaxException
+    {
+        System.out.println("block1");
+        String input = "import x; class A { } ";
+        System.out.println(input);
+        parseCorrectInput(input);
+    }
+
+    @Test
+    /**
+     * SimpleParser.Block should allow an empty block
+     */
+    public void block2() throws SyntaxException
+    {
+        System.out.println("block");
+        String input = "import Import; import not; class A { } ";
+        System.out.println(input);
+        parseCorrectInput(input);
+    }
+
+    @Test
+    public void block3() throws SyntaxException
+    {
+
+    }
+
+    @Test
+    public void block4() throws SyntaxException
+    {
+
+    }
+
+    @Test
+    public void block5() throws SyntaxException
+    {
+
     }
 
 	@Test

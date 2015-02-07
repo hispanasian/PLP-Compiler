@@ -188,127 +188,137 @@ public class SimpleParser
 		match(RCURLY);
 	}
 
-    private void Declaration() throws SyntaxException
+    protected void Declaration() throws SyntaxException
     {
 
     }
 
-    private void VarDec() throws SyntaxException
+    protected void VarDec() throws SyntaxException
     {
 
     }
 
-    private void Type() throws SyntaxException
+    protected void Type() throws SyntaxException
     {
 
     }
 
-    private void SimpleType() throws SyntaxException
+    protected void SimpleType() throws SyntaxException
     {
 
     }
 
-    private void KeyValueType() throws SyntaxException
+    protected void KeyValueType() throws SyntaxException
     {
 
     }
 
-    private void ListType() throws SyntaxException
+    protected void ListType() throws SyntaxException
     {
 
     }
 
-    private void ClosureDec() throws SyntaxException
+    protected void ClosureDec() throws SyntaxException
     {
 
     }
 
-    private void Closure() throws SyntaxException
+    protected void Closure() throws SyntaxException
     {
 
     }
 
-    private void FormalArgList() throws SyntaxException
+    protected void FormalArgList() throws SyntaxException
     {
 
     }
 
-    private void Statement() throws SyntaxException
+    protected void Statement() throws SyntaxException
     {
 
     }
 
-    private void ClosureEvalExpression() throws SyntaxException
+    protected void ClosureEvalExpression() throws SyntaxException
     {
 
     }
 
-    private void LValue() throws SyntaxException
+    protected void LValue() throws SyntaxException
     {
 
     }
 
-    private void List() throws SyntaxException
+    protected void List() throws SyntaxException
     {
 
     }
 
-    private void ExpressionList() throws SyntaxException
+    protected void ExpressionList() throws SyntaxException
     {
 
     }
 
-    private void KeyValueList() throws SyntaxException
+    protected void KeyValueExpression() throws SyntaxException
     {
 
     }
 
-    private void MapList() throws SyntaxException
+    protected void KeyValueList() throws SyntaxException
     {
 
     }
 
-    private void RangeExpr() throws SyntaxException
+    protected void MapList() throws SyntaxException
     {
 
     }
 
-    private void Expression() throws SyntaxException
+    protected void RangeExpr() throws SyntaxException
     {
 
     }
 
-    private void Term() throws SyntaxException
+    protected void Expression() throws SyntaxException
     {
 
     }
 
-    private void Elem() throws SyntaxException
+    protected void Term() throws SyntaxException
     {
 
     }
 
-    private void Thing() throws SyntaxException
+    protected void Elem() throws SyntaxException
     {
 
     }
 
-    private void Factor() throws SyntaxException
+    protected void Thing() throws SyntaxException
     {
 
     }
 
-    private void RelOp() throws SyntaxException
+    protected void Factor() throws SyntaxException
     {
 
     }
 
-    private void WeakOp() throws SyntaxException
+    protected void RelOp() throws SyntaxException
     {
 
     }
 
-    private void VeryStrongOp() throws SyntaxException
+    protected void WeakOp() throws SyntaxException
+    {
+
+    }
+
+    protected void StrongOp() throws SyntaxException
+    {
+
+    }
+
+    protected void VeryStrongOp() throws SyntaxException
     {
 
     }
