@@ -52,7 +52,10 @@ import static cop5555sp15.TokenStream.Kind.STRING_LIT;
 import static cop5555sp15.TokenStream.Kind.TIMES;
 import cop5555sp15.TokenStream.Kind;
 import cop5555sp15.TokenStream.Token;
+import org.mockito.internal.matchers.Null;
+import org.mockito.internal.util.collections.ArrayUtils;
 import sun.java2d.pipe.SpanShapeRenderer;
+import sun.reflect.annotation.ExceptionProxy;
 
 public class SimpleParser
 {
@@ -74,6 +77,7 @@ public class SimpleParser
 		public SyntaxException(Token t, String msg) {
 			this.t = t;
 			this.msg = msg;
+
 		}
 
 		public SyntaxException(Token t, Kind[] expected) {
@@ -83,14 +87,18 @@ public class SimpleParser
 		}
 
 		public String getMessage() {
-			StringBuilder sb = new StringBuilder();
-			sb.append(" error at token ").append(t.toString()).append(" ")
-					.append(msg);
-			sb.append(". Expected: ");
-			for (Kind kind : expected) {
-				sb.append(kind).append(" ");
-			}
-			return sb.toString();
+            if(expected != null)
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.append(" error at token ").append(t.toString()).append(" ")
+                        .append(msg);
+                sb.append(". Expected: ");
+                for (Kind kind : expected) {
+                    sb.append(kind).append(" ");
+                }
+                return sb.toString();
+            }
+			else return msg;
 		}
 	}
 
@@ -123,6 +131,7 @@ public class SimpleParser
 		}
 		StringBuilder sb = new StringBuilder();
 		for (Kind kind1 : kinds) { sb.append(kind1).append(kind1).append(" "); }
+        sb.append("instead of " + t);
 		throw new SyntaxException(t, "expected one of " + sb.toString());
 	}
 
@@ -130,6 +139,12 @@ public class SimpleParser
     {
 		return (t.kind == kind);
 	}
+
+    private boolean aheadIs(Kind kind, int x)
+    {
+        if(t.kind != EOF) return tokens.lookAhead(x).kind == kind;
+        return false;
+    }
 
 	private void consume()
     {
@@ -147,6 +162,18 @@ public class SimpleParser
 		return false;
 	}
 
+    private boolean aheadIs(int x, Kind... kinds)
+    {
+        if(t.kind != EOF)
+        {
+            for(Kind kind : kinds)
+            {
+                if(tokens.lookAhead(x) != null &&  tokens.lookAhead(x).kind == kind) return true;
+            }
+        }
+        return false;
+    }
+
 	//This is a convenient way to represent fixed sets of
 	//token kinds.  You can pass these to isKind.
 	static final Kind[] REL_OPS = { BAR, AND, EQUAL, NOTEQUAL, LT, GT, LE, GE };
@@ -158,7 +185,29 @@ public class SimpleParser
     // Kinds used by Factor
     static final Kind[] FACTOR_FIRST = { IDENT, INT_LIT, BL_TRUE, BL_FALSE, STRING_LIT };
     static final Kind[] FACTOR_FACTOR = { NOT, MINUS };
-    static final Kind[] FACTOR_EXPRESSION = {}; //TODO: Implement
+    static final Kind[] FACTOR_EXPRESSION = {KW_SIZE, KW_KEY, KW_VALUE};
+    static final Kind[] FIRST_FACTOR = { IDENT, INT_LIT, BL_TRUE, BL_FALSE, STRING_LIT,
+            LPAREN, NOT, MINUS, KW_SIZE, KW_KEY, KW_VALUE, LCURLY, AT};
+
+    // Some firsts, follows, and predicts
+    static final Kind[] FIRST_THING = FIRST_FACTOR;
+    static final Kind[] FIRST_ELEM = FIRST_THING;
+    static final Kind[] FIRST_TERM = FIRST_ELEM;
+    static final Kind[] FIRST_EXPRESSION = FIRST_TERM;
+    static final Kind[] FIRST_DECLARATION = { KW_DEF };
+    static final Kind[] PREDICT_DECLARATION = { KW_DEF };
+    static final Kind[] FIRST_STATEMENT = { IDENT, KW_PRINT, KW_WHILE, KW_IF, MOD, KW_RETURN };
+    static final Kind[] FOLLOW_STATEMENT = { SEMICOLON };
+    static final Kind[] PREDICT_STATEMENT = {IDENT, KW_PRINT, KW_WHILE, KW_IF, MOD, KW_RETURN, SEMICOLON};
+
+    // Kinds used by KeyValueList
+    static final Kind[] FIRST_KEY_VALUE_LIST = { IDENT, INT_LIT, BL_TRUE, BL_FALSE, STRING_LIT,
+        LPAREN, NOT, MINUS, KW_SIZE, KW_KEY, KW_VALUE, LCURLY, AT};
+    static final Kind[] FOLLOW_KEY_VALUE_LIST = { RSQUARE };
+
+    // Kinds used by ExpressionList
+    static final Kind[] FIRST_EXPRESSION_LIST = FIRST_FACTOR;
+    static final Kind[] FOLLOW_EXPRESSION_LIST = { RPAREN, RSQUARE } ;
 
 	public void parse() throws SyntaxException
     {
@@ -192,7 +241,12 @@ public class SimpleParser
 	private void Block() throws SyntaxException
     {
 		match(LCURLY);
-		//TODO  Fill this in
+        while(isKind(PREDICT_DECLARATION) || isKind(PREDICT_STATEMENT))
+        {
+            if(isKind(PREDICT_DECLARATION)) Declaration();
+            else Statement();
+            match(SEMICOLON); // The FOLLOW of Declaration.
+        }
 		match(RCURLY);
 	}
 
@@ -200,7 +254,12 @@ public class SimpleParser
 
     protected void Declaration() throws SyntaxException
     {
-
+        match(KW_DEF);
+        // Look ahead by 1. If it is an '=' then it must be a Closure Declaration. Else, it must be
+        // a Var Declaration. Assume that the current kind is correct (is a IDENT), this will be
+        // matched by VarDec or ClosureDec
+        if(aheadIs(ASSIGN, 1)) ClosureDec();
+        else VarDec();
     }
 
     protected void VarDec() throws SyntaxException
@@ -248,12 +307,22 @@ public class SimpleParser
 
     protected void ClosureDec() throws SyntaxException
     {
-
+        match(IDENT);
+        match(ASSIGN);
+        Closure();
     }
 
     protected void Closure() throws SyntaxException
     {
-
+        match(LCURLY);
+        FormalArgList();
+        match(ARROW);
+        while(isKind(FIRST_STATEMENT))
+        {
+            Statement();
+            match(SEMICOLON);
+        }
+        match(RCURLY);
     }
 
     protected void FormalArgList() throws SyntaxException
@@ -271,17 +340,86 @@ public class SimpleParser
 
     protected void Statement() throws SyntaxException
     {
-
+        if(isKind(IDENT))
+        {
+            LValue();
+            match(ASSIGN);
+            Expression();
+        }
+        else if(isKind(KW_PRINT))
+        {
+            match(KW_PRINT);
+            Expression();
+        }
+        else if(isKind(KW_WHILE))
+        {
+            match(KW_WHILE);
+            if(isKind(TIMES))
+            {
+                match(TIMES);
+                match(LPAREN);
+                Expression();
+                // Manually check for Range Expression
+                if(isKind(RANGE))
+                {
+                    match(RANGE);
+                    Expression();
+                }
+                match(RPAREN);
+                Block();
+            }
+            else
+            {
+                match(LPAREN);
+                Expression();
+                match(RPAREN);
+                Block();
+            }
+        }
+        else if(isKind(KW_IF))
+        {
+            match(KW_IF);
+            match(LPAREN);
+            Expression();
+            match(RPAREN);
+            Block();
+            if(isKind(KW_ELSE))
+            {
+                match(KW_ELSE);
+                Block();
+            }
+        }
+        else if(isKind(MOD))
+        {
+            match(MOD);
+            Expression();
+        }
+        else if(isKind(KW_RETURN))
+        {
+            match(KW_RETURN);
+            Expression();
+        }
+        else if(isKind(FIRST_STATEMENT)) throw new SyntaxException(t, "Error: Unused " + t);
+        else if(!isKind(FOLLOW_STATEMENT)) throw new SyntaxException(t, PREDICT_STATEMENT);
     }
 
     protected void ClosureEvalExpression() throws SyntaxException
     {
-
+        match(IDENT);
+        match(LPAREN);
+        ExpressionList();
+        match(RPAREN);
     }
 
     protected void LValue() throws SyntaxException
     {
-
+        match(IDENT);
+        if(isKind(LSQUARE))
+        {
+            match(LSQUARE);
+            Expression();
+            match(RSQUARE);
+        }
     }
 
     protected void List() throws SyntaxException
@@ -293,17 +431,56 @@ public class SimpleParser
 
     protected void ExpressionList() throws SyntaxException
     {
-
+        // Check FIRST(ExpressionList)
+        if(isKind(FIRST_EXPRESSION_LIST))
+        {
+            Expression();
+            while(isKind(COMMA))
+            {
+                match(COMMA);
+                Expression();
+            }
+        }
+        else if(isKind(FOLLOW_EXPRESSION_LIST)) { /* Do nothing, empty */ }
+        else
+        { /* unknown, throw error or let next match deal with it? */
+            StringBuilder sb = new StringBuilder();
+            sb.append("Unexpected token " + t + " found. Expected one of:");
+            for (Kind kinds : FIRST_EXPRESSION_LIST) { sb.append(kinds).append(" "); }
+            for (Kind kinds : FOLLOW_EXPRESSION_LIST) { sb.append(kinds).append(" "); }
+            throw new SyntaxException(t, sb.toString());
+        }
     }
 
     protected void KeyValueExpression() throws SyntaxException
     {
-
+        Expression();
+        match(COLON);
+        Expression();
     }
 
     protected void KeyValueList() throws SyntaxException
     {
-
+        // Check FIRST(KeyValueList)
+        if(isKind(FIRST_KEY_VALUE_LIST))
+        {
+            KeyValueExpression();
+            while(isKind(COMMA))
+            {
+                match(COMMA);
+                KeyValueExpression();
+            }
+        }
+        // Check FOLLOW(KeyValueList)
+        else if(isKind(FOLLOW_KEY_VALUE_LIST)) { /* Do nothing, empty */ }
+        else
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.append("Unexpected token " + t + " found. Expected one of:");
+            for (Kind kinds : FIRST_KEY_VALUE_LIST) { sb.append(kinds).append(" "); }
+            for (Kind kinds : FOLLOW_KEY_VALUE_LIST) { sb.append(kinds).append(" "); }
+            throw new SyntaxException(t, sb.toString());
+        }
     }
 
     protected void MapList() throws SyntaxException
@@ -315,7 +492,9 @@ public class SimpleParser
 
     protected void RangeExpr() throws SyntaxException
     {
-
+        Expression();
+        match(RANGE);
+        Expression();
     }
 
     protected void Expression() throws SyntaxException
@@ -362,14 +541,15 @@ public class SimpleParser
     {
         if(isKind(IDENT))
         {
-            match(IDENT);
-            if(isKind(LPAREN)) ClosureEvalExpression();
-            else if (isKind(LSQUARE))
+            if(aheadIs(1, LPAREN)) ClosureEvalExpression();
+            else if (aheadIs(1, LSQUARE))
             {
+                match(IDENT);
                 match(LSQUARE);
                 Expression();
                 match(RSQUARE);
             }
+            else match(IDENT);
         }
         else if(isKind(FACTOR_FACTOR))
         {

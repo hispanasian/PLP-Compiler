@@ -59,6 +59,9 @@ public class TokenStream {
 		return tokens.get(pos++);
 	}
 
+    /** returns the token that is x indices ahead of the position */
+    public Token lookAhead(int x) { return (pos + x - 1 < tokens.size()) ? tokens.get(pos + x - 1): null; }
+
 	/** resets the position in the token stream */
 	public void reset() {
 		pos = 0;
