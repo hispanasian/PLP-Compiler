@@ -59,6 +59,9 @@ public class TokenStream {
 		return tokens.get(pos++);
 	}
 
+    /** returns the token that is x indices ahead of the position */
+    public Token lookAhead(int x) { return (pos + x - 1 < tokens.size()) ? tokens.get(pos + x - 1): null; }
+
 	/** resets the position in the token stream */
 	public void reset() {
 		pos = 0;
@@ -77,7 +80,8 @@ public class TokenStream {
 	public static enum Kind {
 		IDENT,
 		/* reserved words */
-		KW_INT, KW_STRING, KW_BOOLEAN, KW_IMPORT, KW_CLASS, KW_DEF, KW_WHILE, KW_IF, KW_ELSE, KW_RETURN, KW_PRINT,
+		KW_INT, KW_STRING, KW_BOOLEAN, KW_IMPORT, KW_CLASS, KW_DEF, KW_WHILE, KW_IF, KW_ELSE,
+        KW_RETURN, KW_PRINT, KW_SIZE, KW_KEY, KW_VALUE,
 		/* boolean literals */
 		BL_TRUE, BL_FALSE,
 		/* null literal */

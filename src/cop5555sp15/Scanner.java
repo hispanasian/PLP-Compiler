@@ -347,6 +347,9 @@ public class Scanner
 		else if(string.equals("else")) return Kind.KW_ELSE;
 		else if(string.equals("return")) return Kind.KW_RETURN;
 		else if(string.equals("print")) return Kind.KW_PRINT;
+        else if(string.equals("size")) return Kind.KW_SIZE;
+        else if(string.equals("key")) return Kind.KW_KEY;
+        else if(string.equals("value")) return Kind.KW_VALUE;
 		else return null;
 	}
 
