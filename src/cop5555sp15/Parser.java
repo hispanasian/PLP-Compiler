@@ -2,9 +2,7 @@ package cop5555sp15;
 
 import cop5555sp15.TokenStream.Kind;
 import cop5555sp15.TokenStream.Token;
-import cop5555sp15.ast.Block;
-import cop5555sp15.ast.Program;
-import cop5555sp15.ast.QualifiedName;
+import cop5555sp15.ast.*;
 import jdk.nashorn.internal.runtime.regexp.joni.Syntax;
 
 import java.util.ArrayList;
@@ -219,20 +217,23 @@ public class Parser
 
 	private Block Block() throws SyntaxException
     {
+        List<BlockElem> elems = new ArrayList<BlockElem>();
+        Token start = t;
+
 		match(LCURLY);
         while(isKind(PREDICT_DECLARATION) || isKind(PREDICT_STATEMENT))
         {
-            if(isKind(PREDICT_DECLARATION)) Declaration();
-            else Statement();
+            if(isKind(PREDICT_DECLARATION)) elems.add(Declaration());
+            else elems.add(Statement());
             match(SEMICOLON); // The FOLLOW of Declaration.
         }
 		match(RCURLY);
-        return null;
+        return new Block(start, elems);
 	}
 
     protected void TestBlock() throws SyntaxException { Block(); }
 
-    protected void Declaration() throws SyntaxException
+    protected Declaration Declaration() throws SyntaxException
     {
         match(KW_DEF);
         // Look ahead by 1. If it is an '=' then it must be a Closure Declaration. Else, it must be
@@ -240,6 +241,7 @@ public class Parser
         // matched by VarDec or ClosureDec
         if(aheadIs(ASSIGN, 1)) ClosureDec();
         else VarDec();
+        return null;
     }
 
     protected void VarDec() throws SyntaxException
@@ -318,7 +320,7 @@ public class Parser
         }
     }
 
-    protected void Statement() throws SyntaxException
+    protected Statement Statement() throws SyntaxException
     {
         if(isKind(IDENT))
         {
@@ -381,6 +383,8 @@ public class Parser
         }
         else if(isKind(FIRST_STATEMENT)) throw new SyntaxException(t, "Error: Unused " + t);
         else if(!isKind(FOLLOW_STATEMENT)) throw new SyntaxException(t, PREDICT_STATEMENT);
+
+        return null;
     }
 
     protected void ClosureEvalExpression() throws SyntaxException
