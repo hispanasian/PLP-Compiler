@@ -163,11 +163,6 @@ public class Parser
     static final Kind[] FIRST_EXPRESSION_LIST = FIRST_FACTOR;
     static final Kind[] FOLLOW_EXPRESSION_LIST = { RPAREN, RSQUARE } ;
 
-//	public void parse() throws SyntaxException
-//    {
-//		Program();
-//		match(EOF);
-//	}
 
     public Program parse()
     {
@@ -186,20 +181,24 @@ public class Parser
 
 	private Program Program() throws SyntaxException
     {
-		ImportList();
+        Token start = t;
 		match(KW_CLASS);
 		match(IDENT);
 		Block();
         return null;
 	}
 
-	private QualifiedName ImportList() throws SyntaxException
+	private List<QualifiedName> ImportList() throws SyntaxException
     {
-        StringBuilder sb = new StringBuilder();
-        Token start = t;
+        List<QualifiedName> imports = new ArrayList<QualifiedName>();
+        StringBuilder sb;
+        Token start;
 
         while(isKind(KW_IMPORT))
         {
+            start = t;
+            sb = new StringBuilder();
+
             match(KW_IMPORT);
             sb.append(t.getText());
             match(IDENT);
@@ -207,11 +206,13 @@ public class Parser
             {
                 sb.append("/");
                 match(DOT);
+                sb.append(tokens.getString(t));
                 match(IDENT);
             }
             match(SEMICOLON);
+            imports.add(new QualifiedName(start, sb.toString()));
         }
-        return new QualifiedName(start, sb.toString());
+        return imports;
 	}
 
 	private void Block() throws SyntaxException
