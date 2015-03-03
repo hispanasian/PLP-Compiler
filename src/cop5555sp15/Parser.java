@@ -202,12 +202,12 @@ public class Parser
             sb = new StringBuilder();
 
             match(KW_IMPORT);
-            sb.append(match(IDENT));
+            sb.append(tokens.getString(match(IDENT)));
             while(isKind(DOT))
             {
                 sb.append("/");
                 match(DOT);
-                sb.append(match(IDENT));
+                sb.append(tokens.getString(match(IDENT)));
             }
             match(SEMICOLON);
             imports.add(new QualifiedName(start, sb.toString()));
