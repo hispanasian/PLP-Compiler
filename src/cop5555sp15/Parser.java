@@ -221,12 +221,17 @@ public class Parser
     {
         List<BlockElem> elems = new ArrayList<BlockElem>();
         Token start = t;
+        BlockElem e;
 
 		match(LCURLY);
         while(isKind(PREDICT_DECLARATION) || isKind(PREDICT_STATEMENT))
         {
             if(isKind(PREDICT_DECLARATION)) elems.add(Declaration());
-            else elems.add(Statement());
+            else
+            {
+                e = Statement();
+                if(e != null) elems.add(e);
+            }
             match(SEMICOLON); // The FOLLOW of Declaration.
         }
 		match(RCURLY);
@@ -417,6 +422,7 @@ public class Parser
             return new ReturnStatement(start, expression);
         }
         else if(isKind(FIRST_STATEMENT)) throw new SyntaxException(t, "Error: Unused " + t);
+        else if(isKind(FOLLOW_STATEMENT)) return null;
         else if(!isKind(FOLLOW_STATEMENT)) throw new SyntaxException(t, PREDICT_STATEMENT);
 
         StringBuilder sb = new StringBuilder();
