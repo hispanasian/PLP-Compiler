@@ -64,24 +64,24 @@ public class Parser
 		t = tokens.nextToken();
 	}
 
-	private String match(Kind kind) throws SyntaxException
+	private Token match(Kind kind) throws SyntaxException
     {
         Token token = t;
 		if (isKind(kind))
         {
 			consume();
-			return tokens.getString(token);
+			return token;
 		}
 		throw new SyntaxException(t, kind);
 	}
 
-	private Kind match(Kind... kinds) throws SyntaxException
+	private Token match(Kind... kinds) throws SyntaxException
     {
 		Token token = t;
 		if (isKind(kinds))
         {
 			consume();
-			return token.kind;
+			return token;
 		}
 		StringBuilder sb = new StringBuilder();
 		for (Kind kind1 : kinds) { sb.append(kind1).append(kind1).append(" "); }
@@ -185,7 +185,7 @@ public class Parser
 
         List<QualifiedName> imports = ImportList();
         match(KW_CLASS);
-        String name = match(IDENT);
+        String name = tokens.getString(match(IDENT));
         Block block = Block();
         return new Program(start, imports, name, block);
 	}
