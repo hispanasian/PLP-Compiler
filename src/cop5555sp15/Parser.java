@@ -293,21 +293,22 @@ public class Parser
     protected ListType ListType(Token start) throws SyntaxException
     {
         match(LSQUARE);
-        Type();
+        Type type = Type();
         match(RSQUARE);
-        return null;
+        return new ListType(start, type);
     }
 
     protected ClosureDec ClosureDec() throws SyntaxException
     {
-        match(IDENT);
+        Token start = t;
+        Token ident = match(IDENT);
         match(ASSIGN);
-        Closure();
+        Closure closure = Closure();
 
-        return null;
+        return new ClosureDec(start, ident, closure);
     }
 
-    protected void Closure() throws SyntaxException
+    protected Closure Closure() throws SyntaxException
     {
         match(LCURLY);
         FormalArgList();
@@ -318,6 +319,8 @@ public class Parser
             match(SEMICOLON);
         }
         match(RCURLY);
+
+        return null;
     }
 
     protected void FormalArgList() throws SyntaxException
