@@ -258,36 +258,38 @@ public class Parser
 
     protected Type Type() throws SyntaxException
     {
+        Token start = t;
         if(isKind(AT))
         {
             match(AT);
             if(isKind(AT))
             {
                 match(AT);
-                KeyValueType();
+                return KeyValueType(start);
             }
-            else ListType();
+            else return ListType(start);
         }
-        else SimpleType();
-        return null;
+        else return SimpleType();
     }
 
-    protected void SimpleType() throws SyntaxException { match(SIMPLE_TYPE); }
+    protected SimpleType SimpleType() throws SyntaxException { match(SIMPLE_TYPE); return null; }
 
-    protected void KeyValueType() throws SyntaxException
+    protected KeyValueType KeyValueType(Token start) throws SyntaxException
     {
         match(LSQUARE);
         SimpleType();
         match(COLON);
         Type();
         match(RSQUARE);
+        return null;
     }
 
-    protected void ListType() throws SyntaxException
+    protected ListType ListType(Token start) throws SyntaxException
     {
         match(LSQUARE);
         Type();
         match(RSQUARE);
+        return null;
     }
 
     protected ClosureDec ClosureDec() throws SyntaxException
