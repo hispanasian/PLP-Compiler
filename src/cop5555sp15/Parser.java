@@ -2,6 +2,7 @@ package cop5555sp15;
 
 import cop5555sp15.TokenStream.Kind;
 import cop5555sp15.TokenStream.Token;
+import cop5555sp15.ast.Block;
 import cop5555sp15.ast.Program;
 import cop5555sp15.ast.QualifiedName;
 import jdk.nashorn.internal.runtime.regexp.joni.Syntax;
@@ -65,23 +66,24 @@ public class Parser
 		t = tokens.nextToken();
 	}
 
-	private Kind match(Kind kind) throws SyntaxException
+	private String match(Kind kind) throws SyntaxException
     {
+        Token token = t;
 		if (isKind(kind))
         {
 			consume();
-			return kind;
+			return tokens.getString(token);
 		}
 		throw new SyntaxException(t, kind);
 	}
 
 	private Kind match(Kind... kinds) throws SyntaxException
     {
-		Kind kind = t.kind;
+		Token token = t;
 		if (isKind(kinds))
         {
 			consume();
-			return kind;
+			return token.kind;
 		}
 		StringBuilder sb = new StringBuilder();
 		for (Kind kind1 : kinds) { sb.append(kind1).append(kind1).append(" "); }
@@ -182,10 +184,12 @@ public class Parser
 	private Program Program() throws SyntaxException
     {
         Token start = t;
-		match(KW_CLASS);
-		match(IDENT);
-		Block();
-        return null;
+
+        List<QualifiedName> imports = ImportList();
+        match(KW_CLASS);
+        String name = match(IDENT);
+        Block block = Block();
+        return new Program(start, imports, name, block);
 	}
 
 	private List<QualifiedName> ImportList() throws SyntaxException
@@ -200,14 +204,12 @@ public class Parser
             sb = new StringBuilder();
 
             match(KW_IMPORT);
-            sb.append(t.getText());
-            match(IDENT);
+            sb.append(match(IDENT));
             while(isKind(DOT))
             {
                 sb.append("/");
                 match(DOT);
-                sb.append(tokens.getString(t));
-                match(IDENT);
+                sb.append(match(IDENT));
             }
             match(SEMICOLON);
             imports.add(new QualifiedName(start, sb.toString()));
@@ -215,7 +217,7 @@ public class Parser
         return imports;
 	}
 
-	private void Block() throws SyntaxException
+	private Block Block() throws SyntaxException
     {
 		match(LCURLY);
         while(isKind(PREDICT_DECLARATION) || isKind(PREDICT_STATEMENT))
@@ -225,6 +227,7 @@ public class Parser
             match(SEMICOLON); // The FOLLOW of Declaration.
         }
 		match(RCURLY);
+        return null;
 	}
 
     protected void TestBlock() throws SyntaxException { Block(); }
