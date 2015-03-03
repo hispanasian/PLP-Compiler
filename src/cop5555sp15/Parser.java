@@ -489,9 +489,8 @@ public class Parser
         return new KeyValueExpression(start, key, value);
     }
 
-    protected MapListExpression KeyValueList() throws SyntaxException
+    protected MapListExpression KeyValueList(Token start) throws SyntaxException
     {
-        Token start = t;
         List<KeyValueExpression> mapList = new ArrayList<KeyValueExpression>();
 
         // Check FIRST(KeyValueList)
@@ -518,11 +517,12 @@ public class Parser
         return new MapListExpression(start, mapList);
     }
 
-    protected void MapList() throws SyntaxException
+    protected MapListExpression MapList(Token start) throws SyntaxException
     {
         match(LSQUARE);
-        KeyValueList();
+        MapListExpression mapList = KeyValueList(start);
         match(RSQUARE);
+        return mapList;
     }
 
     protected void RangeExpr() throws SyntaxException
