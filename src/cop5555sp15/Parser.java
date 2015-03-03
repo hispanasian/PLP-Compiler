@@ -231,20 +231,17 @@ public class Parser
         return new Block(start, elems);
 	}
 
-    protected void TestBlock() throws SyntaxException { Block(); }
-
     protected Declaration Declaration() throws SyntaxException
     {
         match(KW_DEF);
         // Look ahead by 1. If it is an '=' then it must be a Closure Declaration. Else, it must be
         // a Var Declaration. Assume that the current kind is correct (is a IDENT), this will be
         // matched by VarDec or ClosureDec
-        if(aheadIs(ASSIGN, 1)) ClosureDec();
-        else VarDec();
-        return null;
+        if(aheadIs(ASSIGN, 1)) return ClosureDec();
+        else return VarDec();
     }
 
-    protected void VarDec() throws SyntaxException
+    protected VarDec VarDec() throws SyntaxException
     {
         match(IDENT);
         if(isKind(COLON))
@@ -252,6 +249,8 @@ public class Parser
             match(COLON);
             Type();
         }
+
+        return null;
     }
 
     protected void Type() throws SyntaxException
@@ -287,11 +286,13 @@ public class Parser
         match(RSQUARE);
     }
 
-    protected void ClosureDec() throws SyntaxException
+    protected ClosureDec ClosureDec() throws SyntaxException
     {
         match(IDENT);
         match(ASSIGN);
         Closure();
+
+        return null;
     }
 
     protected void Closure() throws SyntaxException
