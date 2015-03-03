@@ -536,17 +536,19 @@ public class Parser
 
     protected Expression Expression() throws SyntaxException
     {
-        Term();
+        Token start = t;
+
+        Expression e1 = Term();
         while(isKind(REL_OPS))
         {
-            RelOp();
-            Term();
+            Token op = RelOp();
+            return new BinaryExpression(start, e1, op, Term());
         }
 
-        return null;
+        return e1;
     }
 
-    protected void Term() throws SyntaxException
+    protected Expression Term() throws SyntaxException
     {
         Elem();
         while(isKind(WEAK_OPS))
@@ -554,9 +556,10 @@ public class Parser
             WeakOp();
             Elem();
         }
+        return null;
     }
 
-    protected void Elem() throws SyntaxException
+    protected Expression Elem() throws SyntaxException
     {
         Thing();
         while(isKind(STRONG_OPS))
@@ -564,9 +567,10 @@ public class Parser
             StrongOp();
             Thing();
         }
+        return null;
     }
 
-    protected void Thing() throws SyntaxException
+    protected Expression Thing() throws SyntaxException
     {
         Factor();
         while(isKind(VERY_STRONG_OPS))
@@ -574,9 +578,10 @@ public class Parser
             VeryStrongOp();
             Factor();
         }
+        return null;
     }
 
-    protected void Factor() throws SyntaxException
+    protected Expression Factor() throws SyntaxException
     {
         if(isKind(IDENT))
         {
@@ -614,13 +619,15 @@ public class Parser
             match(RPAREN);
         }
         else match(FACTOR_FIRST);
+
+        return null;
     }
 
-    protected void RelOp() throws SyntaxException { match(REL_OPS); }
+    protected Token RelOp() throws SyntaxException { return match(REL_OPS); }
 
-    protected void WeakOp() throws SyntaxException { match(WEAK_OPS); }
+    protected Token WeakOp() throws SyntaxException { return match(WEAK_OPS); }
 
-    protected void StrongOp() throws SyntaxException { match(STRONG_OPS); }
+    protected Token StrongOp() throws SyntaxException { return match(STRONG_OPS); }
 
-    protected void VeryStrongOp() throws SyntaxException { match(VERY_STRONG_OPS); }
+    protected Token VeryStrongOp() throws SyntaxException { return match(VERY_STRONG_OPS); }
 }
