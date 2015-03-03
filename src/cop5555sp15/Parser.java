@@ -610,7 +610,7 @@ public class Parser
 
         if(isKind(IDENT))
         {
-            if(aheadIs(1, LPAREN)) ClosureEvalExpression();
+            if(aheadIs(1, LPAREN)) return ClosureEvalExpression();
             else if (aheadIs(1, LSQUARE))
             {
                 Token ident = match(IDENT);
