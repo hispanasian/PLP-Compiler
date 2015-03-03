@@ -525,11 +525,13 @@ public class Parser
         return mapList;
     }
 
-    protected void RangeExpr() throws SyntaxException
+    protected RangeExpression RangeExpr() throws SyntaxException
     {
-        Expression();
+        Token start = t;
+        Expression lower = Expression();
         match(RANGE);
-        Expression();
+        Expression upper = Expression();
+        return new RangeExpression(start, lower, upper);
     }
 
     protected Expression Expression() throws SyntaxException
