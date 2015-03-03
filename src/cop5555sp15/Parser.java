@@ -376,6 +376,7 @@ public class Parser
                 }
                 match(RPAREN);
                 Block block = Block();
+
                 if(upperExpression == null) return new WhileStarStatement(start, expression, block);
                 else return new WhileRangeStatement(start, new RangeExpression(start, expression, upperExpression), block);
             }
@@ -445,11 +446,12 @@ public class Parser
         return new IdentLValue(start, ident);
     }
 
-    protected void List() throws SyntaxException
+    protected List<Expression> List() throws SyntaxException
     {
         match(LSQUARE);
-        ExpressionList();
+        List<Expression> expression = ExpressionList();
         match(RSQUARE);
+        return expression;
     }
 
     protected List<Expression> ExpressionList() throws SyntaxException
@@ -477,11 +479,14 @@ public class Parser
         return expressionList;
     }
 
-    protected void KeyValueExpression() throws SyntaxException
+    protected KeyValueExpression KeyValueExpression() throws SyntaxException
     {
-        Expression();
+        Token start = t;
+        Expression key = Expression();
         match(COLON);
-        Expression();
+        Expression value = Expression();
+
+        return new KeyValueExpression(start, key, value);
     }
 
     protected void KeyValueList() throws SyntaxException
