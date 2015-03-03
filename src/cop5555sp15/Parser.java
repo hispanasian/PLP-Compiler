@@ -272,7 +272,12 @@ public class Parser
         else return SimpleType();
     }
 
-    protected SimpleType SimpleType() throws SyntaxException { match(SIMPLE_TYPE); return null; }
+    protected SimpleType SimpleType() throws SyntaxException
+    {
+        Token start = t;
+        Token type = match(SIMPLE_TYPE);
+        return new SimpleType(start, type);
+    }
 
     protected KeyValueType KeyValueType(Token start) throws SyntaxException
     {
