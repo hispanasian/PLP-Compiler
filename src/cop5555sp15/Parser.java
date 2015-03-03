@@ -419,7 +419,12 @@ public class Parser
         else if(isKind(FIRST_STATEMENT)) throw new SyntaxException(t, "Error: Unused " + t);
         else if(!isKind(FOLLOW_STATEMENT)) throw new SyntaxException(t, PREDICT_STATEMENT);
 
-        return null;
+        StringBuilder sb = new StringBuilder();
+        sb.append("Unexpected token " + t + " found. Expected one of:");
+        for (Kind kinds : FIRST_STATEMENT) { sb.append(kinds).append(" "); }
+        for (Kind kinds : FOLLOW_STATEMENT) { sb.append(kinds).append(" "); }
+        sb.append("for a Statement");
+        throw new SyntaxException(t, sb.toString());
     }
 
     protected ClosureEvalExpression ClosureEvalExpression() throws SyntaxException
