@@ -5,6 +5,7 @@ import cop5555sp15.TokenStream.Token;
 import cop5555sp15.ast.*;
 import jdk.nashorn.internal.runtime.regexp.joni.Syntax;
 
+import javax.xml.crypto.dsig.keyinfo.KeyValue;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -282,11 +283,11 @@ public class Parser
     protected KeyValueType KeyValueType(Token start) throws SyntaxException
     {
         match(LSQUARE);
-        SimpleType();
+        SimpleType simple = SimpleType();
         match(COLON);
-        Type();
+        Type type = Type();
         match(RSQUARE);
-        return null;
+        return new KeyValueType(start, simple, type);
     }
 
     protected ListType ListType(Token start) throws SyntaxException
