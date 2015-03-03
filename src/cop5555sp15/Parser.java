@@ -310,21 +310,25 @@ public class Parser
 
     protected Closure Closure() throws SyntaxException
     {
+        Token start = t;
+        List<Statement> statements = new ArrayList<Statement>();
+
         match(LCURLY);
-        FormalArgList();
+        List<VarDec> formalArgList = FormalArgList();
         match(ARROW);
         while(isKind(FIRST_STATEMENT))
         {
-            Statement();
+            statements.add(Statement());
             match(SEMICOLON);
         }
         match(RCURLY);
 
-        return null;
+        return new Closure(start, formalArgList, statements);
     }
 
-    protected void FormalArgList() throws SyntaxException
+    protected List<VarDec> FormalArgList() throws SyntaxException
     {
+        List<VarDec> formalArgList = new ArrayList<VarDec>();
         if(isKind(IDENT))
         {
             VarDec();
@@ -334,6 +338,7 @@ public class Parser
                 VarDec();
             }
         }
+        return formalArgList;
     }
 
     protected Statement Statement() throws SyntaxException
