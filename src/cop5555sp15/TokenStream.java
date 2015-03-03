@@ -76,6 +76,14 @@ public class TokenStream {
 		return sb.toString();
 	}
 
+	public String getString(Token t) {
+		StringBuilder sb = new StringBuilder();
+		for(int i = t.beg; i < t.end; i++) {
+			sb.append(inputChars[i]);
+		}
+		return sb.toString();
+	}
+
 
 	public static enum Kind {
 		IDENT,
