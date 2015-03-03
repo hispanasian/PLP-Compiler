@@ -489,16 +489,19 @@ public class Parser
         return new KeyValueExpression(start, key, value);
     }
 
-    protected void KeyValueList() throws SyntaxException
+    protected MapListExpression KeyValueList() throws SyntaxException
     {
+        Token start = t;
+        List<KeyValueExpression> mapList = new ArrayList<KeyValueExpression>();
+
         // Check FIRST(KeyValueList)
         if(isKind(FIRST_KEY_VALUE_LIST))
         {
-            KeyValueExpression();
+            mapList.add(KeyValueExpression());
             while(isKind(COMMA))
             {
                 match(COMMA);
-                KeyValueExpression();
+                mapList.add(KeyValueExpression());
             }
         }
         // Check FOLLOW(KeyValueList)
@@ -511,6 +514,8 @@ public class Parser
             for (Kind kinds : FOLLOW_KEY_VALUE_LIST) { sb.append(kinds).append(" "); }
             throw new SyntaxException(t, sb.toString());
         }
+
+        return new MapListExpression(start, mapList);
     }
 
     protected void MapList() throws SyntaxException
