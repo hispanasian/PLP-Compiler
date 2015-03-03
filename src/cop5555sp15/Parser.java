@@ -537,89 +537,132 @@ public class Parser
     protected Expression Expression() throws SyntaxException
     {
         Token start = t;
+        Expression e0 = null;
+        Expression e1 = null;
 
-        Expression e1 = Term();
+        e0 = Term();
         while(isKind(REL_OPS))
         {
             Token op = RelOp();
-            return new BinaryExpression(start, e1, op, Term());
+            e1 = Term();
+            e0 = new BinaryExpression(start, e0, op, e1);
         }
 
-        return e1;
+        return e0;
     }
 
     protected Expression Term() throws SyntaxException
     {
-        Elem();
+        Token start = t;
+        Expression e0 = null;
+        Expression e1 = null;
+
+        e0 = Elem();
         while(isKind(WEAK_OPS))
         {
-            WeakOp();
-            Elem();
+            Token op = WeakOp();
+            e1 = Elem();
+            e0 = new BinaryExpression(start, e0, op, e1);
         }
-        return null;
+        return e0;
     }
 
     protected Expression Elem() throws SyntaxException
     {
-        Thing();
+        Token start = t;
+        Expression e0 = null;
+        Expression e1 = null;
+
+        e0 = Thing();
         while(isKind(STRONG_OPS))
         {
-            StrongOp();
-            Thing();
+            Token op = StrongOp();
+            e1 = Thing();
+            e0 = new BinaryExpression(start, e0, op, e1);
         }
-        return null;
+        return e0;
     }
 
     protected Expression Thing() throws SyntaxException
     {
-        Factor();
+        Token start = t;
+        Expression e0 = null;
+        Expression e1 = null;
+
+        e0 = Factor();
         while(isKind(VERY_STRONG_OPS))
         {
-            VeryStrongOp();
-            Factor();
+            Token op = VeryStrongOp();
+            e1 = Factor();
+            e0 = new BinaryExpression(start, e0, op, e1);
         }
-        return null;
+        return e0;
     }
 
     protected Expression Factor() throws SyntaxException
     {
+        Token start = t;
+
         if(isKind(IDENT))
         {
             if(aheadIs(1, LPAREN)) ClosureEvalExpression();
             else if (aheadIs(1, LSQUARE))
             {
-                match(IDENT);
+                Token ident = match(IDENT);
                 match(LSQUARE);
-                Expression();
+                Expression expression = Expression();
                 match(RSQUARE);
+                return new ListOrMapElemExpression(start, ident, expression);
             }
-            else match(IDENT);
+            else return new IdentExpression(start, match(IDENT));
         }
         else if(isKind(FACTOR_FACTOR))
         {
-            match(FACTOR_FACTOR);
-            Factor();
+            Token op = match(FACTOR_FACTOR);
+            Expression expression = Factor();
+            return new UnaryExpression(start, op, expression);
         }
-        else if(isKind(LCURLY)) Closure();
+        else if(isKind(LCURLY)) return new ClosureExpression(start, Closure());
         else if(isKind(AT))
         {
             match(AT);
             if(isKind(AT))
             {
                 match(AT);
-                MapList();
+                return MapList(start);
             }
-            else List();
+            else return new ListExpression(start, List());
         }
         else if(isKind(FACTOR_EXPRESSION) || isKind(LPAREN))
         {
-            if(isKind(FACTOR_EXPRESSION)) match(FACTOR_EXPRESSION);
+            Token kw = null;
+            if(isKind(FACTOR_EXPRESSION)) kw = match(FACTOR_EXPRESSION);
             match(LPAREN);
-            Expression();
+            Expression expression = Expression();
             match(RPAREN);
-        }
-        else match(FACTOR_FIRST);
 
+            if(kw == null) return expression;
+            else
+            {
+                switch(kw.kind)
+                {
+                    case KW_SIZE: return new SizeExpression(start, expression);
+                    case KW_KEY: return new KeyExpression(start, expression);
+                    case KW_VALUE: return new ValueExpression(start, expression);
+                }
+            }
+        }
+        else
+        {
+            Token next = match(FACTOR_FIRST);
+            switch(next.kind)
+            {
+                case INT_LIT: return new IntLitExpression(start, next.getIntVal());
+                case BL_TRUE: return new BooleanLitExpression(start, next.getBooleanVal());
+                case BL_FALSE: return new BooleanLitExpression(start, next.getBooleanVal());
+                case STRING_LIT: return new StringLitExpression(start, next.getText());
+            }
+        }
         return null;
     }
 
