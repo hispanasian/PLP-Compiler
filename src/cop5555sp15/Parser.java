@@ -421,12 +421,14 @@ public class Parser
         return null;
     }
 
-    protected void ClosureEvalExpression() throws SyntaxException
+    protected ClosureEvalExpression ClosureEvalExpression() throws SyntaxException
     {
-        match(IDENT);
+        Token start = t;
+        Token ident = match(IDENT);
         match(LPAREN);
-        ExpressionList();
+        List<Expression> expressionList = ExpressionList();
         match(RPAREN);
+        return new ClosureEvalExpression(start, ident, expressionList);
     }
 
     protected LValue LValue() throws SyntaxException
@@ -448,16 +450,17 @@ public class Parser
         match(RSQUARE);
     }
 
-    protected void ExpressionList() throws SyntaxException
+    protected List<Expression> ExpressionList() throws SyntaxException
     {
+        List<Expression> expressionList = new ArrayList<Expression>();
         // Check FIRST(ExpressionList)
         if(isKind(FIRST_EXPRESSION_LIST))
         {
-            Expression();
+            expressionList.add(Expression());
             while(isKind(COMMA))
             {
                 match(COMMA);
-                Expression();
+                expressionList.add(Expression());
             }
         }
         else if(isKind(FOLLOW_EXPRESSION_LIST)) { /* Do nothing, empty */ }
@@ -469,6 +472,7 @@ public class Parser
             for (Kind kinds : FOLLOW_EXPRESSION_LIST) { sb.append(kinds).append(" "); }
             throw new SyntaxException(t, sb.toString());
         }
+        return expressionList;
     }
 
     protected void KeyValueExpression() throws SyntaxException
