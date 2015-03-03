@@ -433,14 +433,16 @@ public class Parser
 
     protected LValue LValue() throws SyntaxException
     {
-        match(IDENT);
+        Token start = t;
+        Token ident = match(IDENT);
         if(isKind(LSQUARE))
         {
             match(LSQUARE);
-            Expression();
+            Expression expression = Expression();
             match(RSQUARE);
+            return new ExpressionLValue(start, ident, expression);
         }
-        return null;
+        return new IdentLValue(start, ident);
     }
 
     protected void List() throws SyntaxException
