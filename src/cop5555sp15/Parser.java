@@ -663,7 +663,15 @@ public class Parser
                 case STRING_LIT: return new StringLitExpression(start, next.getText());
             }
         }
-        return null;
+        StringBuilder sb = new StringBuilder();
+        sb.append("Unexpected token " + t + " found. Expected one of:");
+        for (Kind kinds : FACTOR_FIRST) { sb.append(kinds).append(" "); }
+        for (Kind kinds : FACTOR_FACTOR) { sb.append(kinds).append(" "); }
+        for (Kind kinds : FACTOR_EXPRESSION) { sb.append(kinds).append(" "); }
+        sb.append(LCURLY).append(" ");
+        sb.append(LPAREN).append(" ");
+        sb.append(AT).append(" ");
+        throw new SyntaxException(t, sb.toString());
     }
 
     protected Token RelOp() throws SyntaxException { return match(REL_OPS); }
