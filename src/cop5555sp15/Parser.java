@@ -243,17 +243,20 @@ public class Parser
 
     protected VarDec VarDec() throws SyntaxException
     {
-        match(IDENT);
+        Token start = t;
+        Token ident = match(IDENT);
+        Type type = null;
+
         if(isKind(COLON))
         {
             match(COLON);
-            Type();
+            type = Type();
         }
 
-        return null;
+        return new VarDec(start, ident, type);
     }
 
-    protected void Type() throws SyntaxException
+    protected Type Type() throws SyntaxException
     {
         if(isKind(AT))
         {
@@ -266,6 +269,7 @@ public class Parser
             else ListType();
         }
         else SimpleType();
+        return null;
     }
 
     protected void SimpleType() throws SyntaxException { match(SIMPLE_TYPE); }
