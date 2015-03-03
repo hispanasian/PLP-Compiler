@@ -3,6 +3,7 @@ package cop5555sp15;
 import cop5555sp15.TokenStream.Kind;
 import cop5555sp15.TokenStream.Token;
 import cop5555sp15.ast.*;
+import jdk.nashorn.internal.ir.Assignment;
 import jdk.nashorn.internal.runtime.regexp.joni.Syntax;
 
 import javax.xml.crypto.dsig.keyinfo.KeyValue;
@@ -331,11 +332,11 @@ public class Parser
         List<VarDec> formalArgList = new ArrayList<VarDec>();
         if(isKind(IDENT))
         {
-            VarDec();
+            formalArgList.add(VarDec());
             while(isKind(COMMA))
             {
                 match(COMMA);
-                VarDec();
+                formalArgList.add(VarDec());
             }
         }
         return formalArgList;
@@ -343,64 +344,76 @@ public class Parser
 
     protected Statement Statement() throws SyntaxException
     {
+        Token start = t;
+
         if(isKind(IDENT))
         {
-            LValue();
+            LValue lvalue = LValue();
             match(ASSIGN);
-            Expression();
+            Expression expression = Expression();
+            return new AssignmentStatement(start, lvalue, expression);
         }
         else if(isKind(KW_PRINT))
         {
             match(KW_PRINT);
-            Expression();
+            Expression expression = Expression();
+            return new PrintStatement(start, expression);
         }
         else if(isKind(KW_WHILE))
         {
             match(KW_WHILE);
             if(isKind(TIMES))
             {
+                Expression upperExpression = null;
                 match(TIMES);
                 match(LPAREN);
-                Expression();
+                Expression expression = Expression();
                 // Manually check for Range Expression
                 if(isKind(RANGE))
                 {
                     match(RANGE);
-                    Expression();
+                    upperExpression = Expression();
                 }
                 match(RPAREN);
-                Block();
+                Block block = Block();
+                if(upperExpression == null) return new WhileStarStatement(start, expression, block);
+                else return new WhileRangeStatement(start, new RangeExpression(start, expression, upperExpression), block);
             }
             else
             {
                 match(LPAREN);
-                Expression();
+                Expression expression = Expression();
                 match(RPAREN);
-                Block();
+                Block block = Block();
+                return new WhileStarStatement(start, expression, block);
             }
         }
         else if(isKind(KW_IF))
         {
             match(KW_IF);
             match(LPAREN);
-            Expression();
+            Expression expression = Expression();
             match(RPAREN);
-            Block();
+            Block ifBlock = Block();
             if(isKind(KW_ELSE))
             {
                 match(KW_ELSE);
-                Block();
+                Block elseBlock = Block();
+                return new IfElseStatement(start, expression, ifBlock, elseBlock);
             }
+            return new IfStatement(start, expression, ifBlock);
         }
         else if(isKind(MOD))
         {
             match(MOD);
-            Expression();
+            Expression expression = Expression();
+            return new ExpressionStatement(start, expression);
         }
         else if(isKind(KW_RETURN))
         {
             match(KW_RETURN);
-            Expression();
+            Expression expression = Expression();
+            return new ReturnStatement(start, expression);
         }
         else if(isKind(FIRST_STATEMENT)) throw new SyntaxException(t, "Error: Unused " + t);
         else if(!isKind(FOLLOW_STATEMENT)) throw new SyntaxException(t, PREDICT_STATEMENT);
@@ -416,7 +429,7 @@ public class Parser
         match(RPAREN);
     }
 
-    protected void LValue() throws SyntaxException
+    protected LValue LValue() throws SyntaxException
     {
         match(IDENT);
         if(isKind(LSQUARE))
@@ -425,6 +438,7 @@ public class Parser
             Expression();
             match(RSQUARE);
         }
+        return null;
     }
 
     protected void List() throws SyntaxException
@@ -502,7 +516,7 @@ public class Parser
         Expression();
     }
 
-    protected void Expression() throws SyntaxException
+    protected Expression Expression() throws SyntaxException
     {
         Term();
         while(isKind(REL_OPS))
@@ -510,6 +524,8 @@ public class Parser
             RelOp();
             Term();
         }
+
+        return null;
     }
 
     protected void Term() throws SyntaxException
