@@ -391,7 +391,7 @@ public class Parser
                 Expression expression = Expression();
                 match(RPAREN);
                 Block block = Block();
-                return new WhileStarStatement(start, expression, block);
+                return new WhileStatement(start, expression, block);
             }
         }
         else if(isKind(KW_IF))
