@@ -178,6 +178,14 @@ public class TestParser {
 		System.out.println(input);
 		System.out.println(parseCorrectInput(input));
 	}
+
+	@Test
+	public void expressions5() throws SyntaxException {
+		System.out.println("***********\nexpressions5");
+		String input = "class A {x = size(a<<b); c = key(b>>z); d = value(c);} ";
+		System.out.println(input);
+		System.out.println(parseCorrectInput(input));
+	}
 	
 	@Test
 	public void statements1()throws SyntaxException {
@@ -217,7 +225,7 @@ public class TestParser {
 		String input = "class A  { %a(1,2,3); } ";
 		System.out.println(input);
 		System.out.println(parseCorrectInput(input));
-	} 	
+	}
 	
 	@Test
 	public void statements5()throws SyntaxException {
@@ -225,8 +233,16 @@ public class TestParser {
 		String input = "class A  { x = a(1,2,3); } ";
 		System.out.println(input);
 		System.out.println(parseCorrectInput(input));
-	} 	
-	
+	}
+
+	@Test
+	public void statements6()throws SyntaxException {
+		System.out.println("***********\nstatements6");
+		String input = "class A  { return x; } ";
+		System.out.println(input);
+		System.out.println(parseCorrectInput(input));
+	}
+
 	@Test
 	public void closureEval()throws SyntaxException {
 		System.out.println("***********\nclosureEval");
@@ -254,9 +270,33 @@ public class TestParser {
 	
 	@Test
 	public void expressionStatement()throws SyntaxException {
-		System.out.println("***********\nmaplist1");
+		System.out.println("***********\nexpressionStatement");
 		String input = "class A  { %4; } ";
 		System.out.println(input);
 		System.out.println(parseCorrectInput(input));
-	} 	
+	}
+
+	@Test
+	public void expressionList1()throws SyntaxException {
+		System.out.println("***********\nexpressionList1");
+		String input = "class A  { x = @[]; b = c(); } ";
+		System.out.println(input);
+		System.out.println(parseCorrectInput(input));
+	}
+
+	@Test
+	public void keyValueList1()throws SyntaxException {
+		System.out.println("***********\nkeyValueList1");
+		String input = "class A  { x = @@[]; } ";
+		System.out.println(input);
+		System.out.println(parseCorrectInput(input));
+	}
+
+	@Test
+	public void formalArgList1()throws SyntaxException {
+		System.out.println("***********\nformalArgList1");
+		String input = "class A  { x = { a:int, b:string, c:boolean -> }; } ";
+		System.out.println(input);
+		System.out.println(parseCorrectInput(input));
+	}
 }
