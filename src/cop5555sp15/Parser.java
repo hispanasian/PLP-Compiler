@@ -536,7 +536,7 @@ public class Parser
         return mapList;
     }
 
-    protected RangeExpression RangeExpr() throws SyntaxException
+    protected RangeExpression RangeExpression() throws SyntaxException
     {
         Token start = t;
         Expression lower = Expression();
