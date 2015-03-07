@@ -259,6 +259,7 @@ public class Parser
             match(COLON);
             type = Type();
         }
+        else type = new UndeclaredType(t);
 
         return new VarDec(start, ident, type);
     }

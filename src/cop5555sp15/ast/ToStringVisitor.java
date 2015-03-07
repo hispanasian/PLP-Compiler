@@ -329,7 +329,7 @@ public class ToStringVisitor implements ASTVisitor {
 	public Object visitSizeExpression(SizeExpression sizeExpression, Object arg) throws Exception {
 		sb.append(arg).append("SizeExpression").append('\n');
 		String indent = arg + "  ";	
-		sizeExpression.expression.visit(this,indent);	
+		sizeExpression.expression.visit(this,indent);
 		return null;
 	}
 
@@ -367,7 +367,8 @@ public class ToStringVisitor implements ASTVisitor {
 	}
 
 	@Override
-	public Object visitUndeclaredVisitor(UndeclaredType undeclaredType, Object arg) {
+	public Object visitUndeclaredType(UndeclaredType undeclaredType, Object arg) {
+		sb.append(arg).append("UndeclaredType").append('\n');
 		return null;
 	}
 

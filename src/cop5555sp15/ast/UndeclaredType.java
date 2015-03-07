@@ -10,7 +10,7 @@ public class UndeclaredType extends Type {
 
 
 
-    public UndeclaredType(Token firstToken ) {
+    public UndeclaredType(Token firstToken) {
 
         super ( firstToken );
 

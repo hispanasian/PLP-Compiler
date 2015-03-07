@@ -299,4 +299,12 @@ public class TestParser {
 		System.out.println(input);
 		System.out.println(parseCorrectInput(input));
 	}
+
+	@Test
+	public void undeclaredType()throws SyntaxException {
+		System.out.println("***********\nundeclaredType");
+		String input = "class A  { def x; } ";
+		System.out.println(input);
+		System.out.println(parseCorrectInput(input));
+	}
 }
