@@ -76,7 +76,8 @@ public class TypeCheckVisitor implements ASTVisitor, TypeConstants {
 	public Object visitBooleanLitExpression(
 			BooleanLitExpression booleanLitExpression, Object arg)
 			throws Exception {
-		throw new UnsupportedOperationException("not yet implemented");
+		booleanLitExpression.setType(booleanType);
+		return booleanType;
 	}
 
 	/**

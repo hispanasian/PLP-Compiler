@@ -140,7 +140,7 @@ public void decUseScopeFail() throws Exception{
  * true  
  */
 public void printBooleanLiteral() throws Exception{
-	System.out.println("***********printIntLiteral");
+	System.out.println("***********printBooleanLiteral");
 	String input = "class A {\n print true; \n}";
 	System.out.println(input);
 	Program program = (Program) parseCorrectInput(input);
