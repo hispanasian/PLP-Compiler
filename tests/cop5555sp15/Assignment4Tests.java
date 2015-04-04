@@ -26,14 +26,14 @@ public class Assignment4Tests {
         public Class<?> define(String className, byte[] bytecode) {
             return super.defineClass(className, bytecode, 0, bytecode.length);
         }
-    };
+	}
 
- public void dumpBytecode(byte[] bytecode){   
-    int flags = ClassReader.SKIP_DEBUG;
-    ClassReader cr;
-    cr = new ClassReader(bytecode); 
-    cr.accept(new TraceClassVisitor(new PrintWriter(System.out)), flags);
-}
+	 public void dumpBytecode(byte[] bytecode){
+		int flags = ClassReader.SKIP_DEBUG;
+		ClassReader cr;
+		cr = new ClassReader(bytecode);
+		cr.accept(new TraceClassVisitor(new PrintWriter(System.out)), flags);
+	}
 	
 	private ASTNode parseCorrectInput(String input) {
 		TokenStream stream = new TokenStream(input);
@@ -116,6 +116,18 @@ public void printIntLiteral() throws Exception{
 	executeByteCode(program.JVMName, bytecode);
 }
 
+@Test
+/** This test is expected to throw a TypeCheckException
+*
+* @throws Exception
+*/
+public void decUseScopeFail() throws Exception{
+	System.out.println("***********binaryExpressionFail1");
+	String input = "class A {\n {\n  def x:int; \n } \n print x; \n}";
+	System.out.println(input);
+	Program program = (Program) parseCorrectInput(input);
+	typeCheckIncorrectAST(program);
+}
 
 @Test
 /**
