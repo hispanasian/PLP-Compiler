@@ -52,8 +52,6 @@ import static cop5555sp15.TokenStream.Kind.STRING_LIT;
 import static cop5555sp15.TokenStream.Kind.TIMES;
 import cop5555sp15.TokenStream.Kind;
 import cop5555sp15.TokenStream.Token;
-import sun.java2d.pipe.SpanShapeRenderer;
-import sun.reflect.annotation.ExceptionProxy;
 
 public class SimpleParser
 {
