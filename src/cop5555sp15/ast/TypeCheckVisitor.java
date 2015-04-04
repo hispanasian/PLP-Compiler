@@ -287,7 +287,8 @@ public class TypeCheckVisitor implements ASTVisitor, TypeConstants {
 	public Object visitStringLitExpression(
 			StringLitExpression stringLitExpression, Object arg)
 			throws Exception {
-		throw new UnsupportedOperationException("not yet implemented");
+		stringLitExpression.setType(stringType);
+		return stringType;
 	}
 
 	/**

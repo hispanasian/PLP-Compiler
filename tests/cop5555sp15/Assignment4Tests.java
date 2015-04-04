@@ -164,7 +164,7 @@ public void printBooleanLiteral() throws Exception{
  * go gators
  */
 public void printStringLiteral() throws Exception{
-	System.out.println("***********printIntLiteral");
+	System.out.println("***********printStringLiteral");
 	String input = "class A {\n print \"go gators\" ; \n}";
 	System.out.println(input);
 	Program program = (Program) parseCorrectInput(input);

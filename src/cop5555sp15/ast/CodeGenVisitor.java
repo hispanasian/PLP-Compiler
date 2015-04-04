@@ -325,8 +325,14 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes, TypeConstants {
 	public Object visitStringLitExpression(
 			StringLitExpression stringLitExpression, Object arg)
 			throws Exception {
-		throw new UnsupportedOperationException(
-				"code generation not yet implemented");
+		MethodVisitor mv = ((InheritedAttributes) arg).mv; // this should be the
+		// first statement
+		// of all visit
+		// methods that
+		// generate
+		// instructions
+		mv.visitLdcInsn(stringLitExpression.value);
+		return null;
 	}
 
 	@Override
