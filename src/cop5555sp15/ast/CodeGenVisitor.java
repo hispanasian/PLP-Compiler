@@ -48,7 +48,9 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes, TypeConstants {
 		// generate
 		// instructions
 
-		if(binaryExpression.getType().equals(intType))
+		// We compare against the sub expressions because different types from the sub expression
+		// can share the same operator, but they will behave differently
+		if(binaryExpression.expression0.getType().equals(intType))
 		{
 			// First, visit the sub expressions and put the result of e1 on the top of the stack and
 			// the result of d0 under it.
@@ -78,7 +80,7 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes, TypeConstants {
 				}
 			}
 			// The boolean/relational cases
-			if(binaryExpression.op.kind == Kind.EQUAL ||
+			else if(binaryExpression.op.kind == Kind.EQUAL ||
 					binaryExpression.op.kind == Kind.NOTEQUAL||
 					binaryExpression.op.kind == Kind.LT ||
 					binaryExpression.op.kind == Kind.LE ||
@@ -112,7 +114,7 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes, TypeConstants {
 				mv.visitLabel(l2);
 			}
 		}
-		else if(binaryExpression.getType().equals(stringType))
+		else if(binaryExpression.expression0.getType().equals(stringType))
 		{
 			switch(binaryExpression.op.kind)
 			{
@@ -137,7 +139,7 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes, TypeConstants {
 					break;
 			}
 		}
-		else if(binaryExpression.getType().equals(booleanType))
+		else if(binaryExpression.expression0.getType().equals(booleanType))
 		{
 			switch(binaryExpression.op.kind)
 			{
