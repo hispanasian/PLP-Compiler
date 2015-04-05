@@ -1,5 +1,7 @@
 package cop5555sp15.ast;
 
+import cop5555sp15.TokenStream;
+import cop5555sp15.TokenStream.Kind;
 import cop5555sp15.TypeConstants;
 import cop5555sp15.symbolTable.SymbolTable;
 
@@ -44,7 +46,59 @@ public class TypeCheckVisitor implements ASTVisitor, TypeConstants {
 	@Override
 	public Object visitBinaryExpression(BinaryExpression binaryExpression,
 			Object arg) throws Exception {
-		throw new UnsupportedOperationException("not yet implemented");
+		// First, find the types of the sub expressions
+		String e0 = (String)binaryExpression.expression0.visit(this, arg);
+		String e1 = (String)binaryExpression.expression1.visit(this, arg);
+		check(e0.equals(e1), "expressions are of different types", binaryExpression);
+
+		// Now, verify that the correct op is being used
+		if(e0.equals(intType))
+		{
+			if(binaryExpression.op.kind == Kind.PLUS ||
+					binaryExpression.op.kind == Kind.MINUS ||
+					binaryExpression.op.kind == Kind.TIMES ||
+					binaryExpression.op.kind == Kind.DIV)
+			{
+				binaryExpression.setType(intType);
+			}
+			else if (binaryExpression.op.kind == Kind.EQUAL ||
+					binaryExpression.op.kind == Kind.NOTEQUAL ||
+					binaryExpression.op.kind == Kind.LT ||
+					binaryExpression.op.kind == Kind.LE ||
+					binaryExpression.op.kind == Kind.GT ||
+					binaryExpression.op.kind == Kind.GE )
+			{
+				binaryExpression.setType(booleanType);
+			}
+			else check(false,"two intLit expressions can only use +, -, *, /, ==, !=, <, <=, >=, or > as operands", binaryExpression);
+		}
+		else if(e0.equals(booleanType))
+		{
+			check(binaryExpression.op.kind == Kind.EQUAL ||
+					binaryExpression.op.kind == Kind.NOTEQUAL ||
+					binaryExpression.op.kind == Kind.AND ||
+					binaryExpression.op.kind == Kind.BAR,
+					"two booleanLit expression can only use ==, !=, &, or | as operands", binaryExpression);
+			binaryExpression.setType(booleanType);
+		}
+		else if(e0.equals(stringType))
+		{
+			if(binaryExpression.op.kind == Kind.PLUS) binaryExpression.setType(stringType);
+			else if(binaryExpression.op.kind == Kind.EQUAL || binaryExpression.op.kind == Kind.NOTEQUAL
+					)
+			{
+				binaryExpression.setType(booleanType);
+			}
+			else check(false,"two stringLit expressions can only use +, ==, or != as operands", binaryExpression);
+		}
+		else check(false, "expression is an unknown type", binaryExpression);
+
+		check(binaryExpression.expressionType.equals(intType) ||
+						binaryExpression.expressionType.equals(booleanType) ||
+						binaryExpression.expressionType.equals(stringType),
+				"the expression type cannot be determined", binaryExpression);
+
+		return binaryExpression.expressionType;
 	}
 
 	/**

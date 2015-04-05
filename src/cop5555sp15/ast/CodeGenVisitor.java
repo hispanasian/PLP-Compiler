@@ -1,5 +1,6 @@
 package cop5555sp15.ast;
 
+import com.sun.org.apache.xpath.internal.operations.NotEquals;
 import org.objectweb.asm.*;
 import cop5555sp15.TokenStream.Kind;
 import cop5555sp15.TypeConstants;
@@ -40,8 +41,88 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes, TypeConstants {
 	@Override
 	public Object visitBinaryExpression(BinaryExpression binaryExpression,
 			Object arg) throws Exception {
-		throw new UnsupportedOperationException(
-				"code generation not yet implemented");
+		MethodVisitor mv = ((InheritedAttributes) arg).mv; // this should be the
+		// first statement
+		// of all visit
+		// methods that
+		// generate
+		// instructions
+
+		if(binaryExpression.getType().equals(intType))
+		{
+			// First, visit the sub expressions and put the result of e1 on the top of the stack and
+			// the result of d0 under it.
+			binaryExpression.expression0.visit(this, arg);
+			binaryExpression.expression1.visit(this, arg);
+
+			// Now we can perform the operations
+			switch(binaryExpression.op.kind)
+			{
+				// First, the arithmetic cases
+				case PLUS: mv.visitInsn(IADD);
+					break;
+				case MINUS: mv.visitInsn(ISUB);
+					break;
+				case TIMES: mv.visitInsn(IMUL);
+					break;
+				case DIV: mv.visitInsn(IDIV);
+					break;
+
+				// Next, the boolean cases
+				case EQUAL:
+					break;
+				case NOTEQUAL:
+					break;
+				case LT:
+					break;
+				case LE:
+					break;
+				case GT:
+					break;
+				case GE:
+					break;
+			}
+		}
+		else if(binaryExpression.getType().equals(stringType))
+		{
+			switch(binaryExpression.op.kind)
+			{
+				// First, concatenation
+				case PLUS:
+					// Use StribgBuilder to concatenate the two strings.
+					mv.visitTypeInsn(NEW, "java/lang/StringBuilder");
+					mv.visitInsn(DUP);
+					binaryExpression.expression0.visit(this, arg); // We first want expression0
+					mv.visitMethodInsn(INVOKESTATIC, "java/lang/String", "valueOf", "(Ljava/lang/Object;)Ljava/lang/String;");
+					mv.visitMethodInsn(INVOKESPECIAL, "java/lang/StringBuilder", "<init>", "(Ljava/lang/String;)V");
+
+					binaryExpression.expression1.visit(this, arg);
+					mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(Ljava/lang/String;)Ljava/lang/StringBuilder;");
+					mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "toString", "()Ljava/lang/String;");
+					break;
+
+				// Next, the boolean cases
+				case EQUAL:
+					break;
+				case NOTEQUAL:
+					break;
+			}
+		}
+		else if(binaryExpression.getType().equals(booleanType))
+		{
+			switch(binaryExpression.op.kind)
+			{
+				case EQUAL:
+					break;
+				case NOTEQUAL:
+					break;
+				case AND:
+					break;
+				case BAR:
+					break;
+			}
+		}
+		return null;
 	}
 
 	@Override
