@@ -50,37 +50,55 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes, TypeConstants {
 
 		if(binaryExpression.getType().equals(intType))
 		{
-			// First, visit the sub expressions and put the result of e1 on the top of the stack and
-			// the result of d0 under it.
-			binaryExpression.expression0.visit(this, arg);
-			binaryExpression.expression1.visit(this, arg);
-
-			// Now we can perform the operations
-			switch(binaryExpression.op.kind)
+			// The arithmetic cases
+			if(binaryExpression.op.kind == Kind.PLUS ||
+					binaryExpression.op.kind == Kind.MINUS ||
+					binaryExpression.op.kind == Kind.TIMES ||
+					binaryExpression.op.kind == Kind.DIV)
 			{
-				// First, the arithmetic cases
-				case PLUS: mv.visitInsn(IADD);
-					break;
-				case MINUS: mv.visitInsn(ISUB);
-					break;
-				case TIMES: mv.visitInsn(IMUL);
-					break;
-				case DIV: mv.visitInsn(IDIV);
-					break;
+				// First, visit the sub expressions and put the result of e1 on the top of the stack and
+				// the result of d0 under it.
+				binaryExpression.expression0.visit(this, arg);
+				binaryExpression.expression1.visit(this, arg);
 
-				// Next, the boolean cases
-				case EQUAL:
-					break;
-				case NOTEQUAL:
-					break;
-				case LT:
-					break;
-				case LE:
-					break;
-				case GT:
-					break;
-				case GE:
-					break;
+				switch(binaryExpression.op.kind) {
+					case PLUS:
+						mv.visitInsn(IADD);
+						break;
+					case MINUS:
+						mv.visitInsn(ISUB);
+						break;
+					case TIMES:
+						mv.visitInsn(IMUL);
+						break;
+					case DIV:
+						mv.visitInsn(IDIV);
+						break;
+				}
+			}
+			// The boolean cases
+			else if(binaryExpression.op.kind == Kind.EQUAL ||
+					binaryExpression.op.kind == Kind.NOTEQUAL ||
+					binaryExpression.op.kind == Kind.LT ||
+					binaryExpression.op.kind == Kind.LE ||
+					binaryExpression.op.kind == Kind.GT ||
+					binaryExpression.op.kind == Kind.GE)
+			{
+				switch(binaryExpression.op.kind)
+				{
+					case EQUAL:
+						break;
+					case NOTEQUAL:
+						break;
+					case LT:
+						break;
+					case LE:
+						break;
+					case GT:
+						break;
+					case GE:
+						break;
+				}
 			}
 		}
 		else if(binaryExpression.getType().equals(stringType))
@@ -113,13 +131,58 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes, TypeConstants {
 			switch(binaryExpression.op.kind)
 			{
 				case EQUAL:
-					break;
+				{
+					binaryExpression.expression0.visit(this, arg);
+					binaryExpression.expression1.visit(this, arg);
+					Label l1 = new Label();
+					mv.visitJumpInsn(IF_ICMPNE, l1);
+					mv.visitInsn(ICONST_1);
+					Label l2 = new Label();
+					mv.visitJumpInsn(GOTO, l2);
+					mv.visitLabel(l1);
+					mv.visitInsn(ICONST_0);
+					mv.visitLabel(l2);
+				}
+				break;
 				case NOTEQUAL:
-					break;
+				{
+					binaryExpression.expression0.visit(this, arg);
+					binaryExpression.expression1.visit(this, arg);
+					mv.visitInsn(IXOR);
+					Label l1 = new Label();
+					mv.visitLabel(l1);
+				}
+				break;
 				case AND:
-					break;
+				{
+					binaryExpression.expression0.visit(this, arg);
+					Label l1 = new Label();
+					mv.visitJumpInsn(IFEQ, l1);
+					binaryExpression.expression1.visit(this, arg);
+					mv.visitJumpInsn(IFEQ, l1);
+					mv.visitInsn(ICONST_1);
+					Label l2 = new Label();
+					mv.visitJumpInsn(GOTO, l2);
+					mv.visitLabel(l1);
+					mv.visitInsn(ICONST_0);
+					mv.visitLabel(l2);
+				}
+				break;
 				case BAR:
-					break;
+				{
+					binaryExpression.expression0.visit(this, arg);
+					Label l1 = new Label();
+					mv.visitJumpInsn(IFNE, l1);
+					binaryExpression.expression1.visit(this, arg);
+					mv.visitJumpInsn(IFNE, l1);
+					mv.visitInsn(ICONST_0);
+					Label l2 = new Label();
+					mv.visitJumpInsn(GOTO, l2);
+					mv.visitLabel(l1);
+					mv.visitInsn(ICONST_1);
+					mv.visitLabel(l2);
+				}
+				break;
 			}
 		}
 		return null;
