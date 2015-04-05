@@ -48,77 +48,34 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes, TypeConstants {
 		// generate
 		// instructions
 
-		// We compare against the sub expressions because different types from the sub expression
-		// can share the same operator, but they will behave differently
-		if(binaryExpression.expression0.getType().equals(intType))
+		// Note, we are computing the return type based on the return type of the expression
+		if(binaryExpression.getType().equals(intType))
 		{
 			// First, visit the sub expressions and put the result of e1 on the top of the stack and
 			// the result of d0 under it.
 			binaryExpression.expression0.visit(this, arg);
 			binaryExpression.expression1.visit(this, arg);
 
-			// The arithmetic cases
-			if(binaryExpression.op.kind == Kind.PLUS ||
-					binaryExpression.op.kind == Kind.MINUS ||
-					binaryExpression.op.kind == Kind.TIMES ||
-					binaryExpression.op.kind == Kind.DIV)
+			switch(binaryExpression.op.kind)
 			{
-				switch(binaryExpression.op.kind)
-				{
-					case PLUS:
-						mv.visitInsn(IADD);
-						break;
-					case MINUS:
-						mv.visitInsn(ISUB);
-						break;
-					case TIMES:
-						mv.visitInsn(IMUL);
-						break;
-					case DIV:
-						mv.visitInsn(IDIV);
-						break;
-				}
-			}
-			// The boolean/relational cases
-			else if(binaryExpression.op.kind == Kind.EQUAL ||
-					binaryExpression.op.kind == Kind.NOTEQUAL||
-					binaryExpression.op.kind == Kind.LT ||
-					binaryExpression.op.kind == Kind.LE ||
-					binaryExpression.op.kind == Kind.GT ||
-					binaryExpression.op.kind == Kind.GE)
-			{
-				// Basically, we will make a jump if the case is true and put 1 on the top of
-				// the stack. If not, then put 0 on top of the stack and then goto the next code
-				Label l1 = new Label();
-				switch(binaryExpression.op.kind)
-				{
-					// The arithmetic cases
-					case EQUAL: mv.visitJumpInsn(IF_ICMPEQ, l1);
-						break;
-					case NOTEQUAL: mv.visitJumpInsn(IF_ICMPNE, l1);
-						break;
-					case LT: mv.visitJumpInsn(IF_ICMPLT, l1);
-						break;
-					case LE: mv.visitJumpInsn(IF_ICMPLE, l1);
-						break;
-					case GT: mv.visitJumpInsn(IF_ICMPGT, l1);
-						break;
-					case GE: mv.visitJumpInsn(IF_ICMPGE, l1);
-						break;
-				}
-				mv.visitInsn(ICONST_0);
-				Label l2 = new Label();
-				mv.visitJumpInsn(GOTO, l2);
-				mv.visitLabel(l1);
-				mv.visitInsn(ICONST_1);
-				mv.visitLabel(l2);
+				case PLUS:
+					mv.visitInsn(IADD);
+					break;
+				case MINUS:
+					mv.visitInsn(ISUB);
+					break;
+				case TIMES:
+					mv.visitInsn(IMUL);
+					break;
+				case DIV:
+					mv.visitInsn(IDIV);
+					break;
 			}
 		}
-		else if(binaryExpression.expression0.getType().equals(stringType))
+		else if(binaryExpression.getType().equals(stringType))
 		{
 			switch(binaryExpression.op.kind)
 			{
-				// First, concatenation
 				case PLUS:
 					// Use StribgBuilder to concatenate the two strings.
 					mv.visitTypeInsn(NEW, "java/lang/StringBuilder");
@@ -131,71 +88,103 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes, TypeConstants {
 					mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(Ljava/lang/String;)Ljava/lang/StringBuilder;");
 					mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "toString", "()Ljava/lang/String;");
 					break;
-
-				// Next, the boolean cases
-				case EQUAL:
-					break;
-				case NOTEQUAL:
-					break;
 			}
 		}
-		else if(binaryExpression.expression0.getType().equals(booleanType))
+		else if(binaryExpression.getType().equals(booleanType))
 		{
-			switch(binaryExpression.op.kind)
+			if(binaryExpression.op.kind == Kind.AND || binaryExpression.op.kind == Kind.BAR)
 			{
-				case EQUAL:
-				{
-					binaryExpression.expression0.visit(this, arg);
-					binaryExpression.expression1.visit(this, arg);
-					Label l1 = new Label();
-					mv.visitJumpInsn(IF_ICMPNE, l1);
-					mv.visitInsn(ICONST_1);
-					Label l2 = new Label();
-					mv.visitJumpInsn(GOTO, l2);
-					mv.visitLabel(l1);
-					mv.visitInsn(ICONST_0);
-					mv.visitLabel(l2);
+				switch(binaryExpression.op.kind) {
+						case AND:
+					{
+						binaryExpression.expression0.visit(this, arg);
+						Label l1 = new Label();
+						mv.visitJumpInsn(IFEQ, l1);
+						binaryExpression.expression1.visit(this, arg);
+						mv.visitJumpInsn(IFEQ, l1);
+						mv.visitInsn(ICONST_1);
+						Label l2 = new Label();
+						mv.visitJumpInsn(GOTO, l2);
+						mv.visitLabel(l1);
+						mv.visitInsn(ICONST_0);
+						mv.visitLabel(l2);
+					}
+					break;
+					case BAR: {
+						binaryExpression.expression0.visit(this, arg);
+						Label l1 = new Label();
+						mv.visitJumpInsn(IFNE, l1);
+						binaryExpression.expression1.visit(this, arg);
+						mv.visitJumpInsn(IFNE, l1);
+						mv.visitInsn(ICONST_0);
+						Label l2 = new Label();
+						mv.visitJumpInsn(GOTO, l2);
+						mv.visitLabel(l1);
+						mv.visitInsn(ICONST_1);
+						mv.visitLabel(l2);
+					}
+					break;
 				}
-				break;
-				case NOTEQUAL:
+			}
+			// The boolean/relational cases
+			else if(binaryExpression.op.kind == Kind.EQUAL ||
+					binaryExpression.op.kind == Kind.NOTEQUAL||
+					binaryExpression.op.kind == Kind.LT ||
+					binaryExpression.op.kind == Kind.LE ||
+					binaryExpression.op.kind == Kind.GT ||
+					binaryExpression.op.kind == Kind.GE)
+			{
+				/**
+				 * The following code is effectively:
+				 * L0
+				 *  load1
+				 *  load2
+				 *  IF_THECOMPARISON L1
+				 *  ICONST_0:false
+				 *  GOTO L2
+				 * L1
+				 *  ICONST_1:true
+				 * L2
+				 */
+
+				// First, visit the sub expressions and put the result of e1 on the top of the stack and
+				// the result of d0 under it.
+				binaryExpression.expression0.visit(this, arg);
+				binaryExpression.expression1.visit(this, arg);
+
+				// Now for the asm
+				Label l1 = new Label();
+				int op = 0;
+				switch(binaryExpression.op.kind)
 				{
-					binaryExpression.expression0.visit(this, arg);
-					binaryExpression.expression1.visit(this, arg);
-					mv.visitInsn(IXOR);
-					Label l1 = new Label();
-					mv.visitLabel(l1);
+					case EQUAL:
+						if(binaryExpression.expression0.getType().equals(intType)) op = IF_ICMPEQ;
+						if(binaryExpression.expression0.getType().equals(booleanType)) op = IF_ICMPEQ;
+						else if(binaryExpression.expression0.getType().equals(stringType)) op = IF_ACMPEQ;
+						break;
+					case NOTEQUAL:
+						if(binaryExpression.expression0.getType().equals(intType)) op = IF_ICMPNE;
+						if(binaryExpression.expression0.getType().equals(booleanType)) op = IF_ICMPNE;
+						else if(binaryExpression.expression0.getType().equals(stringType)) op = IF_ACMPNE;
+						break;
+
+					// Note that only ints can do the following operations
+					case LT: op = IF_ICMPLT;
+						break;
+					case LE: op = IF_ICMPLE;
+						break;
+					case GT: op = IF_ICMPGT;
+						break;
+					case GE: op = IF_ICMPGE;
+						break;
 				}
-				break;
-				case AND:
-				{
-					binaryExpression.expression0.visit(this, arg);
-					Label l1 = new Label();
-					mv.visitJumpInsn(IFEQ, l1);
-					binaryExpression.expression1.visit(this, arg);
-					mv.visitJumpInsn(IFEQ, l1);
-					mv.visitInsn(ICONST_1);
-					Label l2 = new Label();
-					mv.visitJumpInsn(GOTO, l2);
-					mv.visitLabel(l1);
-					mv.visitInsn(ICONST_0);
-					mv.visitLabel(l2);
-				}
-				break;
-				case BAR:
-				{
-					binaryExpression.expression0.visit(this, arg);
-					Label l1 = new Label();
-					mv.visitJumpInsn(IFNE, l1);
-					binaryExpression.expression1.visit(this, arg);
-					mv.visitJumpInsn(IFNE, l1);
-					mv.visitInsn(ICONST_0);
-					Label l2 = new Label();
-					mv.visitJumpInsn(GOTO, l2);
-					mv.visitLabel(l1);
-					mv.visitInsn(ICONST_1);
-					mv.visitLabel(l2);
-				}
-				break;
+				mv.visitJumpInsn(op, l1);
+				mv.visitInsn(ICONST_0);
+				Label l2 = new Label();
+				mv.visitJumpInsn(GOTO, l2);
+				mv.visitLabel(l1);
+				mv.visitInsn(ICONST_1);
+				mv.visitLabel(l2);
 			}
 		}
 		return null;
