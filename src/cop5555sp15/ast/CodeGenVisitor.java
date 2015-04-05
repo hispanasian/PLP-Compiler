@@ -50,18 +50,19 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes, TypeConstants {
 
 		if(binaryExpression.getType().equals(intType))
 		{
+			// First, visit the sub expressions and put the result of e1 on the top of the stack and
+			// the result of d0 under it.
+			binaryExpression.expression0.visit(this, arg);
+			binaryExpression.expression1.visit(this, arg);
+
 			// The arithmetic cases
 			if(binaryExpression.op.kind == Kind.PLUS ||
 					binaryExpression.op.kind == Kind.MINUS ||
 					binaryExpression.op.kind == Kind.TIMES ||
 					binaryExpression.op.kind == Kind.DIV)
 			{
-				// First, visit the sub expressions and put the result of e1 on the top of the stack and
-				// the result of d0 under it.
-				binaryExpression.expression0.visit(this, arg);
-				binaryExpression.expression1.visit(this, arg);
-
-				switch(binaryExpression.op.kind) {
+				switch(binaryExpression.op.kind)
+				{
 					case PLUS:
 						mv.visitInsn(IADD);
 						break;
@@ -76,29 +77,39 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes, TypeConstants {
 						break;
 				}
 			}
-			// The boolean cases
-			else if(binaryExpression.op.kind == Kind.EQUAL ||
-					binaryExpression.op.kind == Kind.NOTEQUAL ||
+			// The boolean/relational cases
+			if(binaryExpression.op.kind == Kind.EQUAL ||
+					binaryExpression.op.kind == Kind.NOTEQUAL||
 					binaryExpression.op.kind == Kind.LT ||
 					binaryExpression.op.kind == Kind.LE ||
 					binaryExpression.op.kind == Kind.GT ||
 					binaryExpression.op.kind == Kind.GE)
 			{
+				// Basically, we will make a jump if the case is true and put 1 on the top of
+				// the stack. If not, then put 0 on top of the stack and then goto the next code
+				Label l1 = new Label();
 				switch(binaryExpression.op.kind)
 				{
-					case EQUAL:
+					// The arithmetic cases
+					case EQUAL: mv.visitJumpInsn(IF_ICMPEQ, l1);
 						break;
-					case NOTEQUAL:
+					case NOTEQUAL: mv.visitJumpInsn(IF_ICMPNE, l1);
 						break;
-					case LT:
+					case LT: mv.visitJumpInsn(IF_ICMPLT, l1);
 						break;
-					case LE:
+					case LE: mv.visitJumpInsn(IF_ICMPLE, l1);
 						break;
-					case GT:
+					case GT: mv.visitJumpInsn(IF_ICMPGT, l1);
 						break;
-					case GE:
+					case GE: mv.visitJumpInsn(IF_ICMPGE, l1);
 						break;
 				}
+				mv.visitInsn(ICONST_0);
+				Label l2 = new Label();
+				mv.visitJumpInsn(GOTO, l2);
+				mv.visitLabel(l1);
+				mv.visitInsn(ICONST_1);
+				mv.visitLabel(l2);
 			}
 		}
 		else if(binaryExpression.getType().equals(stringType))
