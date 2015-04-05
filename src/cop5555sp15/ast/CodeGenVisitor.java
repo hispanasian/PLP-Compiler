@@ -31,30 +31,36 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes, TypeConstants {
 	}
 
 	@Override
+	/**
+	 * Puts the value from expression into lvalue.
+	 * TODO: This method currently treats all variables as global to one object. Fix this
+	 */
 	public Object visitAssignmentStatement(
 			AssignmentStatement assignmentStatement, Object arg)
 			throws Exception {
-		throw new UnsupportedOperationException(
-				"code generation not yet implemented");
+		MethodVisitor mv = ((InheritedAttributes) arg).mv;
+		LValue lval = assignmentStatement.lvalue;
+
+		// Make the stack look like:
+		// bottom:[ .. | this(object holding lvalue) | val ]:top
+		mv.visitVarInsn(ALOAD, 0);
+		assignmentStatement.expression.visit(this, arg); // Load expression to the top of the stack
+		assignmentStatement.lvalue.visit(this, arg); // Load expression to the top of the stack
+		return null;
 	}
 
 	@Override
 	public Object visitBinaryExpression(BinaryExpression binaryExpression,
 			Object arg) throws Exception {
-		MethodVisitor mv = ((InheritedAttributes) arg).mv; // this should be the
-		// first statement
-		// of all visit
-		// methods that
-		// generate
-		// instructions
+		MethodVisitor mv = ((InheritedAttributes) arg).mv;
 
 		// Note, we are computing the return type based on the return type of the expression
 		if(binaryExpression.getType().equals(intType))
 		{
 			// First, visit the sub expressions and put the result of e1 on the top of the stack and
 			// the result of d0 under it.
-			binaryExpression.expression0.visit(this, arg);
-			binaryExpression.expression1.visit(this, arg);
+			binaryExpression.expression0.visit(this, arg); // load 0
+			binaryExpression.expression1.visit(this, arg); // load 1
 
 			switch(binaryExpression.op.kind)
 			{
@@ -80,11 +86,11 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes, TypeConstants {
 					// Use StribgBuilder to concatenate the two strings.
 					mv.visitTypeInsn(NEW, "java/lang/StringBuilder");
 					mv.visitInsn(DUP);
-					binaryExpression.expression0.visit(this, arg); // We first want expression0
+					binaryExpression.expression0.visit(this, arg); // We first want expression0, Load 0
 					mv.visitMethodInsn(INVOKESTATIC, "java/lang/String", "valueOf", "(Ljava/lang/Object;)Ljava/lang/String;");
 					mv.visitMethodInsn(INVOKESPECIAL, "java/lang/StringBuilder", "<init>", "(Ljava/lang/String;)V");
 
-					binaryExpression.expression1.visit(this, arg);
+					binaryExpression.expression1.visit(this, arg); // load 1
 					mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(Ljava/lang/String;)Ljava/lang/StringBuilder;");
 					mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "toString", "()Ljava/lang/String;");
 					break;
@@ -97,10 +103,10 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes, TypeConstants {
 				switch(binaryExpression.op.kind) {
 						case AND:
 					{
-						binaryExpression.expression0.visit(this, arg);
+						binaryExpression.expression0.visit(this, arg); // load0
 						Label l1 = new Label();
 						mv.visitJumpInsn(IFEQ, l1);
-						binaryExpression.expression1.visit(this, arg);
+						binaryExpression.expression1.visit(this, arg); // load 1
 						mv.visitJumpInsn(IFEQ, l1);
 						mv.visitInsn(ICONST_1);
 						Label l2 = new Label();
@@ -111,10 +117,10 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes, TypeConstants {
 					}
 					break;
 					case BAR: {
-						binaryExpression.expression0.visit(this, arg);
+						binaryExpression.expression0.visit(this, arg); // load 0
 						Label l1 = new Label();
 						mv.visitJumpInsn(IFNE, l1);
-						binaryExpression.expression1.visit(this, arg);
+						binaryExpression.expression1.visit(this, arg); // load 1
 						mv.visitJumpInsn(IFNE, l1);
 						mv.visitInsn(ICONST_0);
 						Label l2 = new Label();
@@ -149,8 +155,8 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes, TypeConstants {
 
 				// First, visit the sub expressions and put the result of e1 on the top of the stack and
 				// the result of d0 under it.
-				binaryExpression.expression0.visit(this, arg);
-				binaryExpression.expression1.visit(this, arg);
+				binaryExpression.expression0.visit(this, arg); // load 0
+				binaryExpression.expression1.visit(this, arg); // load 1
 
 				// Now for the asm
 				Label l1 = new Label();
@@ -202,13 +208,8 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes, TypeConstants {
 	public Object visitBooleanLitExpression(
 			BooleanLitExpression booleanLitExpression, Object arg)
 			throws Exception {
-		MethodVisitor mv = ((InheritedAttributes) arg).mv; // this should be the
-		// first statement
-		// of all visit
-		// methods that
-		// generate
-		// instructions
-		mv.visitLdcInsn(booleanLitExpression.value);
+		MethodVisitor mv = ((InheritedAttributes) arg).mv;
+		mv.visitLdcInsn(booleanLitExpression.value); // Load
 		return null;
 	}
 
@@ -256,17 +257,32 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes, TypeConstants {
 	}
 
 	@Override
+	/**
+	 * Load the VALUE of the expression onto the top of the stack
+	 * TODO: Currently, this method treats all variables as global and in the same class, change this
+	 */
 	public Object visitIdentExpression(IdentExpression identExpression,
 			Object arg) throws Exception {
-		throw new UnsupportedOperationException(
-				"code generation not yet implemented");
+		MethodVisitor mv = ((InheritedAttributes) arg).mv;
+		// Load
+		mv.visitVarInsn(ALOAD, 0);
+		mv.visitFieldInsn(GETFIELD, className, identExpression.identToken.getText(),
+				identExpression.getType());
+		return null;
 	}
 
 	@Override
+	/**
+	 * Stores the top most element of the stack into the this variable. Note, the stack should look
+	 * like:
+	 * bottom:[ .. | this(object holding lvalue) | val ]:top
+	 * TODO: Currently, this method treats all variables as global and in the same class, change this
+	 */
 	public Object visitIdentLValue(IdentLValue identLValue, Object arg)
 			throws Exception {
-		throw new UnsupportedOperationException(
-				"code generation not yet implemented");
+		MethodVisitor mv = ((InheritedAttributes) arg).mv;
+		mv.visitFieldInsn(PUTFIELD, className, identLValue.firstToken.getText(), identLValue.getType());
+		return null;
 	}
 
 	@Override
@@ -286,13 +302,8 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes, TypeConstants {
 	@Override
 	public Object visitIntLitExpression(IntLitExpression intLitExpression,
 			Object arg) throws Exception {
-		MethodVisitor mv = ((InheritedAttributes) arg).mv; // this should be the
-															// first statement
-															// of all visit
-															// methods that
-															// generate
-															// instructions
-		mv.visitLdcInsn(intLitExpression.value);
+		MethodVisitor mv = ((InheritedAttributes) arg).mv;
+		mv.visitLdcInsn(intLitExpression.value); // Load
 		return null;
 	}
 
@@ -477,7 +488,7 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes, TypeConstants {
 		// methods that
 		// generate
 		// instructions
-		mv.visitLdcInsn(stringLitExpression.value);
+		mv.visitLdcInsn(stringLitExpression.value); // Load
 		return null;
 	}
 
@@ -497,8 +508,9 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes, TypeConstants {
 
 	@Override
 	public Object visitVarDec(VarDec varDec, Object arg) throws Exception {
-		throw new UnsupportedOperationException(
-				"code generation not yet implemented");
+		fv = cw.visitField(0, varDec.identToken.getText(), varDec.type.getJVMType(), null, null);
+		fv.visitEnd(); // maybe put this at the end of the program? @TODO: check
+		return null;
 	}
 
 	@Override
