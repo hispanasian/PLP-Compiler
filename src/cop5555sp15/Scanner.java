@@ -1,9 +1,6 @@
 package cop5555sp15;
 
 import cop5555sp15.TokenStream.Kind;
-import cop5555sp15.TokenStream.Token;
-
-import java.util.ArrayList;
 
 public class Scanner
 {

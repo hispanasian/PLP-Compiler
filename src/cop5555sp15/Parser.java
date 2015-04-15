@@ -3,8 +3,6 @@ package cop5555sp15;
 import cop5555sp15.TokenStream.Kind;
 import cop5555sp15.TokenStream.Token;
 import cop5555sp15.ast.*;
-
-import javax.xml.crypto.dsig.keyinfo.KeyValue;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -126,6 +124,11 @@ public class Parser
             }
         }
         return false;
+    }
+
+    public String getErrors()
+    { /* Do nothing */
+        return "";
     }
 
 	//This is a convenient way to represent fixed sets of
