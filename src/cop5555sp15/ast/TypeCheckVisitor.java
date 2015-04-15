@@ -405,7 +405,26 @@ public class TypeCheckVisitor implements ASTVisitor, TypeConstants {
 	@Override
 	public Object visitUnaryExpression(UnaryExpression unaryExpression,
 			Object arg) throws Exception {
-		throw new UnsupportedOperationException("not yet implemented");
+		String etype = (String)unaryExpression.expression.visit(this, arg);
+
+		switch(unaryExpression.op.kind)
+		{
+			case MINUS:
+				check(etype.equals(intType), "Expected an int to be prefixed by -", unaryExpression);
+				unaryExpression.setType(intType);
+				break;
+			case NOT:
+				check(etype.equals(booleanType), "Expected a boolean to be prefixed by !", unaryExpression);
+				unaryExpression.setType(booleanType);
+				break;
+			default:
+				// This should never happen
+				check(unaryExpression.op.kind != Kind.MINUS || unaryExpression.op.kind != Kind.NOT,
+						"Unary expression found prefixed with a token that was not ! or -",
+						unaryExpression);
+				break;
+		}
+		return unaryExpression.getType();
 	}
 
 	@Override

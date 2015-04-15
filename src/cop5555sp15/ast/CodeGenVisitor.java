@@ -493,10 +493,35 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes, TypeConstants {
 	}
 
 	@Override
+	/**
+	 * This method expects that the expression (when visited) will put the value of the expression
+	 * on the top of the stack. In turn, this method will put the value of this UnaryExpression
+	 * on top of the stack.
+	 */
 	public Object visitUnaryExpression(UnaryExpression unaryExpression,
 			Object arg) throws Exception {
-		throw new UnsupportedOperationException(
-				"code generation not yet implemented");
+		MethodVisitor mv = ((InheritedAttributes) arg).mv;
+		unaryExpression.expression.visit(this, arg); // Put the value of the expression on top of the stack
+
+		switch (unaryExpression.op.kind)
+		{
+			case MINUS:
+				mv.visitInsn(INEG);
+				break;
+			case NOT:
+				Label l0 = new Label();
+				mv.visitJumpInsn(IFEQ, l0); // if val is equal to 0, jump to l1 (put 1 on stack)
+				mv.visitInsn(ICONST_0);
+				Label l1 = new Label();
+				mv.visitJumpInsn(GOTO, l1);
+				mv.visitLabel(l0);
+				mv.visitInsn(ICONST_1);
+				mv.visitLabel(l1);
+				break;
+			default:
+				throw new Exception("Parsing failed, this is not a Unary Expression");
+		}
+		return null;
 	}
 
 	@Override
