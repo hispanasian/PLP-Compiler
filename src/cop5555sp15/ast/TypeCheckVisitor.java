@@ -37,7 +37,29 @@ public class TypeCheckVisitor implements ASTVisitor, TypeConstants {
 	public Object visitAssignmentStatement(
 			AssignmentStatement assignmentStatement, Object arg)
 			throws Exception {
-		throw new UnsupportedOperationException("not yet implemented");
+		LValue lval = assignmentStatement.lvalue;
+		Expression exp = assignmentStatement.expression;
+
+		Declaration ldec = (Declaration)lval.visit(this, arg); // Ensure lval exists
+		exp.visit(this, arg); // Determine type of expression
+
+		// Time to find the type
+		if(ldec instanceof VarDec)
+		{
+			Type ltype = ((VarDec) ldec).type;
+			if(ltype instanceof UndeclaredType)
+			{ // Infer type from expression
+				throw new UnsupportedOperationException("not yet implemented");
+			}
+			// Type check
+			else check(ltype.getJVMType().equals(exp.getType()),
+						"cannot assign expression to a variable of different type", assignmentStatement);
+		}
+		else if(ldec instanceof ClosureDec)
+		{
+			throw new UnsupportedOperationException("not yet implemented");
+		}
+		return null;
 	}
 
 	/**
@@ -191,18 +213,50 @@ public class TypeCheckVisitor implements ASTVisitor, TypeConstants {
 	/**
 	 * Check that name has been declared in scope Get its type from the
 	 * declaration.
-	 * 
+	 * @return returns the JVM type of this expression
 	 */
 	@Override
 	public Object visitIdentExpression(IdentExpression identExpression,
 			Object arg) throws Exception {
-		throw new UnsupportedOperationException("not yet implemented");
+		// Check that ident exists
+		Declaration dec = symbolTable.lookup(identExpression.firstToken.getText());
+		check(dec != null, "cannot use undeclared variable", identExpression);
+
+		// Time to find the type
+		if(dec instanceof VarDec)
+		{
+			Type type = ((VarDec) dec).type;
+			check(type.getJVMType() != null, "variable type cannot be determined or" +
+					" variable was never assigned a value", identExpression);
+			identExpression.setType(type.getJVMType());
+		}
+		else if(dec instanceof ClosureDec)
+		{
+			throw new UnsupportedOperationException("not yet implemented");
+		}
+		return identExpression.getType();
 	}
 
 	@Override
+	/**
+	 * @return	Returns the declaration of this value
+	 */
 	public Object visitIdentLValue(IdentLValue identLValue, Object arg)
 			throws Exception {
-		throw new UnsupportedOperationException("not yet implemented");
+		Declaration dec = symbolTable.lookup(identLValue.firstToken.getText());
+		check(dec != null, "cannot use undeclared variable", identLValue);
+
+		// Time to find the type
+		if(dec instanceof VarDec)
+		{
+			Type type = ((VarDec) dec).type;
+			identLValue.setType(type.getJVMType());
+		}
+		else if(dec instanceof ClosureDec)
+		{
+			throw new UnsupportedOperationException("not yet implemented");
+		}
+		return dec;
 	}
 
 	@Override
@@ -372,7 +426,9 @@ public class TypeCheckVisitor implements ASTVisitor, TypeConstants {
 	 */
 	@Override
 	public Object visitVarDec(VarDec varDec, Object arg) throws Exception {
-		throw new UnsupportedOperationException("not yet implemented");
+		check(symbolTable.insert(varDec.identToken.getText(), varDec),
+				"cannot re-declare variable in the same scope", varDec);
+		return null;
 	}
 
 	/**
