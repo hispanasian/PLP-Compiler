@@ -51,12 +51,26 @@ public class TypeCheckVisitor implements ASTVisitor, TypeConstants {
 			{ // Infer type from expression
 				throw new UnsupportedOperationException("not yet implemented");
 			}
-			else if(exp.getType().equals(emptyList))
+			// Check list types
+			else if(ltype instanceof ListType)
 			{
-				check(ltype.getJVMType().contains("Ljava/util/ArrayList"),
-					"cannot assign expression to a variable of different type",
-					assignmentStatement);
+				// Check empty list
+				if(exp.getType().equals(emptyList))
+				{
+					check(ltype.getJVMType().contains("Ljava/util/List"), // the interface
+							"cannot assign expression to a variable of different type",
+							assignmentStatement);
+				}
+				// Check lists with types
+				else
+				{
+					check(ltype.getJVMType().replaceAll("Ljava/util/List", "Ljava/util/ArrayList").equals(exp.getType()),
+							"cannot assign expression to a variable of different type",
+							assignmentStatement);
+				}
+
 			}
+			// Check remaining types
 			else check(ltype.getJVMType().equals(exp.getType()),
 						"cannot assign expression to a variable of different type", assignmentStatement);
 		}
