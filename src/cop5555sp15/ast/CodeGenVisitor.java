@@ -580,10 +580,23 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes, TypeConstants {
 	}
 
 	@Override
+	/**
+	 * This expects that the call to expression.visit will put the result of the expression on top
+	 * of the stack (and the result will be a boolean).
+	 */
 	public Object visitWhileStatement(WhileStatement whileStatement, Object arg)
 			throws Exception {
-		throw new UnsupportedOperationException(
-				"code generation not yet implemented");
+		MethodVisitor mv = ((InheritedAttributes) arg).mv;
+		Label l0 = new Label();
+		Label l1 = new Label();
+		mv.visitLabel(l0);
+		whileStatement.expression.visit(this, arg); // put the result of the expression on the stack
+		mv.visitJumpInsn(IFEQ, l1); // if the expression is equal to 0 (false), jump to l1
+		whileStatement.block.visit(this, arg);
+		mv.visitJumpInsn(GOTO, l0); // loop
+		mv.visitLabel(l1);
+
+		return null;
 	}
 
 	@Override

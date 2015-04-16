@@ -484,7 +484,12 @@ public class TypeCheckVisitor implements ASTVisitor, TypeConstants {
 	@Override
 	public Object visitWhileStatement(WhileStatement whileStatement, Object arg)
 			throws Exception {
-		throw new UnsupportedOperationException("not yet implemented");
+		String etype = (String)whileStatement.expression.visit(this, arg);
+		check(etype.equals(booleanType),
+				"while expects an expression that evaluates to a boolean",
+				whileStatement);
+		whileStatement.block.visit(this, arg);
+		return null;
 	}
 
 }
