@@ -347,13 +347,13 @@ public class TypeCheckVisitor implements ASTVisitor, TypeConstants {
 		Type dectype = ((VarDec)dec).type;
 
 		// If the list is not empty, verify that it is of the same type as the ident
-		if(type.equals("")) type = "Ljava/util/ArrayList";
+		if(type.equals("")) type = emptyList;
 		else
 		{
 			// First, check if we are using int or boolean. If so, change their types to their
 			// object counterparts
-			if(type.equals(intType)) type = "java/lang/Integer;";
-			else if(type.equals(booleanType)) type = "java/lang/Boolean;";
+			if(type.equals(intType)) type = intObjectType;
+			else if(type.equals(booleanType)) type = booleanObjectType;
 
 			// Now verify the type of the expression and the type of the ident
 			type = "Ljava/util/ArrayList<"+type+">;";
