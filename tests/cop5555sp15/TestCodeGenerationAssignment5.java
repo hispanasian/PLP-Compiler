@@ -5,13 +5,25 @@ import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Arrays;
+import java.util.List;
 
+//import jdk.internal.org.objectweb.asm.tree.AbstractInsnNode;
+//import jdk.internal.org.objectweb.asm.tree.ClassNode;
+//import jdk.internal.org.objectweb.asm.tree.InsnList;
+//import jdk.internal.org.objectweb.asm.tree.MethodNode;
+import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.tree.AbstractInsnNode;
+import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.InsnList;
+import org.objectweb.asm.tree.MethodNode;
+import org.objectweb.asm.util.*;
 import org.junit.Test;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.util.TraceClassVisitor;
@@ -94,7 +106,6 @@ public class TestCodeGenerationAssignment5 {
 
         codelet.execute();
     }
-   
 
 
 /** In this assignment, we add support for 
@@ -449,207 +460,259 @@ public class TestCodeGenerationAssignment5 {
  *   
  */
 
-@Test
-/** 
- *  In this test, we declare a list l1 which contains int values, and apply the size operator
- *  to the empty list.
- *  
- *  The size expression result type is int and it requires that its argument is a list or map.
- *  It is implemented by invoking the List size function.
- * 
- * output:
- * 0
- */
-public void list1() throws Exception{
-	System.out.println("***********list1");
-	String input = "class B {\ndef l1 : @[int]; \n  l1 = @[];  print  size(l1); \n}";
-	System.out.println(input);
-	Program program = (Program) parseCorrectInput(input);
-	assertNotNull(program);
-	typeCheckCorrectAST(program);
-	byte[] bytecode = generateByteCode(program);
-	assertNotNull(bytecode);
-	System.out.println("\nexecuting bytecode:");
-	executeByteCode(program.JVMName, bytecode);
-}
+	@Test
+	/**
+	 *  In this test, we declare a list l1 which contains int values, and apply the size operator
+	 *  to the empty list.
+	 *
+	 *  The size expression result type is int and it requires that its argument is a list or map.
+	 *  It is implemented by invoking the List size function.
+	 *
+	 * output:
+	 * 0
+	 */
+	public void list1() throws Exception{
+		System.out.println("***********list1");
+		String input = "class B {\ndef l1 : @[int]; \n  l1 = @[];  print  size(l1); \n}";
+		System.out.println(input);
+		Program program = (Program) parseCorrectInput(input);
+		assertNotNull(program);
+		typeCheckCorrectAST(program);
+		byte[] bytecode = generateByteCode(program);
+		assertNotNull(bytecode);
+		System.out.println("\nexecuting bytecode:");
+		executeByteCode(program.JVMName, bytecode);
+	}
 
 
 
-/**
- * This is the same as above, except that the list is nonempty.
- * During type checking, we must ensure that the types of the items int this ListExpression
- * are all the same as the declared element type of the list.
- * 
- * output:
- * 3
- */
-@Test
-public void list2() throws Exception{
-	System.out.println("***********list2");
-	String input = "class B {\ndef l1 : @[int]; \n l1 = @[1,2,3];  print size(l1); \n}";
-	System.out.println(input);
-	Program program = (Program) parseCorrectInput(input);
-	assertNotNull(program);
-	typeCheckCorrectAST(program);
-	byte[] bytecode = generateByteCode(program);
-	assertNotNull(bytecode);
-	System.out.println("\nexecuting bytecode:");
-	executeByteCode(program.JVMName, bytecode);
-}
+	/**
+	 * This is the same as above, except that the list is nonempty.
+	 * During type checking, we must ensure that the types of the items int this ListExpression
+	 * are all the same as the declared element type of the list.
+	 *
+	 * output:
+	 * 3
+	 */
+	@Test
+	public void list2() throws Exception{
+		System.out.println("***********list2");
+		String input = "class B {\ndef l1 : @[int]; \n l1 = @[1,2,3];  print size(l1); \n}";
+		System.out.println(input);
+		Program program = (Program) parseCorrectInput(input);
+		assertNotNull(program);
+		typeCheckCorrectAST(program);
+		byte[] bytecode = generateByteCode(program);
+		assertNotNull(bytecode);
+		System.out.println("\nexecuting bytecode:");
+		executeByteCode(program.JVMName, bytecode);
+	}
 
 
-/**
- * This list introduces an ListOrMapElemExpression as the argument in the print statement.
- * 
- * For type checking, you need to determine that since l1 is a list, the argument (here 1)
- * must be an int.  The result type is the element type of the list.
- * 
- * output:
- * 2
- */
-@Test
-public void list3() throws Exception{
-	System.out.println("***********list3");
-	String input = "class B {\ndef l1 : @[int]; \n l1 = @[1,2,3];   print l1[1]; \n}";
-	System.out.println(input);
-	Program program = (Program) parseCorrectInput(input);
-	assertNotNull(program);
-	typeCheckCorrectAST(program);
-	byte[] bytecode = generateByteCode(program);
-	assertNotNull(bytecode);
-	System.out.println("\nexecuting bytecode:");
-	executeByteCode(program.JVMName, bytecode);
-}
+	/**
+	 * This list introduces an ListOrMapElemExpression as the argument in the print statement.
+	 *
+	 * For type checking, you need to determine that since l1 is a list, the argument (here 1)
+	 * must be an int.  The result type is the element type of the list.
+	 *
+	 * output:
+	 * 2
+	 */
+	@Test
+	public void list3() throws Exception{
+		System.out.println("***********list3");
+		String input = "class B {\ndef l1 : @[int]; \n l1 = @[1,2,3];   print l1[1]; \n}";
+		System.out.println(input);
+		Program program = (Program) parseCorrectInput(input);
+		assertNotNull(program);
+		typeCheckCorrectAST(program);
+		byte[] bytecode = generateByteCode(program);
+		assertNotNull(bytecode);
+		System.out.println("\nexecuting bytecode:");
+		executeByteCode(program.JVMName, bytecode);
+	}
 
-/**
- * output:
- * 1
- * 2
- * 42
- */
-@Test
-public void list4() throws Exception{
-	System.out.println("***********list4");
-	String input = "class B {\ndef l1 : @[int]; \n l1 = @[1,2,3];  l1[2]=42; print l1[0]; print l1[1]; print l1[2];\n}";
-	System.out.println(input);
-	Program program = (Program) parseCorrectInput(input);
-	assertNotNull(program);
-	typeCheckCorrectAST(program);
-	byte[] bytecode = generateByteCode(program);
-	assertNotNull(bytecode);
-	System.out.println("\nexecuting bytecode:");
-	executeByteCode(program.JVMName, bytecode);
-}
+	/**
+	 * output:
+	 * 1
+	 * 2
+	 * 42
+	 */
+	@Test
+	public void list4() throws Exception{
+		System.out.println("***********list4");
+		String input = "class B {\ndef l1 : @[int]; \n l1 = @[1,2,3];  l1[2]=42; print l1[0]; print l1[1]; print l1[2];\n}";
+		System.out.println(input);
+		Program program = (Program) parseCorrectInput(input);
+		assertNotNull(program);
+		typeCheckCorrectAST(program);
+		byte[] bytecode = generateByteCode(program);
+		assertNotNull(bytecode);
+		System.out.println("\nexecuting bytecode:");
+		executeByteCode(program.JVMName, bytecode);
+	}
 
-/**
- * List contians a list
- * 
- * output
- * 6
- */
-@Test
-public void list5() throws Exception{
-	System.out.println("***********list5");
-	String input = "class B {\ndef ll1 : @[@[int]];\n   def l1 : @[int]; def l2 : @[int];"
-			+ "def l3: @[int];" 
-			+ "\n l1 = @[1,2,3];  " 
-			+ "l2 = @[4,5,6]; l3=@[];\n  ll1 = @[l1,l2,l3];" 
-			+ "l3 = ll1[1]; \n   print l3[2];"
-			+ "\n}";
-	System.out.println(input);
-	Program program = (Program) parseCorrectInput(input);
-	assertNotNull(program);
-	typeCheckCorrectAST(program);
-	byte[] bytecode = generateByteCode(program);
-	assertNotNull(bytecode);
-	System.out.println("\nexecuting bytecode:");
-	executeByteCode(program.JVMName, bytecode);	
-}
-
-
-/**
- * list contains strings
- * 
- * output:
- * go
- * gators
- * chomp!
- */
-@Test
-public void list6() throws Exception{
-	System.out.println("***********list6");
-	String input = "class B {\ndef l1 : @[string]; \n l1 = @[\"go\",\"gators\"]; "
-			+ "\n l1[2]=\"chomp!\"; "
-			+ "\n print l1[0];\n print l1[1];\n print l1[2];"
-			+ "\n}";
-	System.out.println(input);
-	Program program = (Program) parseCorrectInput(input);
-	assertNotNull(program);
-	typeCheckCorrectAST(program);
-	byte[] bytecode = generateByteCode(program);
-	assertNotNull(bytecode);
-	System.out.println("\nexecuting bytecode:");
-	executeByteCode(program.JVMName, bytecode);	
-}
+	/**
+	 * List contians a list
+	 *
+	 * output
+	 * 6
+	 */
+	@Test
+	public void list5() throws Exception{
+		System.out.println("***********list5");
+		String input = "class B {\ndef ll1 : @[@[int]];\n   def l1 : @[int]; def l2 : @[int];"
+				+ "def l3: @[int];"
+				+ "\n l1 = @[1,2,3];  "
+				+ "l2 = @[4,5,6]; l3=@[];\n  ll1 = @[l1,l2,l3];"
+				+ "l3 = ll1[1]; \n   print l3[2];"
+				+ "\n}";
+		System.out.println(input);
+		Program program = (Program) parseCorrectInput(input);
+		assertNotNull(program);
+		typeCheckCorrectAST(program);
+		byte[] bytecode = generateByteCode(program);
+		assertNotNull(bytecode);
+		System.out.println("\nexecuting bytecode:");
+		executeByteCode(program.JVMName, bytecode);
+	}
 
 
-/**
- * List contains booleans
- * 
- * output:
- * true
- * false
- * true
- */
-@Test
-public void list7() throws Exception{
-	System.out.println("***********list7");
-	String input = "class B {\ndef l1 : @[boolean]; \n l1 = @[true, false]; "
-			+ "\n l1[2]=true; "
-			+ "\n print l1[0];\n print l1[1];\n print l1[2];"
-			+ "\n}";
-	System.out.println(input);
-	Program program = (Program) parseCorrectInput(input);
-	assertNotNull(program);
-	typeCheckCorrectAST(program);
-	byte[] bytecode = generateByteCode(program);
-	assertNotNull(bytecode);
-	System.out.println("\nexecuting bytecode:");
-	executeByteCode(program.JVMName, bytecode);	
-}
-
-/**
- * This program has a type error, the list elements are not the correct type
- * @throws Exception
- */
-@Test
-public void listFail1() throws Exception{
-	System.out.println("***********listFail1");
-	String input = "class B {\ndef l1 : @[boolean]; \n l1 = @[true, 1]; "
-			+ "\n l1[2]=true; "
-			+ "\n print l1[0];\n print l1[1];\n print l1[2];"
-			+ "\n}";
-	System.out.println(input);
-	Program program = (Program) parseCorrectInput(input);
- 	typeCheckIncorrectAST(program);	
-}
+	/**
+	 * list contains strings
+	 *
+	 * output:
+	 * go
+	 * gators
+	 * chomp!
+	 */
+	@Test
+	public void list6() throws Exception{
+		System.out.println("***********list6");
+		String input = "class B {\ndef l1 : @[string]; \n l1 = @[\"go\",\"gators\"]; "
+				+ "\n l1[2]=\"chomp!\"; "
+				+ "\n print l1[0];\n print l1[1];\n print l1[2];"
+				+ "\n}";
+		System.out.println(input);
+		Program program = (Program) parseCorrectInput(input);
+		assertNotNull(program);
+		typeCheckCorrectAST(program);
+		byte[] bytecode = generateByteCode(program);
+		assertNotNull(bytecode);
+		System.out.println("\nexecuting bytecode:");
+		executeByteCode(program.JVMName, bytecode);
+	}
 
 
-/**
- * The print l1["one"] statement has a type error.
- * 
- */
-@Test
-public void listFail2() throws Exception{
-	System.out.println("***********listFail2");
-	String input = "class B {\ndef l1 : @[boolean]; \n l1 = @[true, false]; "
-			+ "\n l1[2]=true; "
-			+ "\n print l1[0];\n print l1[\"one\"];\n print l1[2];"
-			+ "\n}";
-	System.out.println(input);
-	Program program = (Program) parseCorrectInput(input);
- 	typeCheckIncorrectAST(program);	
-}
+	/**
+	 * List contains booleans
+	 *
+	 * output:
+	 * true
+	 * false
+	 * true
+	 */
+	@Test
+	public void list7() throws Exception{
+		System.out.println("***********list7");
+		String input = "class B {\ndef l1 : @[boolean]; \n l1 = @[true, false]; "
+				+ "\n l1[2]=true; "
+				+ "\n print l1[0];\n print l1[1];\n print l1[2];"
+				+ "\n}";
+		System.out.println(input);
+		Program program = (Program) parseCorrectInput(input);
+		assertNotNull(program);
+		typeCheckCorrectAST(program);
+		byte[] bytecode = generateByteCode(program);
+		assertNotNull(bytecode);
+		System.out.println("\nexecuting bytecode:");
+		executeByteCode(program.JVMName, bytecode);
+	}
+
+	/**
+	 * It should be possible to assign the element of a list to a variable.
+	 *
+	 * Expected Output:
+	 * 2
+	 */
+	@Test
+	public void list8() throws Exception{
+		System.out.println("***********list8");
+		String input = "class B {\ndef l1 : @[int]; \n l1 = @[1,2,3];   def x:int; x=l1[1]; print x;\n}";
+		System.out.println(input);
+		Program program = (Program) parseCorrectInput(input);
+		assertNotNull(program);
+		typeCheckCorrectAST(program);
+		byte[] bytecode = generateByteCode(program);
+		assertNotNull(bytecode);
+		System.out.println("\nexecuting bytecode:");
+		executeByteCode(program.JVMName, bytecode);
+	}
+
+	/**
+	 * This program has a type error, the list elements are not the correct type
+	 * @throws Exception
+	 */
+	@Test
+	public void listFail1() throws Exception{
+		System.out.println("***********listFail1");
+		String input = "class B {\ndef l1 : @[boolean]; \n l1 = @[true, 1]; "
+				+ "\n l1[2]=true; "
+				+ "\n print l1[0];\n print l1[1];\n print l1[2];"
+				+ "\n}";
+		System.out.println(input);
+		Program program = (Program) parseCorrectInput(input);
+		typeCheckIncorrectAST(program);
+	}
+
+
+	/**
+	 * The print l1["one"] statement has a type error.
+	 *
+	 */
+	@Test
+	public void listFail2() throws Exception{
+		System.out.println("***********listFail2");
+		String input = "class B {\ndef l1 : @[boolean]; \n l1 = @[true, false]; "
+				+ "\n l1[2]=true; "
+				+ "\n print l1[0];\n print l1[\"one\"];\n print l1[2];"
+				+ "\n}";
+		System.out.println(input);
+		Program program = (Program) parseCorrectInput(input);
+		typeCheckIncorrectAST(program);
+	}
+
+	/**
+	 * The print l2[0] has a undeclared variable error
+	 *
+	 */
+	@Test
+	public void listFail3() throws Exception{
+		System.out.println("***********listFail3");
+		String input = "class B {\ndef l1 : @[boolean]; \n l1 = @[true, false]; "
+				+ "\n l1[2]=true; "
+				+ "\n print l1[0];\n  print l1[2]; print l2[0];\n"
+				+ "\n}";
+		System.out.println(input);
+		Program program = (Program) parseCorrectInput(input);
+		typeCheckIncorrectAST(program);
+	}
+
+	/**
+	 * x=l1[0] is attempting to assign a boolean to an int. This is illegal
+	 *
+	 */
+	@Test
+	public void listFail4() throws Exception{
+		System.out.println("***********listFail4");
+		String input = "class B {\ndef l1 : @[boolean]; \n l1 = @[true, false]; def x:int; x=l1[0];"
+				+ "\n l1[2]=true; "
+				+ "\n print l1[0];\n  print l1[2]; print l2[0];\n"
+				+ "\n}";
+		System.out.println(input);
+		Program program = (Program) parseCorrectInput(input);
+		typeCheckIncorrectAST(program);
+	}
 	
 }
 
