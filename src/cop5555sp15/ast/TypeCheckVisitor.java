@@ -64,11 +64,10 @@ public class TypeCheckVisitor implements ASTVisitor, TypeConstants {
 				// Check lists with types
 				else
 				{
-					check(ltype.getJVMType().replaceAll("Ljava/util/List", "Ljava/util/ArrayList").equals(exp.getType()),
+					check(ltype.getJVMType().equals(exp.getType()),
 							"cannot assign expression to a variable of different type",
 							assignmentStatement);
 				}
-
 			}
 			// Check remaining types
 			else check(ltype.getJVMType().equals(exp.getType()),
@@ -247,7 +246,7 @@ public class TypeCheckVisitor implements ASTVisitor, TypeConstants {
 			Type type = ((VarDec) dec).type;
 			check(type.getJVMType() != null, "variable type cannot be determined or" +
 					" variable was never assigned a value", identExpression);
-			identExpression.setType(type.getJVMType());
+			identExpression.setFields(type.getJVMType(), type.getDesc());
 		}
 		else if(dec instanceof ClosureDec)
 		{
@@ -347,10 +346,10 @@ public class TypeCheckVisitor implements ASTVisitor, TypeConstants {
 		String type = "";
 		if(listExpression.expressionList.size() > 0)
 		{
-			type = listExpression.expressionList.get(0).getType();
+			type = (String)listExpression.expressionList.get(0).visit(this, arg);
 			for(int i = 1; i < listExpression.expressionList.size(); i++)
 			{
-				check(!type.equals(listExpression.expressionList.get(i).getType()),
+				check(type.equals(listExpression.expressionList.get(i).visit(this, arg)),
 				"Not all expressions in the list are of the same type",
 				listExpression);
 			}
@@ -362,10 +361,10 @@ public class TypeCheckVisitor implements ASTVisitor, TypeConstants {
 		{
 			// Check if we are using int or boolean. If so, change their types to their object
 			// counterparts
-			if(type.equals(intType)) type = intObjectType;
-			else if(type.equals(booleanType)) type = booleanObjectType;
-			listExpression.setType(type);
+			if(type.equals(intType)) type = ListType.prefix()+"<L"+intObjectType+";>;";
+			else if(type.equals(booleanType)) type = ListType.prefix()+"<L"+booleanObjectType+";>;";
 		}
+		listExpression.setFields(type, listInterface+";");
 		return type;
 	}
 
@@ -374,7 +373,14 @@ public class TypeCheckVisitor implements ASTVisitor, TypeConstants {
 	public Object visitListOrMapElemExpression(
 			ListOrMapElemExpression listOrMapElemExpression, Object arg)
 			throws Exception {
-		throw new UnsupportedOperationException("not yet implemented");
+		Declaration dec = symbolTable.lookup(listOrMapElemExpression.firstToken.getText());
+		check(dec != null, "cannot use undeclared variable", listOrMapElemExpression);
+
+		String type = (String)listOrMapElemExpression.expression.visit(this, arg);
+		check(type.equals(intType),
+				"The expression provided to a List or Map element must be an int",
+				listOrMapElemExpression);
+		return type;
 	}
 
 	@Override
@@ -447,9 +453,11 @@ public class TypeCheckVisitor implements ASTVisitor, TypeConstants {
 	 */
 	public Object visitSizeExpression(SizeExpression sizeExpression, Object arg)
 			throws Exception {
-		check(sizeExpression.getType().contains("Ljava/util/List"),
+		String type = (String) sizeExpression.expression.visit(this, arg);
+		check(type.contains("Ljava/util/List"),
 				"Size() must be given a list",
 				sizeExpression);
+		sizeExpression.setType(intType);
 		return intType;
 	}
 

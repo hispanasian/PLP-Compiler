@@ -16,7 +16,6 @@ public abstract class LValue extends ASTNode {
 		this.type = type;
 	}
 
-
 	public LValue(Token firstToken) {
 		super(firstToken);
 	}

@@ -1,9 +1,10 @@
 package cop5555sp15.ast;
 
-import com.sun.org.apache.xpath.internal.operations.NotEquals;
 import org.objectweb.asm.*;
 import cop5555sp15.TokenStream.Kind;
 import cop5555sp15.TypeConstants;
+
+import java.util.List;
 
 public class CodeGenVisitor implements ASTVisitor, Opcodes, TypeConstants {
 
@@ -41,11 +42,13 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes, TypeConstants {
 		MethodVisitor mv = ((InheritedAttributes) arg).mv;
 		LValue lval = assignmentStatement.lvalue;
 
-		// Make the stack look like:
+		// Make the stack look like (for lvalue):
 		// bottom:[ .. | this(object holding lvalue) | val ]:top
 		mv.visitVarInsn(ALOAD, 0);
 		assignmentStatement.expression.visit(this, arg); // Load expression to the top of the stack
-		assignmentStatement.lvalue.visit(this, arg); // Load expression to the top of the stack
+
+		// Now our stack looks like what we want
+		assignmentStatement.lvalue.visit(this, arg); // Load lvalue to the top of the stack
 		return null;
 	}
 
@@ -267,7 +270,7 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes, TypeConstants {
 		// Load
 		mv.visitVarInsn(ALOAD, 0);
 		mv.visitFieldInsn(GETFIELD, className, identExpression.identToken.getText(),
-				identExpression.getType());
+				identExpression.getDesc());
 		return null;
 	}
 
@@ -281,7 +284,13 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes, TypeConstants {
 	public Object visitIdentLValue(IdentLValue identLValue, Object arg)
 			throws Exception {
 		MethodVisitor mv = ((InheritedAttributes) arg).mv;
-		mv.visitFieldInsn(PUTFIELD, className, identLValue.firstToken.getText(), identLValue.getType());
+		String type = identLValue.getType();
+
+		// Check if type is a list
+		if(type.contains(listInterface)) type = listInterface+";";
+
+		// Now put the object on the stack into the variable
+		mv.visitFieldInsn(PUTFIELD, className, identLValue.firstToken.getText(), type);
 		return null;
 	}
 
@@ -355,10 +364,42 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes, TypeConstants {
 	}
 
 	@Override
+	/**
+	 * Puts the REFERENCE to an object that is created from the listExpression onto the top of the
+	 * stack
+	 */
 	public Object visitListExpression(ListExpression listExpression, Object arg)
 			throws Exception {
-		throw new UnsupportedOperationException(
-				"code generation not yet implemented");
+		MethodVisitor mv = ((InheritedAttributes) arg).mv;
+		List<Expression> expression = listExpression.expressionList;
+
+		// First, create the new list
+		mv.visitTypeInsn(NEW, "java/util/ArrayList");
+		mv.visitInsn(DUP);
+		mv.visitMethodInsn(INVOKESPECIAL, "java/util/ArrayList", "<init>", "()V", false);
+
+		// Now, populate the List with the values
+		for(int i = 0; i < expression.size(); i++)
+		{
+			mv.visitInsn(DUP);  // Keep two references of the object on top of the stack. This way
+								// we can keep a reference for future adds/leave a copy on top after
+								// populating it
+
+			expression.get(i).visit(this, arg); // Put the expression onto the stack
+
+			// Handle some special cases
+			if(expression.get(i).getType().equals(intType))
+				mv.visitMethodInsn(INVOKESTATIC, "java/lang/Integer", "valueOf", "(I)Ljava/lang/Integer;", false);
+			else if(expression.get(i).getType().equals(booleanType))
+				mv.visitMethodInsn(INVOKESTATIC, "java/lang/Boolean", "valueOf", "(Z)Ljava/lang/Boolean;", false);
+
+			// Continue
+			mv.visitMethodInsn(INVOKEINTERFACE, "java/util/List", "add", "(Ljava/lang/Object;)Z", true);
+			mv.visitInsn(POP); // remove returned boolean
+		}
+
+		// The call to DUP should ensure that this is on the top of the stack
+		return null;
 	}
 
 	@Override
@@ -498,10 +539,15 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes, TypeConstants {
 	}
 
 	@Override
+	/**
+	 * This expects that expression.visit() will put the referenced object onto the stack
+	 */
 	public Object visitSizeExpression(SizeExpression sizeExpression, Object arg)
 			throws Exception {
-		throw new UnsupportedOperationException(
-				"code generation not yet implemented");
+		MethodVisitor mv = ((InheritedAttributes) arg).mv; // this should be the
+		sizeExpression.expression.visit(this, arg); // put expression (list) on top of the stack
+		mv.visitMethodInsn(INVOKEINTERFACE, "java/util/List", "size", "()I", true);
+		return null;
 	}
 
 	@Override
@@ -559,7 +605,7 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes, TypeConstants {
 
 	@Override
 	public Object visitVarDec(VarDec varDec, Object arg) throws Exception {
-		fv = cw.visitField(0, varDec.identToken.getText(), varDec.type.getJVMType(), null, null);
+		fv = cw.visitField(0, varDec.identToken.getText(), varDec.type.getDesc(), varDec.type.getSignature(), null);
 		fv.visitEnd(); // maybe put this at the end of the program? @TODO: check
 		return null;
 	}

@@ -10,4 +10,8 @@ public abstract class Type extends ASTNode {
 	
 	abstract String getJVMType();
 
+	abstract String getDesc();
+
+	abstract String getSignature();
+
 }
