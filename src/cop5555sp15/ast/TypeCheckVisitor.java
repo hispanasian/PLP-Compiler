@@ -51,7 +51,12 @@ public class TypeCheckVisitor implements ASTVisitor, TypeConstants {
 			{ // Infer type from expression
 				throw new UnsupportedOperationException("not yet implemented");
 			}
-			// Type check
+			else if(exp.getType().equals(emptyList))
+			{
+				check(ltype.getJVMType().contains("Ljava/util/ArrayList"),
+					"cannot assign expression to a variable of different type",
+					assignmentStatement);
+			}
 			else check(ltype.getJVMType().equals(exp.getType()),
 						"cannot assign expression to a variable of different type", assignmentStatement);
 		}
@@ -337,32 +342,16 @@ public class TypeCheckVisitor implements ASTVisitor, TypeConstants {
 			}
 		}
 
-		// Check that ident exists and that it is a VarDec
-		Declaration dec = symbolTable.lookup(listExpression.firstToken.getText());
-		check(dec != null, "cannot use undeclared variable", listExpression);
-
-		check(dec instanceof VarDec,
-				"cannot assign a list to a Closure",
-				listExpression);
-		Type dectype = ((VarDec)dec).type;
-
-		// If the list is not empty, verify that it is of the same type as the ident
+		// Take care of special cases (int, boolean, and empty list)
 		if(type.equals("")) type = emptyList;
 		else
 		{
-			// First, check if we are using int or boolean. If so, change their types to their
-			// object counterparts
+			// Check if we are using int or boolean. If so, change their types to their object
+			// counterparts
 			if(type.equals(intType)) type = intObjectType;
 			else if(type.equals(booleanType)) type = booleanObjectType;
-
-			// Now verify the type of the expression and the type of the ident
-			type = "Ljava/util/ArrayList<"+type+">;";
-			check(type.equals(dectype.getJVMType()),
-					"",
-					listExpression);
 			listExpression.setType(type);
 		}
-
 		return type;
 	}
 
