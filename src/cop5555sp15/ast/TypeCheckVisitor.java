@@ -262,7 +262,14 @@ public class TypeCheckVisitor implements ASTVisitor, TypeConstants {
 	@Override
 	public Object visitIfElseStatement(IfElseStatement ifElseStatement,
 			Object arg) throws Exception {
-		throw new UnsupportedOperationException("not yet implemented");
+		String etype = (String)ifElseStatement.expression.visit(this, arg);
+		check(etype.equals(booleanType),
+				"if expects an expression that evaluates to a boolean",
+				ifElseStatement);
+
+		ifElseStatement.ifBlock.visit(this, arg);
+		ifElseStatement.elseBlock.visit(this, arg);
+		return null;
 	}
 
 	/**
@@ -271,7 +278,13 @@ public class TypeCheckVisitor implements ASTVisitor, TypeConstants {
 	@Override
 	public Object visitIfStatement(IfStatement ifStatement, Object arg)
 			throws Exception {
-		throw new UnsupportedOperationException("not yet implemented");
+		String etype = (String)ifStatement.expression.visit(this, arg);
+		check(etype.equals(booleanType),
+				"if expects an expression that evaluates to a boolean",
+				ifStatement);
+
+		ifStatement.block.visit(this, arg);
+		return null;
 	}
 
 	/**
