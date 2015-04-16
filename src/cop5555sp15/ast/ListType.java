@@ -29,6 +29,8 @@ public class ListType extends Type {
 	public String getSignature() {
 		return getJVMType();
 	}
+
+	public String getElementType() { return type.getJVMType(); }
 	
 	public static String prefix(){
 		return "Ljava/util/List";

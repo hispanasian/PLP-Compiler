@@ -1,5 +1,6 @@
 package cop5555sp15.ast;
 
+import com.sun.prism.PhongMaterial;
 import cop5555sp15.TokenStream;
 import cop5555sp15.TokenStream.Kind;
 import cop5555sp15.TypeConstants;
@@ -380,6 +381,25 @@ public class TypeCheckVisitor implements ASTVisitor, TypeConstants {
 		check(type.equals(intType),
 				"The expression provided to a List or Map element must be an int",
 				listOrMapElemExpression);
+
+		check(dec instanceof VarDec,
+				"variable must be a list or a map",
+				listOrMapElemExpression);
+		Type identType = ((VarDec) dec).type;
+		check(identType.getJVMType() != null,
+				"variable type cannot be determined or variable was never assigned a value",
+				listOrMapElemExpression);
+
+		check(identType instanceof ListType || identType instanceof KeyValueType,
+				"variable must be a list or a map",
+				listOrMapElemExpression);
+
+		// Find type of lists elements
+		if(identType instanceof ListType) type = ((ListType) identType).getElementType();
+		// Find type of maps elements
+		else throw new UnsupportedOperationException("Type checking for Map in ListOrMapExpression not supported");
+
+		listOrMapElemExpression.setType(type);
 		return type;
 	}
 

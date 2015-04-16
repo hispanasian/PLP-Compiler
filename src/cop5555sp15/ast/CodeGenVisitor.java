@@ -403,11 +403,36 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes, TypeConstants {
 	}
 
 	@Override
+	/**
+	 * Load the VALUE of the element in the list located at the provided expression onto the top of
+	 * the stack
+	 * TODO: Currently, this method treats all variables as global and in the same class, change this
+	 */
 	public Object visitListOrMapElemExpression(
 			ListOrMapElemExpression listOrMapElemExpression, Object arg)
 			throws Exception {
-		throw new UnsupportedOperationException(
-				"code generation not yet implemented");
+		MethodVisitor mv = ((InheritedAttributes) arg).mv;
+		// Load object onto stack
+		mv.visitVarInsn(ALOAD, 0); // this
+		mv.visitFieldInsn(GETFIELD, className, listOrMapElemExpression.identToken.getText(),
+				"Ljava/util/List;");
+		listOrMapElemExpression.expression.visit(this, arg); // find index we want to load
+		mv.visitMethodInsn(INVOKEINTERFACE, "java/util/List", "get", "(I)Ljava/lang/Object;", true);;
+
+		// Now we want to check if we have an integer or boolean. If we do, ast it to an int or
+		// bool (respectively)
+		if(listOrMapElemExpression.getType().equals(intType))
+		{
+			mv.visitTypeInsn(CHECKCAST, "java/lang/Integer");
+			mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Integer", "intValue", "()I", false);
+		}
+		else if(listOrMapElemExpression.getType().equals(booleanType))
+		{
+			mv.visitTypeInsn(CHECKCAST, "java/lang/Boolean");
+			mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Boolean", "booleanValue", "()Z", false);
+		}
+
+		return null;
 	}
 
 	@Override
