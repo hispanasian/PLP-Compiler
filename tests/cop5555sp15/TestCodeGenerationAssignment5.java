@@ -114,13 +114,14 @@ public class TestCodeGenerationAssignment5 {
  *    	- only applies to int
  *   output:
  *   -4
- *   1 
+ *   1
+ *   -5
  *    
  */
     @Test
     public void unaryMinus() throws Exception{
     	System.out.println("***********unaryMinus");
-    	String input = "class B {\n  print -4; print -3 + 4;  \n}";
+    	String input = "class B {\n  print -4; print -3 + 4; def x:int;  x=5; print -x; \n}";
     	System.out.println(input);
     	Program program = (Program) parseCorrectInput(input);
     	assertNotNull(program);
@@ -129,7 +130,7 @@ public class TestCodeGenerationAssignment5 {
     	assertNotNull(bytecode);
     	System.out.println("\nexecuting bytecode:");
     	executeByteCode(program.JVMName, bytecode);
-    }  
+    }
     
     @Test
     /**
@@ -143,10 +144,11 @@ public class TestCodeGenerationAssignment5 {
      * true
      * true
      * true
+	 * true
      */
     public void unaryNot() throws Exception{
     	System.out.println("***********unaryNot");
-    	String input = "class B {\n print (!true); print (!!true); print !false; print !!!false; \n}";
+    	String input = "class B {\n print (!true); print (!!true); print !false; print !!!false; def x:boolean; x = false; print !x;\n}";
     	System.out.println(input);
     	Program program = (Program) parseCorrectInput(input);
     	assertNotNull(program);
