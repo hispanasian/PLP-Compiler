@@ -439,9 +439,15 @@ public class TypeCheckVisitor implements ASTVisitor, TypeConstants {
 	}
 
 	@Override
+	/**
+	 * Size takes in a List, hence the type of the expression must be of Ljava/util/List
+	 */
 	public Object visitSizeExpression(SizeExpression sizeExpression, Object arg)
 			throws Exception {
-		throw new UnsupportedOperationException("not yet implemented");
+		check(sizeExpression.getType().contains("Ljava/util/List"),
+				"Size() must be given a list",
+				sizeExpression);
+		return intType;
 	}
 
 	@Override
