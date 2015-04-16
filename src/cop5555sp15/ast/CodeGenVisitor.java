@@ -6,6 +6,16 @@ import cop5555sp15.TypeConstants;
 
 import java.util.List;
 
+final class ExpArgPair {
+	Object arg;
+	Expression expression;
+
+	public ExpArgPair(Object arg, Expression expression) {
+		this.arg = arg;
+		this.expression = expression;
+	}
+}
+
 public class CodeGenVisitor implements ASTVisitor, Opcodes, TypeConstants {
 
 	ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
@@ -40,15 +50,15 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes, TypeConstants {
 			AssignmentStatement assignmentStatement, Object arg)
 			throws Exception {
 		MethodVisitor mv = ((InheritedAttributes) arg).mv;
-		LValue lval = assignmentStatement.lvalue;
+		ExpArgPair pair = new ExpArgPair(arg, assignmentStatement.expression);
 
-		// Make the stack look like (for lvalue):
-		// bottom:[ .. | this(object holding lvalue) | val ]:top
+
+		// Make the stack look like:
+		// bottom:[ .. | this(object holding lvalue) ]:top
 		mv.visitVarInsn(ALOAD, 0);
-		assignmentStatement.expression.visit(this, arg); // Load expression to the top of the stack
 
 		// Now our stack looks like what we want
-		assignmentStatement.lvalue.visit(this, arg); // Load lvalue to the top of the stack
+		assignmentStatement.lvalue.visit(this, pair); // Load lvalue to the top of the stack
 		return null;
 	}
 
@@ -245,10 +255,35 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes, TypeConstants {
 	}
 
 	@Override
+	/**
+	 * Stores the top most element of the list at a provided index. The stack should look like:
+	 * bottom:[ .. | this(object holding lvalue) ]:top
+	 * TODO: Currently, this method treats all variables as global and in the same class, change this
+	 */
 	public Object visitExpressionLValue(ExpressionLValue expressionLValue,
 			Object arg) throws Exception {
-		throw new UnsupportedOperationException(
-				"code generation not yet implemented");
+		ExpArgPair pair = (ExpArgPair) arg;
+		MethodVisitor mv = ((InheritedAttributes) pair.arg).mv;
+
+		// We want to make the stack look like:
+		// bottom:[ .. | list | index | val ]:top
+
+		// Let's first start by getting the list
+		mv.visitFieldInsn(GETFIELD, className, expressionLValue.identToken.getText(),
+				"Ljava/util/List;");
+		expressionLValue.expression.visit(this, pair.arg); // Get index
+		pair.expression.visit(this, pair.arg); // Get value to be stored
+
+		// Handle some special cases
+		if (pair.expression.getType().equals(intType))
+			mv.visitMethodInsn(INVOKESTATIC, "java/lang/Integer", "valueOf", "(I)Ljava/lang/Integer;", false);
+		else if (pair.expression.getType().equals(booleanType))
+			mv.visitMethodInsn(INVOKESTATIC, "java/lang/Boolean", "valueOf", "(Z)Ljava/lang/Boolean;", false);
+
+		mv.visitMethodInsn(INVOKEINTERFACE, "java/util/List", "set", "(ILjava/lang/Object;)Ljava/lang/Object;", true);
+		mv.visitInsn(POP);
+
+		return null;
 	}
 
 	@Override
@@ -278,13 +313,21 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes, TypeConstants {
 	/**
 	 * Stores the top most element of the stack into the this variable. Note, the stack should look
 	 * like:
-	 * bottom:[ .. | this(object holding lvalue) | val ]:top
+	 * bottom:[ .. | this(object holding lvalue) ]:top
 	 * TODO: Currently, this method treats all variables as global and in the same class, change this
 	 */
 	public Object visitIdentLValue(IdentLValue identLValue, Object arg)
 			throws Exception {
-		MethodVisitor mv = ((InheritedAttributes) arg).mv;
+		ExpArgPair pair = (ExpArgPair) arg;
+		MethodVisitor mv = ((InheritedAttributes) pair.arg).mv;
 		String type = identLValue.getType();
+
+		// Put expression onto the stack
+		pair.expression.visit(this, pair.arg); // Load expression to the top of the stack
+
+		// Now our stack looks like:
+		// bottom:[ .. | this(object holding lvalue) | val ]:top
+		// We can now proceed to put the value into the variable
 
 		// Check if type is a list
 		if(type.contains(listInterface)) type = listInterface+";";

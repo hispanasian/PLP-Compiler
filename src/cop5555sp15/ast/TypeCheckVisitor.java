@@ -42,7 +42,7 @@ public class TypeCheckVisitor implements ASTVisitor, TypeConstants {
 		Expression exp = assignmentStatement.expression;
 
 		Declaration ldec = (Declaration)lval.visit(this, arg); // Ensure lval exists
-		exp.visit(this, arg); // Determine type of expression
+		String expType = (String)exp.visit(this, arg); // Determine type of expression
 
 		// Time to find the type
 		if(ldec instanceof VarDec)
@@ -55,20 +55,32 @@ public class TypeCheckVisitor implements ASTVisitor, TypeConstants {
 			// Check list types
 			else if(ltype instanceof ListType)
 			{
-				// Check empty list
-				if(exp.getType().equals(emptyList))
-				{
-					check(ltype.getJVMType().contains("Ljava/util/List"), // the interface
-							"cannot assign expression to a variable of different type",
+				ListType list = (ListType) ltype;
+				// Check if we are assigning a list to a list or a value to a list at a given index
+				if(lval instanceof IdentLValue)
+				{ // We are assigning a list to a list var
+					// Check empty list
+					if(expType.equals(emptyList))
+					{
+						check(ltype.getJVMType().contains("Ljava/util/List"), // the interface
+								"cannot assign expression to a variable of different type",
+								assignmentStatement);
+					}
+					// Check lists with types
+					else
+					{
+						check(ltype.getJVMType().equals(exp.getType()),
+								"cannot assign expression to a variable of different type",
+								assignmentStatement);
+					}
+				}
+				else if(lval instanceof ExpressionLValue)
+				{ // We are setting the value of a list at a given index
+					check(list.getElementType().equals(expType),
+							"Expression must be of the same type as the list's element",
 							assignmentStatement);
 				}
-				// Check lists with types
-				else
-				{
-					check(ltype.getJVMType().equals(exp.getType()),
-							"cannot assign expression to a variable of different type",
-							assignmentStatement);
-				}
+				else throw new UnsupportedOperationException("Unknown lval type encountered");
 			}
 			// Check remaining types
 			else check(ltype.getJVMType().equals(exp.getType()),
@@ -219,7 +231,24 @@ public class TypeCheckVisitor implements ASTVisitor, TypeConstants {
 	@Override
 	public Object visitExpressionLValue(ExpressionLValue expressionLValue,
 			Object arg) throws Exception {
-		throw new UnsupportedOperationException("not yet implemented");
+		Declaration dec = symbolTable.lookup(expressionLValue.identToken.getText());
+		check(dec != null, "cannot use undeclared variable", expressionLValue);
+
+		check(dec instanceof VarDec,
+				"expected a list type here",
+				expressionLValue);
+
+		Type type = ((VarDec) dec).type;
+		check(type instanceof ListType,
+				"expected a list type here",
+				expressionLValue);
+
+		// We can only obtain an int from this expression
+		check(expressionLValue.expression.visit(this, arg).equals(intType),
+				"list index must be an int",
+				expressionLValue);
+
+		return null;
 	}
 
 	@Override
