@@ -3,27 +3,9 @@ package cop5555sp15;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
-import java.io.File;
 import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.lang.reflect.Method;
 import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.Arrays;
-import java.util.List;
 
-//import jdk.internal.org.objectweb.asm.tree.AbstractInsnNode;
-//import jdk.internal.org.objectweb.asm.tree.ClassNode;
-//import jdk.internal.org.objectweb.asm.tree.InsnList;
-//import jdk.internal.org.objectweb.asm.tree.MethodNode;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.tree.AbstractInsnNode;
-import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.tree.InsnList;
-import org.objectweb.asm.tree.MethodNode;
-import org.objectweb.asm.util.*;
 import org.junit.Test;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.util.TraceClassVisitor;
@@ -45,7 +27,7 @@ public class TestCodeGenerationAssignment5 {
         public Class<?> define(String className, byte[] bytecode) {
             return super.defineClass(className, bytecode, 0, bytecode.length);
         }
-    };    
+    }
 
  public void dumpBytecode(byte[] bytecode){   
     int flags = ClassReader.SKIP_DEBUG;

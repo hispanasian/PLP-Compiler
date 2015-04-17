@@ -667,7 +667,7 @@ public class Assignment4Tests {
 	/*  similar to above except with a boolean.
 	 *
 	 * output:
-	 * almost done
+	 * false
 	 */
 	public void booleanVariable() throws Exception{
 		System.out.println("***********booleanVariable");
@@ -686,7 +686,7 @@ public class Assignment4Tests {
 	/*  similar to above except with a string.
 	 *
 	 * output:
-	 * false
+	 * almost done
 	 */
 	public void stringVariable() throws Exception{
 		System.out.println("***********stringVariable");
@@ -762,7 +762,7 @@ public class Assignment4Tests {
 		typeCheckIncorrectAST(program);
 	}
 
-//	@Test
+	@Test
 	/**
 	 * TODO: Get test to work
 	 * A test that should fail due to the use of an undeclared variable
