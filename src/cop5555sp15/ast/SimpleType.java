@@ -25,4 +25,11 @@ public class SimpleType extends Type {
 		else return "Ljava/lang/String;";
 	}
 
+	@Override
+	String getDesc() {
+		return getJVMType();
+	}
+
+	@Override
+	String getSignature() { return null; }
 }

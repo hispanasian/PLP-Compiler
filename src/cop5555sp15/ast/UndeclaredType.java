@@ -20,7 +20,10 @@ public class UndeclaredType extends Type {
 	}
 
 
+	@Override
+	String getDesc() {
+		return null;
+	}
 	
-	
-
+	@Override String getSignature() { return null; }
 }

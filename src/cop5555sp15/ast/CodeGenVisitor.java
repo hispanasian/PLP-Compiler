@@ -1,9 +1,20 @@
 package cop5555sp15.ast;
 
-import com.sun.org.apache.xpath.internal.operations.NotEquals;
 import org.objectweb.asm.*;
 import cop5555sp15.TokenStream.Kind;
 import cop5555sp15.TypeConstants;
+
+import java.util.List;
+
+final class ExpArgPair {
+	Object arg;
+	Expression expression;
+
+	public ExpArgPair(Object arg, Expression expression) {
+		this.arg = arg;
+		this.expression = expression;
+	}
+}
 
 public class CodeGenVisitor implements ASTVisitor, Opcodes, TypeConstants {
 
@@ -39,13 +50,15 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes, TypeConstants {
 			AssignmentStatement assignmentStatement, Object arg)
 			throws Exception {
 		MethodVisitor mv = ((InheritedAttributes) arg).mv;
-		LValue lval = assignmentStatement.lvalue;
+		ExpArgPair pair = new ExpArgPair(arg, assignmentStatement.expression);
+
 
 		// Make the stack look like:
-		// bottom:[ .. | this(object holding lvalue) | val ]:top
+		// bottom:[ .. | this(object holding lvalue) ]:top
 		mv.visitVarInsn(ALOAD, 0);
-		assignmentStatement.expression.visit(this, arg); // Load expression to the top of the stack
-		assignmentStatement.lvalue.visit(this, arg); // Load expression to the top of the stack
+
+		// Now our stack looks like what we want
+		assignmentStatement.lvalue.visit(this, pair); // Load lvalue to the top of the stack
 		return null;
 	}
 
@@ -242,10 +255,63 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes, TypeConstants {
 	}
 
 	@Override
+	/**
+	 * Stores the top most element of the list at a provided index. The stack should look like:
+	 * bottom:[ .. | this(object holding lvalue) ]:top
+	 * TODO: Currently, this method treats all variables as global and in the same class, change this
+	 */
 	public Object visitExpressionLValue(ExpressionLValue expressionLValue,
 			Object arg) throws Exception {
-		throw new UnsupportedOperationException(
-				"code generation not yet implemented");
+		ExpArgPair pair = (ExpArgPair) arg;
+		MethodVisitor mv = ((InheritedAttributes) pair.arg).mv;
+
+		// First, let's make sure that the list can fit the element. So, add null to the list until
+		// we have enough elements to hold the desired value.
+
+		Label l0 = new Label();
+		mv.visitJumpInsn(GOTO, l0);
+		Label l1 = new Label();
+		mv.visitLabel(l1);
+//		mv.visitFrame(Opcodes.F_APPEND, 1, new Object[]{Opcodes.INTEGER}, 0, null);
+//		mv.visitVarInsn(ALOAD, 0);
+		mv.visitInsn(DUP); // make sure we sitll have the this reference for the set
+		mv.visitFieldInsn(GETFIELD, className, expressionLValue.identToken.getText(),
+				"Ljava/util/List;"); // get the list
+		mv.visitInsn(ACONST_NULL);
+		mv.visitMethodInsn(INVOKEINTERFACE, "java/util/List", "add", "(Ljava/lang/Object;)Z", true);
+		mv.visitInsn(POP);
+		mv.visitLabel(l0);
+//		mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
+		mv.visitVarInsn(ALOAD, 0);
+		mv.visitFieldInsn(GETFIELD, className, expressionLValue.identToken.getText(),
+				"Ljava/util/List;"); // get the list
+		mv.visitMethodInsn(INVOKEINTERFACE, "java/util/List", "size", "()I", true);
+		expressionLValue.expression.visit(this, pair.arg); // Get index
+		mv.visitInsn(ICONST_1);
+		mv.visitInsn(IADD); // increment the index by 1 so we can make sure the size can fit the index
+		mv.visitJumpInsn(IF_ICMPLT, l1);
+		
+		// now we can continue on with life...
+
+		// We want to make the stack look like:
+		// bottom:[ .. | list | index | val ]:top
+
+		// Let's first start by getting the list
+		mv.visitFieldInsn(GETFIELD, className, expressionLValue.identToken.getText(),
+				"Ljava/util/List;");
+		expressionLValue.expression.visit(this, pair.arg); // Get index
+		pair.expression.visit(this, pair.arg); // Get value to be stored
+
+		// Handle some special cases
+		if (pair.expression.getType().equals(intType))
+			mv.visitMethodInsn(INVOKESTATIC, "java/lang/Integer", "valueOf", "(I)Ljava/lang/Integer;", false);
+		else if (pair.expression.getType().equals(booleanType))
+			mv.visitMethodInsn(INVOKESTATIC, "java/lang/Boolean", "valueOf", "(Z)Ljava/lang/Boolean;", false);
+
+		mv.visitMethodInsn(INVOKEINTERFACE, "java/util/List", "set", "(ILjava/lang/Object;)Ljava/lang/Object;", true);
+		mv.visitInsn(POP);
+
+		return null;
 	}
 
 	@Override
@@ -267,7 +333,7 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes, TypeConstants {
 		// Load
 		mv.visitVarInsn(ALOAD, 0);
 		mv.visitFieldInsn(GETFIELD, className, identExpression.identToken.getText(),
-				identExpression.getType());
+				identExpression.getDesc());
 		return null;
 	}
 
@@ -275,28 +341,68 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes, TypeConstants {
 	/**
 	 * Stores the top most element of the stack into the this variable. Note, the stack should look
 	 * like:
-	 * bottom:[ .. | this(object holding lvalue) | val ]:top
+	 * bottom:[ .. | this(object holding lvalue) ]:top
 	 * TODO: Currently, this method treats all variables as global and in the same class, change this
 	 */
 	public Object visitIdentLValue(IdentLValue identLValue, Object arg)
 			throws Exception {
-		MethodVisitor mv = ((InheritedAttributes) arg).mv;
-		mv.visitFieldInsn(PUTFIELD, className, identLValue.firstToken.getText(), identLValue.getType());
+		ExpArgPair pair = (ExpArgPair) arg;
+		MethodVisitor mv = ((InheritedAttributes) pair.arg).mv;
+		String type = identLValue.getType();
+
+		// Put expression onto the stack
+		pair.expression.visit(this, pair.arg); // Load expression to the top of the stack
+
+		// Now our stack looks like:
+		// bottom:[ .. | this(object holding lvalue) | val ]:top
+		// We can now proceed to put the value into the variable
+
+		// Check if type is a list
+		if(type.contains(listInterface)) type = listInterface+";";
+
+		// Now put the object on the stack into the variable
+		mv.visitFieldInsn(PUTFIELD, className, identLValue.firstToken.getText(), type);
 		return null;
 	}
 
 	@Override
+	/**
+	 * This expects that the call to expression.visit will put the result of the expression on top
+	 * of the stack (and the result will be a boolean).
+	 */
 	public Object visitIfElseStatement(IfElseStatement ifElseStatement,
 			Object arg) throws Exception {
-		throw new UnsupportedOperationException(
-				"code generation not yet implemented");
+		MethodVisitor mv = ((InheritedAttributes) arg).mv;
+		ifElseStatement.expression.visit(this, arg); // put the result of the expression on the stack
+
+		Label l0 = new Label();
+		mv.visitJumpInsn(IFEQ, l0); // if the expression is equal to 0 (false), jump to l0
+		ifElseStatement.ifBlock.visit(this, arg); // Execute the if block
+		Label l1 = new Label();
+		mv.visitJumpInsn(GOTO, l1);
+		mv.visitLabel(l0);
+		ifElseStatement.elseBlock.visit(this, arg); // Execute else block
+		mv.visitLabel(l1);
+
+		return null;
 	}
 
 	@Override
+	/**
+	 * This expects that the call to expression.visit will put the result of the expression on top
+	 * of the stack (and the result will be a boolean).
+	 */
 	public Object visitIfStatement(IfStatement ifStatement, Object arg)
 			throws Exception {
-		throw new UnsupportedOperationException(
-				"code generation not yet implemented");
+		MethodVisitor mv = ((InheritedAttributes) arg).mv;
+		ifStatement.expression.visit(this, arg); // put the result of the expression on the stack
+
+		Label l0 = new Label();
+		mv.visitJumpInsn(IFEQ, l0); // if the expression is equal to 0 (false), jump to l0
+		ifStatement.block.visit(this, arg); // execute the if block
+		mv.visitLabel(l0);
+
+		return null;
 	}
 
 	@Override
@@ -329,18 +435,79 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes, TypeConstants {
 	}
 
 	@Override
+	/**
+	 * Puts the REFERENCE to an object that is created from the listExpression onto the top of the
+	 * stack
+	 */
 	public Object visitListExpression(ListExpression listExpression, Object arg)
 			throws Exception {
-		throw new UnsupportedOperationException(
-				"code generation not yet implemented");
+		MethodVisitor mv = ((InheritedAttributes) arg).mv;
+		List<Expression> expression = listExpression.expressionList;
+
+		// First, create the new list
+		mv.visitTypeInsn(NEW, "java/util/ArrayList");
+		mv.visitInsn(DUP);
+		mv.visitMethodInsn(INVOKESPECIAL, "java/util/ArrayList", "<init>", "()V", false);
+
+		// Now, populate the List with the values
+		for(int i = 0; i < expression.size(); i++)
+		{
+			mv.visitInsn(DUP);  // Keep two references of the object on top of the stack. This way
+								// we can keep a reference for future adds/leave a copy on top after
+								// populating it
+
+			expression.get(i).visit(this, arg); // Put the expression onto the stack
+
+			// Handle some special cases
+			if(expression.get(i).getType().equals(intType))
+				mv.visitMethodInsn(INVOKESTATIC, "java/lang/Integer", "valueOf", "(I)Ljava/lang/Integer;", false);
+			else if(expression.get(i).getType().equals(booleanType))
+				mv.visitMethodInsn(INVOKESTATIC, "java/lang/Boolean", "valueOf", "(Z)Ljava/lang/Boolean;", false);
+
+			// Continue
+			mv.visitMethodInsn(INVOKEINTERFACE, "java/util/List", "add", "(Ljava/lang/Object;)Z", true);
+			mv.visitInsn(POP); // remove returned boolean
+		}
+
+		// The call to DUP should ensure that this is on the top of the stack
+		return null;
 	}
 
 	@Override
+	/**
+	 * Load the VALUE of the element in the list located at the provided expression onto the top of
+	 * the stack
+	 * TODO: Currently, this method treats all variables as global and in the same class, change this
+	 */
 	public Object visitListOrMapElemExpression(
 			ListOrMapElemExpression listOrMapElemExpression, Object arg)
 			throws Exception {
-		throw new UnsupportedOperationException(
-				"code generation not yet implemented");
+		MethodVisitor mv = ((InheritedAttributes) arg).mv;
+		// Load object onto stack
+		mv.visitVarInsn(ALOAD, 0); // this
+		mv.visitFieldInsn(GETFIELD, className, listOrMapElemExpression.identToken.getText(),
+				"Ljava/util/List;");
+		listOrMapElemExpression.expression.visit(this, arg); // find index we want to load
+		mv.visitMethodInsn(INVOKEINTERFACE, "java/util/List", "get", "(I)Ljava/lang/Object;", true);;
+
+		// Now we want to check if we have an integer or boolean. If we do, cast it to an int or
+		// bool (respectively)
+		if(listOrMapElemExpression.getType().equals(intType))
+		{
+			mv.visitTypeInsn(CHECKCAST, "java/lang/Integer");
+			mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Integer", "intValue", "()I", false);
+		}
+		else if(listOrMapElemExpression.getType().equals(booleanType))
+		{
+			mv.visitTypeInsn(CHECKCAST, "java/lang/Boolean");
+			mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Boolean", "booleanValue", "()Z", false);
+		}
+		else if(listOrMapElemExpression.getType().equals(stringType))
+		{
+			mv.visitTypeInsn(CHECKCAST, "java/lang/String");
+		}
+
+		return null;
 	}
 
 	@Override
@@ -472,10 +639,15 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes, TypeConstants {
 	}
 
 	@Override
+	/**
+	 * This expects that expression.visit() will put the referenced object onto the stack
+	 */
 	public Object visitSizeExpression(SizeExpression sizeExpression, Object arg)
 			throws Exception {
-		throw new UnsupportedOperationException(
-				"code generation not yet implemented");
+		MethodVisitor mv = ((InheritedAttributes) arg).mv; // this should be the
+		sizeExpression.expression.visit(this, arg); // put expression (list) on top of the stack
+		mv.visitMethodInsn(INVOKEINTERFACE, "java/util/List", "size", "()I", true);
+		return null;
 	}
 
 	@Override
@@ -493,10 +665,35 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes, TypeConstants {
 	}
 
 	@Override
+	/**
+	 * This method expects that the expression (when visited) will put the value of the expression
+	 * on the top of the stack. In turn, this method will put the value of this UnaryExpression
+	 * on top of the stack.
+	 */
 	public Object visitUnaryExpression(UnaryExpression unaryExpression,
 			Object arg) throws Exception {
-		throw new UnsupportedOperationException(
-				"code generation not yet implemented");
+		MethodVisitor mv = ((InheritedAttributes) arg).mv;
+		unaryExpression.expression.visit(this, arg); // Put the value of the expression on top of the stack
+
+		switch (unaryExpression.op.kind)
+		{
+			case MINUS:
+				mv.visitInsn(INEG);
+				break;
+			case NOT:
+				Label l0 = new Label();
+				mv.visitJumpInsn(IFEQ, l0); // if val is equal to 0, jump to l1 (put 1 on stack)
+				mv.visitInsn(ICONST_0);
+				Label l1 = new Label();
+				mv.visitJumpInsn(GOTO, l1);
+				mv.visitLabel(l0);
+				mv.visitInsn(ICONST_1);
+				mv.visitLabel(l1);
+				break;
+			default:
+				throw new Exception("Parsing failed, this is not a Unary Expression");
+		}
+		return null;
 	}
 
 	@Override
@@ -508,7 +705,7 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes, TypeConstants {
 
 	@Override
 	public Object visitVarDec(VarDec varDec, Object arg) throws Exception {
-		fv = cw.visitField(0, varDec.identToken.getText(), varDec.type.getJVMType(), null, null);
+		fv = cw.visitField(0, varDec.identToken.getText(), varDec.type.getDesc(), varDec.type.getSignature(), null);
 		fv.visitEnd(); // maybe put this at the end of the program? @TODO: check
 		return null;
 	}
@@ -529,10 +726,23 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes, TypeConstants {
 	}
 
 	@Override
+	/**
+	 * This expects that the call to expression.visit will put the result of the expression on top
+	 * of the stack (and the result will be a boolean).
+	 */
 	public Object visitWhileStatement(WhileStatement whileStatement, Object arg)
 			throws Exception {
-		throw new UnsupportedOperationException(
-				"code generation not yet implemented");
+		MethodVisitor mv = ((InheritedAttributes) arg).mv;
+		Label l0 = new Label();
+		Label l1 = new Label();
+		mv.visitLabel(l0);
+		whileStatement.expression.visit(this, arg); // put the result of the expression on the stack
+		mv.visitJumpInsn(IFEQ, l1); // if the expression is equal to 0 (false), jump to l1
+		whileStatement.block.visit(this, arg);
+		mv.visitJumpInsn(GOTO, l0); // loop
+		mv.visitLabel(l1);
+
+		return null;
 	}
 
 	@Override

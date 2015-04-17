@@ -15,12 +15,25 @@ public class ListType extends Type {
 	@Override
 	public String getJVMType() {
 		String elementType = type.getJVMType();
-		return "Ljava/util/List<"+elementType+">;";	
+		if(elementType.equals("I")) elementType = "Ljava/lang/Integer;";
+		else if(elementType.equals("Z")) elementType = "Ljava/lang/Boolean;";
+		return "Ljava/util/List<"+elementType+">;";
 	}
+
+	@Override
+	public String getDesc() {
+		return "Ljava/util/List;";
+	}
+
+	@Override
+	public String getSignature() {
+		return getJVMType();
+	}
+
+	public String getElementType() { return type.getJVMType(); }
 	
 	public static String prefix(){
 		return "Ljava/util/List";
 	}
-
 
 }
