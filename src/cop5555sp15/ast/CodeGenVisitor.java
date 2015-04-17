@@ -265,6 +265,34 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes, TypeConstants {
 		ExpArgPair pair = (ExpArgPair) arg;
 		MethodVisitor mv = ((InheritedAttributes) pair.arg).mv;
 
+		// First, let's make sure that the list can fit the element. So, add null to the list until
+		// we have enough elements to hold the desired value.
+
+		Label l0 = new Label();
+		mv.visitJumpInsn(GOTO, l0);
+		Label l1 = new Label();
+		mv.visitLabel(l1);
+//		mv.visitFrame(Opcodes.F_APPEND, 1, new Object[]{Opcodes.INTEGER}, 0, null);
+//		mv.visitVarInsn(ALOAD, 0);
+		mv.visitInsn(DUP); // make sure we sitll have the this reference for the set
+		mv.visitFieldInsn(GETFIELD, className, expressionLValue.identToken.getText(),
+				"Ljava/util/List;"); // get the list
+		mv.visitInsn(ACONST_NULL);
+		mv.visitMethodInsn(INVOKEINTERFACE, "java/util/List", "add", "(Ljava/lang/Object;)Z", true);
+		mv.visitInsn(POP);
+		mv.visitLabel(l0);
+//		mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
+		mv.visitVarInsn(ALOAD, 0);
+		mv.visitFieldInsn(GETFIELD, className, expressionLValue.identToken.getText(),
+				"Ljava/util/List;"); // get the list
+		mv.visitMethodInsn(INVOKEINTERFACE, "java/util/List", "size", "()I", true);
+		expressionLValue.expression.visit(this, pair.arg); // Get index
+		mv.visitInsn(ICONST_1);
+		mv.visitInsn(IADD); // increment the index by 1 so we can make sure the size can fit the index
+		mv.visitJumpInsn(IF_ICMPLT, l1);
+		
+		// now we can continue on with life...
+
 		// We want to make the stack look like:
 		// bottom:[ .. | list | index | val ]:top
 
@@ -462,7 +490,7 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes, TypeConstants {
 		listOrMapElemExpression.expression.visit(this, arg); // find index we want to load
 		mv.visitMethodInsn(INVOKEINTERFACE, "java/util/List", "get", "(I)Ljava/lang/Object;", true);;
 
-		// Now we want to check if we have an integer or boolean. If we do, ast it to an int or
+		// Now we want to check if we have an integer or boolean. If we do, cast it to an int or
 		// bool (respectively)
 		if(listOrMapElemExpression.getType().equals(intType))
 		{
@@ -473,6 +501,10 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes, TypeConstants {
 		{
 			mv.visitTypeInsn(CHECKCAST, "java/lang/Boolean");
 			mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Boolean", "booleanValue", "()Z", false);
+		}
+		else if(listOrMapElemExpression.getType().equals(stringType))
+		{
+			mv.visitTypeInsn(CHECKCAST, "java/lang/String");
 		}
 
 		return null;
