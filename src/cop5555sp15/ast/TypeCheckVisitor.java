@@ -393,6 +393,7 @@ public class TypeCheckVisitor implements ASTVisitor, TypeConstants {
 			// counterparts
 			if(type.equals(intType)) type = ListType.prefix()+"<L"+intObjectType+";>;";
 			else if(type.equals(booleanType)) type = ListType.prefix()+"<L"+booleanObjectType+";>;";
+			else type = ListType.prefix()+"<"+type+">;";
 		}
 		listExpression.setFields(type, listInterface+";");
 		return type;
