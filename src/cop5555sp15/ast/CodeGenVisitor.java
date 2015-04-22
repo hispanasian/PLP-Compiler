@@ -705,7 +705,7 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes, TypeConstants {
 
 	@Override
 	public Object visitVarDec(VarDec varDec, Object arg) throws Exception {
-		fv = cw.visitField(0, varDec.identToken.getText(), varDec.type.getDesc(), varDec.type.getSignature(), null);
+		fv = cw.visitField(ACC_PUBLIC, varDec.identToken.getText(), varDec.type.getDesc(), varDec.type.getSignature(), null);
 		fv.visitEnd(); // maybe put this at the end of the program? @TODO: check
 		return null;
 	}
