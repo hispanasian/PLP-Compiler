@@ -39,8 +39,6 @@ public class CodeletBuilder {
         Parser parser = new Parser(stream);
         System.out.println();
         ASTNode ast = parser.parse();
-        if (ast == null) System.out.println("Syntax errors found.");
-        assertNotNull(ast);
         return ast;
     }
 
@@ -77,7 +75,7 @@ public class CodeletBuilder {
     public static Codelet newInstance(String source) throws Exception
     {
         Program program = (Program) parseSource(source);
-        if(program == null) throw new Exception("Error occurred when parsing source.");
+        if(program == null) throw new Exception("Syntax errors found.");
         typeCheckAST(program);
         byte[] bytecode = generateByteCode(program);
         if(bytecode == null) throw new Exception("Error occurred when generating code.");
